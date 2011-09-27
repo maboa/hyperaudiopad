@@ -327,8 +327,6 @@
 		// Sets the excerpt
 
 		$('#transcript-content').mouseup(function(e){     
-
-
 	 		var select = getSelText(); 
 	  		var tweetable = select+"";  
 
@@ -343,7 +341,7 @@
 				if (endSpan == null) {
 					endSpan = select.focusNode.parentNode;
 				}
-			}     
+			}
 			
 			// Flip if end time is less than start time (ie the text was selected backwards)
 			
@@ -360,10 +358,10 @@
 			console.log(endSpan);   
 			var nextSpan = startSpan;
 			while(nextSpan != endSpan) {    
-				console.log(nextSpan);         
-				$(nextSpan).clone().appendTo('#target-content');
-				$('#target-content').append(' '); 
-				nextSpan = getNextNode(nextSpan,true,endSpan);  
+			//for (i=0; i<10; i++) {
+				nextSpan = getNextNode(nextSpan,true,endSpan);     
+				$(nextSpan).appendTo('#target-content');  
+				console.log(nextSpan); 
 			}
 			  
 			//console.log(startSpan.nextElementSibling); 
@@ -539,8 +537,9 @@
  		</div>  
 
 		<!-- pasteable part -->
-        <p><h1>Target</h1></p>
+
 		<div id="target-content" contenteditable="true">
+			Paste here.
 		</div>
     
         <!-- BEGIN #footer -->
