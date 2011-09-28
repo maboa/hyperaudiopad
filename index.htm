@@ -17,10 +17,11 @@
 
 	
 	<!-- Stylesheets -->
-    <!--<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Serif:regular,italic,bold,bolditalic" type="text/css" />
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Sans:regular,bold" type="text/css" />      -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Serif:regular,italic,bold,bolditalic" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Sans:regular,bold" type="text/css" />
 	<link rel="stylesheet" href="style.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="circleplayer.css" type="text/css" media="screen" />   
+	<!--<link rel="stylesheet" href="circleplayer.css" type="text/css" media="screen" /> -->
+    <link rel="stylesheet" type="text/css" media="all" href="scrollpane.css" />  
 	
 	<!-- Magick -->      
 	
@@ -32,7 +33,8 @@
 	<script type="text/javascript" src="js/jquery.jplayer.js"></script>      
 	<script type="text/javascript" src="js/mod.csstransforms.min.js"></script>
 	<script type="text/javascript" src="js/popcorn.js"></script> 
-	<script type="text/javascript" src="js/popcorn.transcript.js"></script>  
+	<script type="text/javascript" src="js/popcorn.transcript.js"></script> 
+    <script type="text/javascript" src="js/jscrollpane.js"></script>  
 	
 	<script type="text/javascript">
 	$(document).ready(function(){    
@@ -117,6 +119,14 @@
 		// transcript links to audio
 
 		$('#transcript').delegate('span','click',function(){  
+			var jumpTo = $(this).attr('m')/1000; 
+
+			myPlayer.jPlayer("play",jumpTo);    
+		   
+			return false;
+		}); 
+		
+		$('#target-content').delegate('span','click',function(){  
 			var jumpTo = $(this).attr('m')/1000; 
 
 			myPlayer.jPlayer("play",jumpTo);    
@@ -267,7 +277,25 @@
 		/* load in the file */  
 
 		function initPopcorn(id) {   
-			var p = Popcorn(id);  
+			var p = Popcorn(id);
+			/*.code({
+			   start: 0,
+		       end: 2000,
+		       onStart: function (options) {
+		         console.log('start')
+		       },
+		       onFrame: (function () {
+		          var count = 0;
+		          return function (options) {
+
+		          console.log(this.Popcorn.instances[0].media.currentTime);
+
+		         }
+		       })(),
+		       onEnd: function (options) {
+		         console.log('end');
+		       }
+			}); */   
 
 			$("#transcript-content span").each(function(i) {  
 				p.transcript({
@@ -297,7 +325,9 @@
 			    myPlayer.jPlayer("setMedia", {
 	         		mp3: audiomp3, 
 					oga: audioogg  
-	       		}); 
+	       		});   
+	
+				$('.scroll-pane').jScrollPane();
 	
 				
 			});
@@ -345,43 +375,76 @@
 				}
 			}     
 			
-			// Flip if end time is less than start time (ie the text was selected backwards)
 			
-			var startTime = startSpan.getAttribute('m');
-			var endTime = endSpan.getAttribute('m');   
-			        
-			var tempSpan = endSpan;
-			if (endTime < startTime) {
-				endSpan = startSpan;
-				startSpan = tempSpan;
+			   
+			// if either are null we have a problem basically, a problem that should be solved
+			if (startSpan != null && endSpan != null) {
+			
+				// Flip if end time is less than start time (ie the text was selected backwards)
+		
+				var startTime = startSpan.getAttribute('m');
+				var endTime = endSpan.getAttribute('m');   
+		        
+				var tempSpan = endSpan;
+				var tempTime = endTime;
+				
+				if (endTime < startTime) {
+					endSpan = startSpan; 
+					endTime = startTime;  
+					startSpan = tempSpan;
+					startTime = tempTime;
+				}   
+				
+                // check for single word click
+				if (getNextNode(startSpan,true,endSpan) != endSpan) {
+			        console.log('startspan'); 
+					console.log(startSpan);
+					console.log('endspan');    
+					console.log(endSpan);   
+
+
+
+					var nextSpan = startSpan; 
+					$('#target-content').append('<p>');
+					while(nextSpan != endSpan) { 
+						console.log('nextspan');   
+						console.log(nextSpan);         
+						$(nextSpan).clone().appendTo('#target-content');
+						$('#target-content').append(' '); 
+						nextSpan = getNextNode(nextSpan,true,endSpan);  
+					}
+					$('#target-content').append('</p>');   
+
+					var theScript = new Array();
+					var timespan = new Object;
+					timespan.s = startTime;
+					timespan.e = endTime; 
+					theScript.push(timespan);
+
+					console.dir(theScript);
+				}
+				
+				
+
+		  
+				//console.log(startSpan.nextElementSibling); 
+		
+		      
+				//console.log(getNextNode(startSpan,true,endSpan));
+				//var midspan = startSpan.nextSibling; 
+				//console.log(startSpan.parentNode.nextElementSibling);  
+			   	//console.log(endSpan);    
+		
+			   /* console.log('hhhhh');
+		
+			    var nextSpan = startSpan; 
+		
+				while (nextSpan != endSpan) {
+					nextSpan = nextSpan.nextSibling;
+					console.log(nextSpan);
+				}     */                      
+			
 			}
-			 
-			console.log(startSpan);   
-			console.log(endSpan);   
-			var nextSpan = startSpan;
-			while(nextSpan != endSpan) {    
-				console.log(nextSpan);         
-				$(nextSpan).clone().appendTo('#target-content');
-				$('#target-content').append(' '); 
-				nextSpan = getNextNode(nextSpan,true,endSpan);  
-			}
-			  
-			//console.log(startSpan.nextElementSibling); 
-			
-			      
-			//console.log(getNextNode(startSpan,true,endSpan));
-			//var midspan = startSpan.nextSibling; 
-			//console.log(startSpan.parentNode.nextElementSibling);  
-		   	//console.log(endSpan);    
-			
-		   /* console.log('hhhhh');
-			
-		    var nextSpan = startSpan; 
-			
-			while (nextSpan != endSpan) {
-				nextSpan = nextSpan.nextSibling;
-				console.log(nextSpan);
-			}     */
 			
 			
 		});
@@ -405,20 +468,28 @@
 		  //return node.nextSibling 
 				         //|| getNextNode(node.parentNode, true, endNode);
 		
-		};
+		};  
 		
- 
-		  
+		$('#instructions-btn').click(function(){   
+			
+			if($('#instructions').is(':visible')){
+				$('#instructions').fadeOut();
+			} else {
+				$('#instructions').fadeIn();
+			}
+			 
+			
+			return false;
+		});
 
-
-  	
 		
     });    
 
 
 
+	</script>
+    
 
-	</script>  
 	
 	<!-- END Magick -->
 	
@@ -428,138 +499,67 @@
 
 <!-- BEGIN body -->
 <body class="single single-post postid-4004 gecko layout-2cr">
-                               
-	<div>
-		<ul>
-			<li><a class="transcript-file" href="nitotmozilla-m" >Tristan Nitot on Firefox</a></li>
-			<li><a class="transcript-file" href="" >Transcript 2</a></li>
-			<li><a class="transcript-file" href="" >Transcript 3</a></li>
-		</ul>   
-		<a href="" id="test">test</a>
-	</div>
-
-	<!-- BEGIN #container -->
-
-	<div id="container">
-	
-		<!-- BEGIN #header -->
-		<div id="header" class="clearfix">
-        
-        	<!-- BEGIN #upper-wrap -->
-			<div id="upper-wrap" class="clearfix">
-
-
+<div id="container">
+	<div id="header" class="clearfix">
+		<div id="title"> 
 			
-    
-               <!-- <div id="logo">
-                                        What is Hyperaudio?
+		   
+            <div id="instructions" style="position:fixed;margin-top:36px;margin-left:160px;display:none">
+				<p>1. Select transcripts from the right hand pane.</p> 
+				<p>2. Transcripts will appear in the centre pane.</p> 
+				<p>3. Highlighted text in the centre pain will appear in the 'Mash-up' pane on the right hand side.</p> 
+			    <p>4. Transcripts can be navigated and played by clicking on the text.</p>
+			 </div>
+            <h1>Hyperaudio Pad</h1>
 
-                    <p id="tagline">hypertext + audio (tightly coupled)</p>
-                                  
-                </div> --> 
+              <div id="accordion"> 
+	
+                 <h2><a id="instructions-btn" href="#">Instructions</a></h2>
 
-
-
-            <!--END #upper-wrap-->
+              </div>
+		</div><!--END #title-->
+	</div><!--END #header-->           
+	
+	<div id="content">
+       	<div id="sidebar">
+            
+			<!-- player -->
+			<div id="jquery_jplayer_1" class="jp-jplayer"></div>
+			<div id="jp_container_1" class="player">
+				<ul class="jp-controls">
+					<li><a href="#" class="jp-play" tabindex="1">play</a></li>
+					<li><a href="#" class="jp-pause" style="display:none;" tabindex="1">pause</a></li>
+				</ul>
 			</div>
+              
+			<!-- transcript loader -->
 			
-		<!--END #header-->
-		</div>
+			<ul>
+				<li><a class="transcript-file" href="nitotmozilla-m" >Nitot on Firefox</a></li>
+				<li><a class="transcript-file" href="mbjkaudio" >HTML5 Audio</a></li>
+				<li><a class="transcript-file" href="" >Transcript 3</a><br/></li>  
+            </ul>
+			
+         </div><!-- end #sidebar -->    
 
-		<!--BEGIN #content -->
-		<div id="content" class="clearfix">
-
-			<!--BEGIN #primary .hfeed-->
-			<div id="primary" class="hfeed">
-            		
-							
-				<!--BEGIN .hentry -->
-				<div>	
-					<!-- Player -->
-
-					<div id="jquery_jplayer_1" class="jp-jplayer"></div>
-					<div id="jp_container_1" class="player">
-						<div id="buffer-holder" class="hold"> <!-- .gt50 only needed when buffer is > than 50% -->
-							<div id="buffer1" class="buffer">
-							</div>
-							<div id="buffer2" class="buffer fill" style="display:none"> <!-- this div, with extra .fill only needed when buffer is > than 50% -->
-							</div>
-						</div>       
-						<div id="circle-holder" class="hold"> <!-- .gt50 only needed when progress is > than 50% -->
-							<div id="progress1" class="progress">
-							</div>
-							<div id="progress2" class="progress fill" style="display:none"> <!-- this div, with extra .fill only needed when progress is > than 50% -->
-							</div>
-						</div>       
-						<div class="click-control"></div>
-						<ul class="jp-controls">
-							<li><a href="#" class="jp-play" tabindex="1">play</a></li>
-							<li><a href="#" class="jp-pause" style="display:none;" tabindex="1">pause</a></li>
-						</ul>
-					</div>
-
-					<!-- END Player -->                			
-					<!--<h2 class="entry-title">Hyperaudio Interview on Danish Radio's HardDisken Program</h2>-->
-                    <h2 id="script-title" class="entry-title"></h2>
-                                        
-					<!--BEGIN .clearfix -->
-                    <div class="clearfix">		
+         <h2 id="script-title" class="entry-title"></h2>
                     
-                        <!--BEGIN .entry-meta .entry-header-->
-
-                        <!--<div class="entry-meta entry-header"> 
-							<span class="author">Interview with <a href="https://twitter.com/#!/nitot">Tristan Nitot</a></span>
-                            <span class="author">By <a href="http://www.dr.dk/P1/harddisken/om_harddisken/20071204114844.htm">Anders Høgh Nissen</a></span>
-                            <span class="published">On <strong>April 3, 2011</strong></span>
-
-
-
-                                                    
-                        </div>    <!--END .entry-meta entry-header -->  
-    
-                        <!--BEGIN .entry-content -->
-                        <div id="transcript" class="entry-content">
-	
-							<!-- transcript goes here -->
-							<div id="transcript-content">
- 
-							</div>  
-                            
-                        <!--END .entry-content -->
-                        </div>
+		 <div id="transcript-hldr" class="scroll-pane">
+            <div id="transcript" class="entry-content">
+				<div id="transcript-content">
+                    
                         
-                    <!--END .clearfix -->
+                </div>
+            </div>
+         </div>        
 
-				    </div>     
-                          
-				<!--END .hentry-->  
-				</div>
-
-
- 		</div>  
-
-		<!-- pasteable part -->
-        <p><h1>Target</h1></p>
-		<div id="target-content" contenteditable="true">
-		</div>
-    
-        <!-- BEGIN #footer -->
-        <div id="footer" class="clearfix">
-        
-            <!--<p>Demo by <a href="http://twitter.com/maboa"> @maboa</a></p>-->
-
-
-        
-        <!-- END #footer -->
-        </div>
+		 <div id="mashup" class="scroll-pane">   
 	
-    <!-- END #footer-container -->
-	</div>
-		
-	<!-- Theme Hook -->
-
-			
-<!--END body-->
+		 	<div id="target-content" contenteditable="true">
+							
+			</div><!-- end #target-content -->    
+		 </div><!-- end #mashup --> 
+	</div><!-- end #content -->
+</div><!-- end #container --> 
 </body>
-<!--END html-->
 </html>

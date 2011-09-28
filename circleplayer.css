@@ -27,8 +27,7 @@ body {
 
 .player {
 	position: relative;
-	width: 200px;
-	height: 200px;
+	height: 125px;
 	background: url("graphics/bgr.jpg") 0 0 no-repeat;
 	margin: 0 auto;
 	padding: 48px;
