@@ -17,21 +17,17 @@
 
 	
 	<!-- Stylesheets -->
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Serif:regular,italic,bold,bolditalic" type="text/css" />
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Sans:regular,bold" type="text/css" />
+    <!--<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Serif:regular,italic,bold,bolditalic" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Sans:regular,bold" type="text/css" /> -->
 	<link rel="stylesheet" href="style.css" type="text/css" media="screen" />
-	<!--<link rel="stylesheet" href="circleplayer.css" type="text/css" media="screen" /> -->
     <link rel="stylesheet" type="text/css" media="all" href="scrollpane.css" />  
 	
 	<!-- Magick -->      
 	
 	<!-- Move jQuery Local! -->
      
-	<script type="text/javascript" src="js/jquery.min.js"></script>  
-	<script type="text/javascript" src="js/jquery.rotate.js"></script>
-	<script type="text/javascript" src="js/jquery.grab.js"></script> 
+	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/jquery.jplayer.js"></script>      
-	<script type="text/javascript" src="js/mod.csstransforms.min.js"></script>
 	<script type="text/javascript" src="js/popcorn.js"></script> 
 	<script type="text/javascript" src="js/popcorn.transcript.js"></script> 
     <script type="text/javascript" src="js/jscrollpane.js"></script>  
@@ -39,10 +35,7 @@
 	<script type="text/javascript">
 	$(document).ready(function(){    
 		
-		var cssTransforms = Modernizr.csstransforms;
-		
-	  	var myPlayer = $("#jquery_jplayer_1");        
-	
+	  	var myPlayer = $("#jquery_jplayer_1");
 	
 		// Utility
 
@@ -83,20 +76,7 @@
       	});
    
 
-		
-
-
-		function checkStartParam() {
-			if (getUrlVars()["s"] != null) {    
-				var s = parseInt(getUrlVars()["s"])/10;    
-
-				if (lang == 'en') {  
-				    playerEn.jPlayer("play",s);    
-				} else {        
-					playerDa.jPlayer("play",s);
-				}
-			}
-		}
+	   
 
 		// These events are fired as play time increments  
 
@@ -120,165 +100,67 @@
 
 		$('#transcript').delegate('span','click',function(){  
 			var jumpTo = $(this).attr('m')/1000; 
-
+            console.log('playing from '+jumpTo);
 			myPlayer.jPlayer("play",jumpTo);    
 		   
 			return false;
-		}); 
+		});     
+		
+		var index = "";
+		var filename = "";
+		var end = "";
+		var start = "";
+		
 		
 		$('#target-content').delegate('span','click',function(){  
-			var jumpTo = $(this).attr('m')/1000; 
+			var jumpTo = $(this).attr('m')/1000;   
+			
+			index = $(this).parent().attr('i'); 
+			
+			console.log("The Script");
+			console.dir(theScript);
+			          
+			console.log("....");      
+			
+			src = theScript[index].src;   
+			
+			console.log("Src = "+src);  
+				
+			var audiomp3 = src.replace('.mp3','').replace('.ogg','')+'.mp3';
+			var audioogg = src.replace('.mp3','').replace('.ogg','')+'.ogg';
 
-			myPlayer.jPlayer("play",jumpTo);    
+			myPlayer.jPlayer("setMedia", {
+	           mp3: audiomp3, 
+			   oga: audioogg  
+	       	}); 
+            
+            console.log('playing from .......'+jumpTo);
+			myPlayer.jPlayer("play",jumpTo);          
+			
+		    filename = $(this).parent().attr('f');  
+			end = $(this).parent().attr('e');  
+			start = $(this).parent().attr('s'); 
+			index = $(this).parent().attr('i'); 
 		   
 			return false;
 		});
 
-		function displayProgress(pc) {
- 			var degs = pc * 3.6+"deg";     
-            
-			// 24 x 104px sprites    
-			var spriteOffset = (Math.floor((Math.round(pc))*0.24)-1)*-104;   
 
-			if (pc <= 50) {   
-				if (cssTransforms) {  
-					$('#circle-holder').removeClass('gt50'); 
-					$('#progress1').css({rotate: degs});   
-					$('#progress1').removeClass('fallback');      
-				}
-				else { // fall back
-				    if (spriteOffset <= 0) {
-						$('#circle-holder').addClass('gt50');
-						$('#progress1').addClass('fallback');    
-						$('#progress1').css('background-position', '0 '+spriteOffset+'px');   
-					}  
-				}
-			
-				$('#progress2').hide();     
-			}
-			else if (pc <= 100) {
-				$('#circle-holder').addClass('gt50');   
-				if (cssTransforms) {
-					$('#progress1').css({rotate: '180deg'}); 
-					$('#progress2').css({rotate: degs}); 
-					$('#progress2').show();    
-				}
-				else { // fall back  
-					$('#progress1').css('background-position', '0 '+spriteOffset+'px');
-				}
-			}		
-		}
-		
-		function displayBuffered(pc) {
- 			var degs = pc * 3.6+"deg";   
+ 
 
-			if (pc <= 50) {   
-				$('#buffer-holder').removeClass('gt50');
-				$('#buffer1').css({rotate: degs}); 
-				$('#buffer2').hide();     
-			}
-			else if (pc <= 100) {
-				$('#buffer-holder').addClass('gt50');     
-				$('#buffer1').css({rotate: '180deg'}); 
-				$('#buffer2').show();
-				$('#buffer2').css({rotate: degs});
-			}		
-		}   
-		
-
-		
-        // This event fired as play time increments 
-
-		myPlayer.bind($.jPlayer.event.timeupdate, function(event) { 
-			var pc = event.jPlayer.status.currentPercentAbsolute;
-			if (!dragging) { 
-            	displayProgress(pc);
-			}
-		}); 
-		          
-		// This event fired as buffered time increments  
-		
-		myPlayer.bind($.jPlayer.event.progress, function(event) {    
-    			 
-			var audio = $('#jquery_jplayer_1').data("jPlayer").htmlElement.audio;
-			var pc = 0;    
-			 
-			// Fallback to event.jPlayer.status.seekPercent; if buffered not supported
-			 	
-			if((typeof audio.buffered === "object") && (audio.buffered.length > 0)) {
-				pc = (audio.duration > 0) ? 100 * audio.buffered.end(audio.buffered.length-1) / audio.duration : 100; 
-				displayBuffered(pc);
-			}
-			else {
-				pc = event.jPlayer.status.seekPercent; 
-			} 
-			
-			// Old buffering doesn't take account of different timeranges when user skips forward
-			
-			/*if ((audio.buffered != undefined) && (audio.buffered.length != 0))
-			{
-			 	pc = parseInt(((audio.buffered.end(0) / audio.duration) * 100), 10); 
-			  	displayBuffered(pc);  
-			}  */      
-			
-		});
 		
 		myPlayer.bind($.jPlayer.event.ended, function() {  
-			if (cssTransforms) {   
-				$('#circle-holder').removeClass('gt50');     
-				$('#progress1').css({rotate: '0deg'}).show(); 
-				$('#progress2').css({rotate: '0deg'}).hide();  
-			}
-			else {
-				$('#progress1').css('background-position', '0 104px');     
-			}  
+			// 
 		}); 
 		     
-		var dragging = false; // Indicates if the progressbar is being 'dragged'.
-		
-		var clickControl = $('.click-control');      
-		
-		function getArcPc(pageX, pageY) { 
-			var	self	= clickControl,
-				offset	= self.offset(),
-				x	= pageX - offset.left - self.width()/2,
-				y	= pageY - offset.top - self.height()/2,
-				a	= Math.atan2(y,x);  
-				
- 			if (a > -1*Math.PI && a < -0.5*Math.PI) {
-			   a = 2*Math.PI+a; 
-			} 
-
-			// a is now value between -0.5PI and 1.5PI 
-			// ready to be normalized and applied   			
-			
-			var pc = (a + Math.PI/2) / 2*Math.PI * 10;   
-			   
-			return pc;
-		}
-
-		clickControl.grab({
-			onstart: function(){
-				dragging = true;
-			}, onmove: function(event){
-				var pc = getArcPc(event.position.x, event.position.y);
-				myPlayer.jPlayer("playHead", pc).jPlayer("play");
-				displayProgress(pc);
-			}, onfinish: function(event){
-				dragging = false;
-				var pc = getArcPc(event.position.x, event.position.y);
-				myPlayer.jPlayer("playHead", pc).jPlayer("play");
-			}
-		});  
-		
 		
 		/* hyperaudiopad stuff */
 
 		/* load in the file */  
 
 		function initPopcorn(id) {   
-			var p = Popcorn(id);
-			/*.code({
+			var p = Popcorn(id)
+			.code({
 			   start: 0,
 		       end: 2000,
 		       onStart: function (options) {
@@ -287,15 +169,56 @@
 		       onFrame: (function () {
 		          var count = 0;
 		          return function (options) {
-
-		          console.log(this.Popcorn.instances[0].media.currentTime);
+					
+                    var now = this.Popcorn.instances[0].media.currentTime*1000;
+		          	/*console.log('now = '+now);
+					console.log('start = '+start);
+					console.log('end = '+end);  
+					console.log('index = '+index); */    
+					
+					var src = "";
+					
+					if (now > end && theScript.length > 0) {   
+						
+          				myPlayer.jPlayer("pause");  
+							
+						console.log("length="+theScript.length);
+						console.log("index="+index);   
+						
+						index = parseInt(index);
+							
+						if (theScript.length > (index+1)) {  
+							
+							index = index + 1;       
+					   	 		// end of the script
+							console.log('switcherooo.............................');      
+						  
+							console.log(index);
+							src = theScript[index].src;
+							start = theScript[index].s;   
+							end = theScript[index].e;
+						
+							console.log('src = '+src);        
+						
+							var audiomp3 = src.replace('.mp3','').replace('.ogg','')+'.mp3';
+							var audioogg = src.replace('.mp3','').replace('.ogg','')+'.ogg';
+     
+							myPlayer.jPlayer("setMedia", {
+				         		mp3: audiomp3, 
+								oga: audioogg  
+				       		});       
+			
+							myPlayer.jPlayer("play",start/1000);  
+						}    
+						
+					}     
 
 		         }
 		       })(),
 		       onEnd: function (options) {
 		         console.log('end');
 		       }
-			}); */   
+			});  
 
 			$("#transcript-content span").each(function(i) {  
 				p.transcript({
@@ -311,7 +234,9 @@
 			var id = $(this).attr('href'); 
 			var file ='transcripts/'+id; 
 			var audioogg = 'audio/'+id+'.ogg';
-			var audiomp3 = 'audio/'+id+'.mp3';   
+			var audiomp3 = 'audio/'+id+'.mp3';  
+			
+			console.log('file = '+audioogg); 
 			
 			$('#script-title').text($(this).text());     
 
@@ -354,7 +279,9 @@
 			return txt;
 		}
 
-		// Sets the excerpt
+		// Sets the excerpt  
+		
+		var theScript = []; 
 
 		$('#transcript-content').mouseup(function(e){     
 
@@ -405,21 +332,30 @@
 
 
 					var nextSpan = startSpan; 
-					$('#target-content').append('<p>');
+					// $('#target-content').append('<p s="'+startTime+'" e="'+endTime+'" f="'+myPlayer.data('jPlayer').status.src+'">');
+					var selectedStuff = $('<p i="'+theScript.length+'" s="'+startTime+'" e="'+endTime+'"  f="'+myPlayer.data('jPlayer').status.src+'">'); 
+					$('#target-content').append( selectedStuff );
+					
 					while(nextSpan != endSpan) { 
 						console.log('nextspan');   
 						console.log(nextSpan);         
-						$(nextSpan).clone().appendTo('#target-content');
-						$('#target-content').append(' '); 
+						// $(nextSpan).clone().appendTo('#target-content');
+						$(nextSpan).clone().appendTo(selectedStuff); 
+						// $(' ').appendTo(selectedStuff);
+						selectedStuff.append(' ');
+						//$('#target-content').append(' '); 
 						nextSpan = getNextNode(nextSpan,true,endSpan);  
 					}
 					$('#target-content').append('</p>');   
 
-					var theScript = new Array();
-					var timespan = new Object;
+					
+					var timespan = {};
 					timespan.s = startTime;
 					timespan.e = endTime; 
-					theScript.push(timespan);
+					//console.log(myPlayer.data('jPlayer').status.src);
+					timespan.src = myPlayer.data('jPlayer').status.src;
+					theScript.push(timespan);     
+					
 
 					console.dir(theScript);
 				}
@@ -491,8 +427,6 @@
     
 
 	
-	<!-- END Magick -->
-	
 
 <!-- END head -->
 </head>
@@ -504,7 +438,7 @@
 		<div id="title"> 
 			
 		   
-            <div id="instructions" style="position:fixed;margin-top:36px;margin-left:160px;display:none">
+            <div id="instructions" style="position:fixed;margin-top:36px;margin-left:160px;z-index:1000;opacity: 0.9;display:none">
 				<p>1. Select transcripts from the right hand pane.</p> 
 				<p>2. Transcripts will appear in the centre pane.</p> 
 				<p>3. Highlighted text in the centre pain will appear in the 'Mash-up' pane on the right hand side.</p> 
