@@ -70,7 +70,8 @@
   			
 			solution: "html, flash",
         	swfPath: "js",
-        	supplied: "mp3,oga"
+        	supplied: "mp3,oga",
+			preload: "auto"
             //errorAlerts: "true",
 			//warningAlerts: "true"
       	});
@@ -134,7 +135,9 @@
 			   oga: audioogg  
 	       	}); 
             
-            console.log('playing from .......'+jumpTo);
+            console.log('playing from .......'+jumpTo); 
+   
+			//myPlayer.jPlayer("pause"); 
 			myPlayer.jPlayer("play",jumpTo);          
 			
 		    filename = $(this).parent().attr('f');  
@@ -182,8 +185,8 @@
 						
           				myPlayer.jPlayer("pause");  
 							
-						console.log("length="+theScript.length);
-						console.log("index="+index);   
+						//console.log("length="+theScript.length);
+						//console.log("index="+index);   
 						
 						index = parseInt(index);
 							
@@ -302,20 +305,36 @@
 				}
 			}     
 			
-			
+			console.log('start span ..... ');
+			console.dir(startSpan);
+			console.log('start span');    
+			console.log(startSpan); 
+			console.log('--------');  
+			console.log('end span ..... ');     
+			console.dir(endSpan);
+			console.log('end span');  
+			console.log(endSpan); 
+			console.log('--------');
 			   
 			// if either are null we have a problem basically, a problem that should be solved
 			if (startSpan != null && endSpan != null) {
 			
 				// Flip if end time is less than start time (ie the text was selected backwards)
 		
-				var startTime = startSpan.getAttribute('m');
-				var endTime = endSpan.getAttribute('m');   
+				var startTime = parseInt(startSpan.getAttribute('m'));
+				var endTime = parseInt(endSpan.getAttribute('m'));   
+				
+				console.log('startTime'); 
+				console.log(startTime); 
+				console.log('--------');
+				console.log('endTime');    
+				console.log(endTime); 
+				console.log('--------');
 		        
 				var tempSpan = endSpan;
 				var tempTime = endTime;
 				
-				if (endTime < startTime) {
+				if (endTime < startTime) {    
 					endSpan = startSpan; 
 					endTime = startTime;  
 					startSpan = tempSpan;
@@ -324,17 +343,21 @@
 				
                 // check for single word click
 				if (getNextNode(startSpan,true,endSpan) != endSpan) {
-			        console.log('startspan'); 
-					console.log(startSpan);
+			        /*console.log('startspan'); 
+					console.log(startSpan); 
+					console.log('--------');
 					console.log('endspan');    
-					console.log(endSpan);   
+					console.log(endSpan); 
+					console.log('--------'); */ 
 
 
 
 					var nextSpan = startSpan; 
 					// $('#target-content').append('<p s="'+startTime+'" e="'+endTime+'" f="'+myPlayer.data('jPlayer').status.src+'">');
 					var selectedStuff = $('<p i="'+theScript.length+'" s="'+startTime+'" e="'+endTime+'"  f="'+myPlayer.data('jPlayer').status.src+'">'); 
-					$('#target-content').append( selectedStuff );
+					$('#target-content').append( selectedStuff ); 
+					
+					
 					
 					while(nextSpan != endSpan) { 
 						console.log('nextspan');   
@@ -359,29 +382,7 @@
 
 					console.dir(theScript);
 				}
-				
-				
-
-		  
-				//console.log(startSpan.nextElementSibling); 
-		
-		      
-				//console.log(getNextNode(startSpan,true,endSpan));
-				//var midspan = startSpan.nextSibling; 
-				//console.log(startSpan.parentNode.nextElementSibling);  
-			   	//console.log(endSpan);    
-		
-			   /* console.log('hhhhh');
-		
-			    var nextSpan = startSpan; 
-		
-				while (nextSpan != endSpan) {
-					nextSpan = nextSpan.nextSibling;
-					console.log(nextSpan);
-				}     */                      
-			
 			}
-			
 			
 		});
 
