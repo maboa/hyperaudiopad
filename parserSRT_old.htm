@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<!-- BEGIN html -->
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<!-- Based on an Orman Clark design (http://www.premiumpixels.com) -->
+
+<!-- BEGIN head -->
+<head>
+
+	<!-- Meta Tags -->
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	
+	<!-- Title -->
+	<title>SRT Parser</title>    
+	
+
+
+	
+	<!-- Stylesheets -->
+    <!--<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Serif:regular,italic,bold,bolditalic" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Sans:regular,bold" type="text/css" /> -->
+	<link rel="stylesheet" href="style.css" type="text/css" media="screen" />
+    <link rel="stylesheet" type="text/css" media="all" href="scrollpane.css" />  
+	    
+	
+	<!-- Move jQuery Local! -->
+     
+	<script type="text/javascript" src="js/jquery.min.js"></script>    
+	<script type="text/javascript" src="js/popcorn.js"></script> 
+	<!--<script type="text/javascript" src="js/popcorn.parserSRT.js"></script>--> 
+
+	
+	<script type="text/javascript">
+	$(document).ready(function(){   
+		
+		// stolen wholesale from popcorn.parserSRT.js
+		
+		function parseSRT(data) {
+	   	
+			var retObj = {
+		          title: "",
+		          remote: "",
+		          data: []
+		        },
+		        subs = [],
+		        i = 0,
+		        len = 0,
+		        idx = 0,
+		        lines,
+		        time,
+		        text,
+		        sub;
+
+		    // Simple function to convert HH:MM:SS,MMM or HH:MM:SS.MMM to SS.MMM
+		    // Assume valid, returns 0 on error
+		    var toSeconds = function( t_in ) {
+		      var t = t_in.split( ':' );
+
+		      try {
+		        var s = t[2].split( ',' );
+
+		        // Just in case a . is decimal seperator
+		        if ( s.length === 1 ) {
+		          s = t[2].split( '.' );
+		        }
+
+		        return parseFloat( t[0], 10 )*3600 + parseFloat( t[1], 10 )*60 + parseFloat( s[0], 10 ) + parseFloat( s[1], 10 )/1000;
+		      } catch ( e ) {
+		        return 0;
+		      }
+		    };
+
+
+	
+            var outputString = "";
+
+		    // Here is where the magic happens
+		    // Split on line breaks
+		    lines = data.split( /(?:\r\n|\r|\n)/gm );
+		    len = lines.length;
+
+		    for( i=0; i < len; i++ ) {
+		      sub = {};
+		      text = [];
+
+		      sub.id = parseInt( lines[i++], 10 );
+
+		      // Split on '-->' delimiter, trimming spaces as well
+		      time = lines[i++].split( /[\t ]*-->[\t ]*/ );
+
+		      sub.start = toSeconds( time[0] );
+
+		      // So as to trim positioning information from end
+		      idx = time[1].indexOf( " " );
+		      if ( idx !== -1) {
+		        time[1] = time[1].substr( 0, idx );
+		      }
+		      sub.end = toSeconds( time[1] );
+
+		      // Build single line of text from multi-line subtitle in file
+		      while ( i < len && lines[i] ) {
+		        text.push( lines[i++] );
+		      }
+
+		      // Join into 1 line, SSA-style linebreaks
+		      // Strip out other SSA-style tags
+		      sub.text = text.join( "\\N" ).replace( /\{(\\[\w]+\(?([\w\d]+,?)+\)?)+\}/gi, "" );
+
+		      // Escape HTML entities
+		      sub.text = sub.text.replace( /</g, "&lt;" ).replace( />/g, "&gt;" );
+
+		      // Unescape great than and less than when it makes a valid html tag of a supported style (font, b, u, s, i)
+		      // Modified version of regex from Phil Haack's blog: http://haacked.com/archive/2004/10/25/usingregularexpressionstomatchhtml.aspx
+		      // Later modified by kev: http://kevin.deldycke.com/2007/03/ultimate-regular-expression-for-html-tag-parsing-with-php/
+		      sub.text = sub.text.replace( /&lt;(\/?(font|b|u|i|s))((\s+(\w|\w[\w\-]*\w)(\s*=\s*(?:\".*?\"|'.*?'|[^'\">\s]+))?)+\s*|\s*)(\/?)&gt;/gi, "<$1$3$7>" );
+		      sub.text = sub.text.replace( /\\N/gi, "<br />" );     
+		
+			  // @secretrobotrons splitter
+		
+			  var swords = sub.text.split(' ');
+	          var sduration = sub.end - sub.start;
+	          var stimeStep = sduration/swords.length;
+	          for (var si=0, sl=swords.length; si<sl; ++si) {
+	            var stime = Math.round((sub.start + si*stimeStep) * 1000);  
+	            var stext = swords[si];
+	            var ssafeText = stext.replace('"', '\\"');
+	            outputString += '<span m="'+stime+'" oval="'+ssafeText+'">'+stext+'</span> '+'\n';
+	          }
+ 
+		    }
+
+		    return outputString;   
+		}   
+		
+
+	
+		/*$.get('test.srt', function(data) {    
+		  console.log(data);
+		  console.log(parseSRT(data));
+		});*/
+		
+		$('#transform').click(function() {   
+			
+			var srt = $('#subtitles').html();   
+			var regex = /<br\s*[\/]?>/gi;
+			srt = srt.replace(regex,'\n');
+			regex = /&gt;/gi; 
+			srt = srt.replace(regex,'>');
+			//console.log(srt);
+			
+			var ht = parseSRT(srt);
+			ht = ht.replace(/\r\n|\r|\n/gi, '<br/>');
+			  
+			$('#htranscript').text(ht); 
+			//console.log($('#subtitles').text());
+		});
+		
+		
+	});   
+	
+	</script> 
+	
+</head>
+<body class="single single-post postid-4004 gecko layout-2cr">
+<div id="container">
+	<div id="header" class="clearfix">
+		<div id="title"> 
+
+            <h1>SRT to Hypertranscript</h1>
+
+		</div><!--END #title-->
+	</div><!--END #header-->           
+	
+	<div id="content">
+       	<div id="sidebar">
+            
+		<p>Paste your SRT file into the next pane  ☞ <br/>and press the transform button below.</p>
+		
+		<a id="transform" href="#">Transform</a>  
+			
+        </div><!-- end #sidebar -->    
+
+         <h2 id="script-title" class="entry-title">SRT</h2>
+                    
+		 <div id="transcript-hldr" class="scroll-pane"  style="background-color:#fff">
+            <div id="subtitles" class="entry-content" contenteditable="true">Paste over me!</div>
+         </div>        
+
+		 <div id="mashup" class="scroll-pane" style="background-color:#fff">   
+	
+		 	<div id="htranscript" contenteditable="true" >
+							
+			</div><!-- end #target-content -->    
+		 </div><!-- end #mashup --> 
+	</div><!-- end #content -->
+</div><!-- end #container -->
+</html>

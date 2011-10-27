@@ -112,6 +112,13 @@ li {
 	overflow: scroll;
 	margin: 0;
 	padding-right: 15px;
+}   
+    
+
+#htranscript-hldr, #original-hldr {
+	width: 36%;
+	height: 600px;
+	float: left;
 }
 
 #transcript, #mashup {
@@ -169,5 +176,11 @@ li {
    
 #instructions {   
 	background-color:#E6E6E6;
-	padding:16px; 	
-}
+	
+}     
+
+#main {
+	padding:16px;
+	padding-left:300px; 	
+}      
+

@@ -1,0 +1,371 @@
+1
+00:00:03,083 --> 00:00:07,013
+Visualization is right at the heart of my own work too.
+
+2
+00:00:07,067 --> 00:00:10,044
+I teach global health.
+
+3
+00:00:10,054 --> 00:00:13,023
+And I know, having the data is not enough.
+
+4
+00:00:13,023 --> 00:00:17,092
+I have to show it in ways people both enjoy, and understand.
+
+5
+00:00:17,092 --> 00:00:22,030
+Now, I'm going to try something I've never done before:
+
+6
+00:00:22,030 --> 00:00:25,018
+animating the data in real space,
+
+7
+00:00:25,018 --> 00:00:28,052
+with a bit of technical assistance from the crew.
+
+8
+00:00:29,031 --> 00:00:33,037
+So, here we go: first an axis for health.
+
+9
+00:00:33,037 --> 00:00:38,064
+Life expectancy from 25 years to 75 years.
+
+10
+00:00:38,064 --> 00:00:41,017
+And down here, an axis for wealth:
+
+11
+00:00:41,017 --> 00:00:46,054
+Income per person: 400, 4,000, and 40,000 dollars.
+
+12
+00:00:46,054 --> 00:00:50,033
+So down here, is poor and sick,
+
+13
+00:00:50,033 --> 00:00:51,090
+and up here is rich and healthy.
+
+14
+00:00:53,047 --> 00:00:58,052
+Now I'm going to show you the world 200 years ago,
+
+15
+00:00:58,052 --> 00:01:00,029
+in 1810.
+
+16
+00:01:00,029 --> 00:01:01,096
+Here come all the countries:
+
+17
+00:01:01,096 --> 00:01:08,009
+Europe brown, Asia red, Middle East green, Africa South of the Sahara blue,
+
+18
+00:01:08,009 --> 00:01:09,062
+and the Americas yellow.
+
+19
+00:01:09,062 --> 00:01:13,029
+And the size of the country bubble shows the size of the population.
+
+20
+00:01:13,029 --> 00:01:17,037
+And in 1810, it was pretty crowded down there, wasn't it?
+
+21
+00:01:17,037 --> 00:01:19,040
+All countries were sick and poor,
+
+22
+00:01:19,040 --> 00:01:23,015
+life expectancy was below 40 in all countries
+
+23
+00:01:23,015 --> 00:01:26,095
+and only the UK  and the Netherlands were slightly better off,
+
+24
+00:01:26,095 --> 00:01:28,055
+but not much.
+
+25
+00:01:28,055 --> 00:01:30,020
+And now, I start the world.
+
+26
+00:01:31,097 --> 00:01:36,060
+The industrial revolution makes countries in Europe and elsewhere
+
+27
+00:01:36,060 --> 00:01:38,057
+move away from the rest,
+
+28
+00:01:38,057 --> 00:01:41,043
+but the colonized countries in Asia and Africa,
+
+29
+00:01:41,043 --> 00:01:43,061
+they are stuck down there.
+
+30
+00:01:43,061 --> 00:01:47,042
+And eventually, the Western countries get healthier and healthier.
+
+31
+00:01:47,046 --> 00:01:51,031
+And now, we slow down to show the impact
+
+32
+00:01:51,031 --> 00:01:52,093
+of the First World War
+
+33
+00:01:52,093 --> 00:01:57,067
+and the Spanish flu epidemic. What a catastrophe!
+
+34
+00:01:57,067 --> 00:02:02,040
+And now I speed up through the 1920s and the 1930s.
+
+35
+00:02:02,040 --> 00:02:04,004
+And, in spite of the Great Depression,
+
+36
+00:02:04,011 --> 00:02:05,088
+western countries forge on
+
+37
+00:02:05,088 --> 00:02:07,042
+towards greater wealth and health.
+
+38
+00:02:07,042 --> 00:02:09,053
+Japan and some others try to follow
+
+39
+00:02:09,053 --> 00:02:11,043
+but most countries stay down here.
+
+40
+00:02:11,043 --> 00:02:15,011
+Now, after the tragedies of the Second World War,
+
+41
+00:02:15,011 --> 00:02:18,051
+we stop a bit to look at the world in 1948.
+
+42
+00:02:18,051 --> 00:02:22,092
+1948 was a great year: the war was over,
+
+43
+00:02:22,092 --> 00:02:26,009
+Sweden topped the medal table at the Winter Olympics,
+
+44
+00:02:26,009 --> 00:02:27,067
+and I was born.
+
+45
+00:02:27,067 --> 00:02:30,076
+But the differences between the countries of the world
+
+46
+00:02:30,076 --> 00:02:32,046
+was wider than ever.
+
+47
+00:02:32,046 --> 00:02:36,052
+The United States was in the front, Japan was catching up,
+
+48
+00:02:36,055 --> 00:02:38,069
+Brazil was way behind,
+
+49
+00:02:38,069 --> 00:02:42,074
+Iran was getting a little richer from oil  but still had short lives.
+
+50
+00:02:42,074 --> 00:02:45,055
+And the Asian giants:
+
+51
+00:02:45,055 --> 00:02:47,094
+China, India, Pakistan, Bangladesh, and Indonesia,
+
+52
+00:02:47,094 --> 00:02:50,034
+they were still poor and sick down here,
+
+53
+00:02:50,034 --> 00:02:52,037
+but look what is about to happen!
+
+54
+00:02:52,037 --> 00:02:53,096
+Here we go again!
+
+55
+00:02:53,096 --> 00:02:57,038
+In my lifetime, former colonies gained independence,
+
+56
+00:02:57,038 --> 00:03:00,018
+and then finally they started to get healthier,
+
+57
+00:03:00,018 --> 00:03:00,094
+and healthier,
+
+58
+00:03:00,094 --> 00:03:02,040
+and healthier.
+
+59
+00:03:02,040 --> 00:03:06,013
+And in the 1970s, then countries in Asia and Latin America
+
+60
+00:03:06,013 --> 00:03:08,056
+started to catch up with the Western countries:
+
+61
+00:03:08,056 --> 00:03:10,071
+they became the emerging  economies.
+
+62
+00:03:10,071 --> 00:03:12,041
+Some in Africa follow,
+
+63
+00:03:12,041 --> 00:03:14,045
+some Africans were stuck in civil wars,
+
+64
+00:03:14,045 --> 00:03:15,095
+others hit by HIV.
+
+65
+00:03:15,095 --> 00:03:18,045
+And now we can see the world today,
+
+66
+00:03:18,045 --> 00:03:21,059
+in the most up-to-date statistics.
+
+67
+00:03:22,085 --> 00:03:25,043
+Most people today live in the middle.
+
+68
+00:03:25,043 --> 00:03:28,006
+But there are huge differences at the same time
+
+69
+00:03:28,006 --> 00:03:30,023
+between the better off countries and the worse off countries
+
+70
+00:03:30,023 --> 00:03:34,009
+and there are also huge inequalities within countries.
+
+71
+00:03:34,009 --> 00:03:36,056
+These bubbles show country averages,
+
+72
+00:03:36,056 --> 00:03:38,012
+but I can split them.
+
+73
+00:03:38,012 --> 00:03:41,015
+Take China, I can split it into provinces.
+
+74
+00:03:41,015 --> 00:03:44,005
+There goes Shanghai.
+
+75
+00:03:44,005 --> 00:03:47,068
+It has the same wealth and health as Italy today.
+
+76
+00:03:47,068 --> 00:03:51,007
+And there is the poor inland province Guizhou,
+
+77
+00:03:51,007 --> 00:03:52,040
+it's like Pakistan
+
+78
+00:03:52,040 --> 00:03:54,091
+and if I split it further
+
+79
+00:03:54,091 --> 00:03:57,080
+the rural parts are like Ghana in Africa.
+
+80
+00:03:58,073 --> 00:04:03,046
+And yet, despite the enormous disparages today,
+
+81
+00:04:03,046 --> 00:04:06,080
+we have seen 200 years of remarkable progress.
+
+82
+00:04:06,080 --> 00:04:08,074
+That huge historical gap
+
+83
+00:04:08,074 --> 00:04:10,044
+between the West and the Rest is now closing.
+
+84
+00:04:10,044 --> 00:04:15,021
+We have become an entirely new converging world,
+
+85
+00:04:15,021 --> 00:04:17,060
+and I see a clear trend into the future,
+
+86
+00:04:17,060 --> 00:04:20,049
+with aid, trade, green technology, and peace.
+
+87
+00:04:20,049 --> 00:04:23,024
+It's fully possible that everyone can make it
+
+88
+00:04:24,038 --> 00:04:25,051
+to the healthy-wealthy corner.
+
+89
+00:04:27,068 --> 00:04:30,068
+Well, what you've just seen in the last few minutes
+
+90
+00:04:30,071 --> 00:04:33,060
+is the story of 200 countries
+
+91
+00:04:33,060 --> 00:04:36,016
+shown over 200 hundred years and beyond.
+
+92
+00:04:36,016 --> 00:04:40,019
+It involved plotting 120,000 numbers.
+
+93
+00:04:40,025 --> 00:04:43,000
+Pretty neat, eh?
