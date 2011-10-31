@@ -30,35 +30,45 @@
 	<script type="text/javascript" src="js/jquery.jplayer.js"></script>      
 	<script type="text/javascript" src="js/popcorn.js"></script> 
 	<script type="text/javascript" src="js/popcorn.transcript.js"></script> 
-    <script type="text/javascript" src="js/jscrollpane.js"></script>  
+    <script type="text/javascript" src="js/jscrollpane.js"></script> 
+	<script type="text/javascript" src="js/jquery.bbq.js"></script>   
 	
 	<script type="text/javascript">
-	$(document).ready(function(){    
+	
+	
+	$(document).ready(function(){   
+		var theScript = [];  
+		var audioDir = "audio";
+		var transcriptDir = "transcripts";
+        console.log('start');                    
+		// Grab the script from the URL
+		theScript = $.bbq.getState();  
+		console.dir(theScript);  
+		var theScriptLength = theScript.length; 
+		
+		//console.log(theScript[0].m);         
+	    console.log(theScriptLength); 
+		console.log(theScript.length);
+		console.log(theScript[0].m); 
+		
+		  
+		var i = 0;
+		if (theScript[i] != false) { 
+			console.log('here');  
+			
+			// We need to paste the appropriate parts in the target pane here  
+			while (theScript[i] != undefined) {
+				loadFile(theScript[i].m);
+				
+				i++;
+			}
+			
+		} else {
+		  theScript = [];   
+		}
 		
 	  	var myPlayer = $("#jquery_jplayer_1");
 	
-		// Utility
-
-		function getUrlVars() {
-		    var vars = [], hash;
-		    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-		    for(var i = 0; i < hashes.length; i++)
-		    {
-		        hash = hashes[i].split('=');
-		        vars.push(hash[0]);
-		        vars[hash[0]] = hash[1];
-		    }
-		    return vars;
-		}	 
-
-		// url links to audio  
-
-
-		var endTime = getUrlVars()["e"];
-
-		if (getUrlVars()["e"] != null) { 
-			endTime = parseInt(getUrlVars()["e"])/10;
-		}
 	
 		myPlayer.jPlayer({
  			ready: function (event) {
@@ -77,24 +87,9 @@
       	});
    
 
-	   
-
 		// These events are fired as play time increments  
 
-		var playingWord = 1;
-
-		myPlayer.bind($.jPlayer.event.timeupdate, function(event) {       
-
-			playTimeEn = event.jPlayer.status.currentPercentAbsolute;  
-			currentTime = event.jPlayer.status.currentTime; 
-
-			// Check for end param         
-
-			if (endTime != null && endTime < currentTime) {
-			    myPlayer.jPlayer("pause");   
-				endTime = null;
-			}
-		});     
+		var playingWord = 1;    
 		
 		
 		// transcript links to audio
@@ -110,7 +105,8 @@
 		var index = "";
 		var filename = "";
 		var end = "";
-		var start = "";
+		var start = ""; 
+		var mediaId = "";
 		
 		
 		$('#target-content').delegate('span','click',function(){  
@@ -123,12 +119,14 @@
 			          
 			console.log("....");      
 			
-			src = theScript[index].src;   
+			//src = theScript[index].src;   
 			
-			console.log("Src = "+src);  
+			//console.log("Src = "+src);  
+			
+			mediaId = theScript[index].m; 
 				
-			var audiomp3 = src.replace('.mp3','').replace('.ogg','')+'.mp3';
-			var audioogg = src.replace('.mp3','').replace('.ogg','')+'.ogg';
+			var audiomp3 = audioDir+"/"+mediaId+".mp3";
+			var audioogg = audioDir+"/"+mediaId+".ogg";
 
 			myPlayer.jPlayer("setMedia", {
 	           mp3: audiomp3, 
@@ -197,14 +195,18 @@
 							console.log('switcherooo.............................');      
 						  
 							console.log(index);
-							src = theScript[index].src;
+							//src = theScript[index].src;
 							start = theScript[index].s;   
 							end = theScript[index].e;
+						    mediaId = theScript[index].m;
 						
 							console.log('src = '+src);        
 						
-							var audiomp3 = src.replace('.mp3','').replace('.ogg','')+'.mp3';
-							var audioogg = src.replace('.mp3','').replace('.ogg','')+'.ogg';
+							/*var audiomp3 = src.replace('.mp3','').replace('.ogg','')+'.mp3';
+							var audioogg = src.replace('.mp3','').replace('.ogg','')+'.ogg';*/  
+							
+							var audiomp3 = audioDir+"/"+mediaId+".mp3";
+							var audioogg = audioDir+"/"+mediaId+".ogg";
      
 							myPlayer.jPlayer("setMedia", {
 				         		mp3: audiomp3, 
@@ -236,15 +238,23 @@
 
 
 		$('.transcript-file').live('click',function(){ 
-			var id = $(this).attr('href'); 
-			var file ='transcripts/'+id; 
-			var audioogg = 'audio/'+id+'.ogg';
-			var audiomp3 = 'audio/'+id+'.mp3';  
+			var id = $(this).attr('href');  
+			
+			$('#script-title').text($(this).text());  
+			
+			loadFile(id); 
+
+			return false;
+		}); 
+		
+		function loadFile(id) { 
+			var file = transcriptDir+'/'+id; 
+			var audioogg = audioDir+'/'+id+'.ogg';
+			var audiomp3 = audioDir+'/'+id+'.mp3';  
 			
 			console.log('file = '+audioogg); 
 			
-			$('#script-title').text($(this).text());     
-
+			   
 
 			$('#transcript-content').load(file, function() {
 			  	//load success!!!     
@@ -257,12 +267,13 @@
 					oga: audioogg  
 	       		});   
 	
+				$.data(myPlayer,'mediaId',id);
+	
 				$('.scroll-pane').jScrollPane();
 	
 				
-			});
-			return false;
-		});  
+			});			
+		} 
 		
 		
 
@@ -286,7 +297,7 @@
 
 		// Sets the excerpt  
 		
-		var theScript = []; 
+
 
 		$('#transcript-content').mouseup(function(e){     
 
@@ -376,12 +387,13 @@
 					
 					var timespan = {};
 					timespan.s = startTime;
-					timespan.e = endTime; 
+					timespan.e = endTime;  
+					timespan.m = $.data(myPlayer,'mediaId');  
 					//console.log(myPlayer.data('jPlayer').status.src);
-					timespan.src = myPlayer.data('jPlayer').status.src;
+					//timespan.src = myPlayer.data('jPlayer').status.src;
 					theScript.push(timespan);     
 					
-
+                    $.bbq.pushState(theScript);
 					console.dir(theScript);
 				}
 			}
