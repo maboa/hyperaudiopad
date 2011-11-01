@@ -11,7 +11,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	
 	<!-- Title -->
-	<title>Hyperaudio Pad</title>    
+	<title>Hyperaudio An Introduction</title>    
 	
 
 
@@ -42,26 +42,36 @@
 		var transcriptDir = "transcripts";
         console.log('start');                    
 		// Grab the script from the URL
-		var theScriptState = $.bbq.getState();  
+		theScript = $.bbq.getState();  
 		console.dir(theScript);  
 		var theScriptLength = theScript.length; 
 		
 		//console.log(theScript[0].m);         
-	    console.log(theScriptLength); 
-		console.log(theScript.length);   
+	    //console.log(theScriptLength); 
+		//console.log(theScript.length);
+		//console.log(theScript[0].m); 
 		
-		/*if (theScriptLength > 0) {   
+		  
+		var i = 0;
+		if (theScript[i] != false) { 
+			console.log('here');  
 			
-			for (var i=0; i < theScriptLength; i++) {
-				loadFile(theScript[i].m);
+			 
+			while (theScript[i] != undefined) {
+				loadFile(theScript[i].m); 
+				
+				// We need to paste the appropriate parts in the target pane here      
+				console.log($('#transcript-content').find('span').attr('m',theScript[i].s));
+				//while (theScript
+				
+				//$('#target-content').append();
+				
+				i++;
 			}
 			
 		} else {
 		  theScript = [];   
-		} */
-		
-		
-		
+		}
 		
 	  	var myPlayer = $("#jquery_jplayer_1");
 	
@@ -80,121 +90,7 @@
 			preload: "auto"
             //errorAlerts: "true",
 			//warningAlerts: "true"
-      	});  
-
-
-		var i = 0;
-		if (theScriptState[i] != false) { 
-		 	while (theScriptState[i] != undefined) {
-				//loadFile(theScriptState[i].m); 
-                
-				// repeated code use loadFile with a callback 
-				
-				console.log('snippet --------------- > '+i);
-
-				var timespan = {};
-				timespan.s = parseInt(theScriptState[i].s);
-				timespan.e = parseInt(theScriptState[i].e);  
-				timespan.m = theScriptState[i].m; 
-				
-				//var id = theScriptState[i].m;
-                var file = transcriptDir+'/'+timespan.m; 
-				var audioogg = audioDir+'/'+timespan.m+'.ogg';
-				var audiomp3 = audioDir+'/'+timespan.m+'.mp3';
-				
-				console.log('file = '+audioogg);       
-				//console.log(myPlayer.data('jPlayer').status.src);
-				//timespan.src = myPlayer.data('jPlayer').status.src; 
-				 
-				
-				theScript.push(timespan);  
-				
-				//console.log(theScriptState[i].s);   
-				
-				$.ajax({
-				  url: file,
-				  async: false,
-				  success: function(data) {  
-					
-					//load success!!!     
-					initPopcorn('#' + myPlayer.data("jPlayer").internal.audio.id);      
-
-					console.log('hissss');  
-
-					// load in the audio      
-
-				    myPlayer.jPlayer("setMedia", {
-		         		mp3: audiomp3, 
-						oga: audioogg  
-		       		});
-
-					$.data(myPlayer,'mediaId',timespan.m);
-					
-					console.log('baaaaa');
-				    $('#transcript-content').html(data); 
-					console.log('miaow'); 
-
-		
-		  			console.log('woof');
-
-					
-
-					$('.scroll-pane').jScrollPane(); 
-					
-					// We need to paste the appropriate parts in the target pane here     
-					//console.log('first span ...');
-					/*console.log($('#transcript-content')); 
-					console.log($('span [m="2680"]'));    
-					console.log($('#transcript-content').find('span').attr('m',s));  
-					console.log(s);*/  
-					var firstSpan = $('#transcript-content span[m="'+timespan.s+'"]');     
-					console.log('moo');
-					console.log(firstSpan);
-					      
-					var endFound = false;
-					var thisSpan = firstSpan;  
-					
-					
-					var selectedStuff = $('<p i="'+i+'" s="'+timespan.s+'" e="'+timespan.e+'"  f="'+myPlayer.data('jPlayer').status.src+'">');
-					 
-					$('#target-content').append( selectedStuff ); 
-					//var snippet = "<p>"+firstSpan.html()+" ";
-					//$('#target-content').append("<p>"+firstSpan.html()+" ");
-					while (endFound == false) {
-						thisSpan = thisSpan.next(); 
-						//snippet = snippet + thisSpan.html()+" ";
-						//$('#target-content').append(thisSpan.html()+" ");
-						//console.log(thisSpan);
-						//console.log(thisSpan.attr('m'));
-						//console.log(timespan.e);    
-						$(thisSpan).clone().appendTo(selectedStuff); 
-						// $(' ').appendTo(selectedStuff);
-						selectedStuff.append(' ');
-						if (thisSpan.attr('m') == timespan.e) endFound = true; 
-					}   
-					$('#target-content').append('</p>');       
-					
-					$('#target-content').append(snippet);  
-					
-					console.log('end found'); 
-
-				  }
-				});
-
-
-
-
-				//while (theScript
-
-				//$('#target-content').append();
-
-				i++;
-				console.log('New snippet');      
-			 } 
-		   
-		}  
-		
-		console.log('EXITED');
+      	});
    
 
 		// These events are fired as play time increments  
@@ -231,10 +127,7 @@
 			
 			//src = theScript[index].src;   
 			
-			//console.log("Src = "+src);   
-			
-			console.log('index = '+index);
-			console.dir(theScript);
+			//console.log("Src = "+src);  
 			
 			mediaId = theScript[index].m; 
 				
@@ -572,7 +465,7 @@
 				<p>3. Highlighted text in the centre pain will appear in the 'Mash-up' pane on the right hand side.</p> 
 			    <p>4. Transcripts can be navigated and played by clicking on the text.</p>
 			 </div>
-            <h1>✪ Hyperaudio Pad</h1>
+            <h1>Hyperaudio Pad</h1>
 
               <div id="accordion"> 
 	
