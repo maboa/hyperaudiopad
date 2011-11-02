@@ -22,8 +22,7 @@
 	<link rel="stylesheet" href="style.css" type="text/css" media="screen" />
     <link rel="stylesheet" type="text/css" media="all" href="scrollpane.css" />  
 	
-	<!-- Magick -->      
-	
+
 	<!-- Move jQuery Local! -->
      
 	<script type="text/javascript" src="js/jquery.min.js"></script>
@@ -38,8 +37,9 @@
 	
 	$(document).ready(function(){   
 		var theScript = [];  
-		var audioDir = "audio";
-		var transcriptDir = "transcripts";
+		var audioDir = "../audio";
+		var transcriptDir = "transcripts";  
+		var latency = 1000;
         console.log('start');                    
 		// Grab the script from the URL
 		var theScriptState = $.bbq.getState();  
@@ -98,7 +98,7 @@
 				timespan.m = theScriptState[i].m; 
 				
 				//var id = theScriptState[i].m;
-                var file = transcriptDir+'/'+timespan.m; 
+                var file = transcriptDir+'/'+timespan.m+'.htm'; 
 				var audioogg = audioDir+'/'+timespan.m+'.ogg';
 				var audiomp3 = audioDir+'/'+timespan.m+'.mp3';
 				
@@ -129,52 +129,30 @@
 		       		});
 
 					$.data(myPlayer,'mediaId',timespan.m);
-					
-					console.log('baaaaa');
+
 				    $('#transcript-content').html(data); 
-					console.log('miaow'); 
-
-		
-		  			console.log('woof');
-
-					
 
 					$('.scroll-pane').jScrollPane(); 
 					
 					// We need to paste the appropriate parts in the target pane here     
-					//console.log('first span ...');
-					/*console.log($('#transcript-content')); 
-					console.log($('span [m="2680"]'));    
-					console.log($('#transcript-content').find('span').attr('m',s));  
-					console.log(s);*/  
-					var firstSpan = $('#transcript-content span[m="'+timespan.s+'"]');     
-					console.log('moo');
-					console.log(firstSpan);
+ 
+					var thisSpan = $('#transcript-content span[m="'+timespan.s+'"]');     
 					      
 					var endFound = false;
-					var thisSpan = firstSpan;  
-					
+ 
 					
 					var selectedStuff = $('<p i="'+i+'" s="'+timespan.s+'" e="'+timespan.e+'"  f="'+myPlayer.data('jPlayer').status.src+'">');
 					 
 					$('#target-content').append( selectedStuff ); 
-					//var snippet = "<p>"+firstSpan.html()+" ";
-					//$('#target-content').append("<p>"+firstSpan.html()+" ");
+
 					while (endFound == false) {
-						thisSpan = thisSpan.next(); 
-						//snippet = snippet + thisSpan.html()+" ";
-						//$('#target-content').append(thisSpan.html()+" ");
-						//console.log(thisSpan);
-						//console.log(thisSpan.attr('m'));
-						//console.log(timespan.e);    
-						$(thisSpan).clone().appendTo(selectedStuff); 
-						// $(' ').appendTo(selectedStuff);
+
+						$(thisSpan).clone().appendTo(selectedStuff);   
+						thisSpan = thisSpan.next();    
 						selectedStuff.append(' ');
 						if (thisSpan.attr('m') == timespan.e) endFound = true; 
 					}   
 					$('#target-content').append('</p>');       
-					
-					$('#target-content').append(snippet);  
 					
 					console.log('end found'); 
 
@@ -247,9 +225,11 @@
 	       	}); 
             
             console.log('playing from .......'+jumpTo); 
-   
-			//myPlayer.jPlayer("pause"); 
-			myPlayer.jPlayer("play",jumpTo);          
+            
+			myPlayer.jPlayer("play");
+			myPlayer.jPlayer("pause");   
+			
+			setTimeout(function(){myPlayer.jPlayer("play",jumpTo); }, latency);           
 			
 		    filename = $(this).parent().attr('f');  
 			end = $(this).parent().attr('e');  
@@ -313,7 +293,14 @@
 							end = theScript[index].e;
 						    mediaId = theScript[index].m;
 						
-							console.log('src = '+src);        
+							console.log('src = '+src);   
+							
+							
+							myPlayer.bind($.jPlayer.event.progress + ".fixStart", function(event) {
+								// Warning: The variable 'start' must not be changed before this handler is called.
+							    $(this).unbind(".fixStart"); 
+								$(this).jPlayer("play",start/1000);
+							});     
 						
 							/*var audiomp3 = src.replace('.mp3','').replace('.ogg','')+'.mp3';
 							var audioogg = src.replace('.mp3','').replace('.ogg','')+'.ogg';*/  
@@ -326,9 +313,14 @@
 								oga: audioogg  
 				       		});   
 				
-				    		myPlayer.jPlayer("pause",3);
-			
-							myPlayer.jPlayer("play",start/1000);  
+							//myPlayer.jPlayer("play");
+							myPlayer.jPlayer("pause",start);   
+							//myPlayer.jPlayer("load");
+				
+							//setTimeout(function(){myPlayer.jPlayer("play",start/1000); }, latency);
+						               
+						
+							//myPlayer.jPlayer("pause",start/1000); 
 						}    
 						
 					}     
@@ -368,7 +360,7 @@
 			console.log('file = '+audioogg); 
 			
 			   
-
+            $('#transcript-content').html('loading ...');
 			$('#transcript-content').load(file, function() {
 			  	//load success!!!     
 				initPopcorn('#' + myPlayer.data("jPlayer").internal.audio.id);   
@@ -599,9 +591,10 @@
 			<!-- transcript loader -->
 			
 			<ul>
-				<li><a class="transcript-file" href="nitotmozilla-m" >Nitot on Firefox</a></li>
-				<li><a class="transcript-file" href="mbjkaudio" >HTML5 Audio</a></li>
-				<li><a class="transcript-file" href="" >Transcript 3</a><br/></li>  
+				<li><a class="transcript-file" href="did-annie-lennox" >Annie Lennox</a></li>
+				<li><a class="transcript-file" href="did-bill-bailey" >Bill Bailey</a></li>
+				<li><a class="transcript-file" href="did-diane-abbot" >Diane Abbot</a></li> 
+				<li><a class="transcript-file" href="did-janet-street-porter" >Janet Street-Porter</a></li>  
             </ul>
 			
          </div><!-- end #sidebar -->    
