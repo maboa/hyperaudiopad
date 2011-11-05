@@ -197,7 +197,8 @@
 		var mediaId = "";
 		
 		
-		$('#target-content').delegate('span','click',function(){  
+		$('#target-content').delegate('span','click',function(){ 
+			$('#transcript-content').html(''); 
 			var jumpTo = $(this).attr('m')/1000;   
 			
 			index = $(this).parent().attr('i'); 
@@ -594,7 +595,8 @@
 				<li><a class="transcript-file" href="did-annie-lennox" >Annie Lennox</a></li>
 				<li><a class="transcript-file" href="did-bill-bailey" >Bill Bailey</a></li>
 				<li><a class="transcript-file" href="did-diane-abbot" >Diane Abbot</a></li> 
-				<li><a class="transcript-file" href="did-janet-street-porter" >Janet Street-Porter</a></li>  
+				<li><a class="transcript-file" href="did-janet-street-porter" >Janet Street-Porter</a></li>
+				<li><a class="transcript-file" href="did-yoko-ono" >Yoko Ono</a></li>  
             </ul>
 			
          </div><!-- end #sidebar -->    
