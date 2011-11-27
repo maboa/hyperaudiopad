@@ -151,26 +151,33 @@ li {
 	padding: 4px;
 }   
 
-/* @maboa */     
+/* @maboa */  
 
-#transcript-content span {
+/* remove focus dotted line */
+
+/*#transcript-content {
+  outline: 0;
+} */
+
+
+#transcript-content span, #target-content span  {
 	cursor: pointer;
 }    
 
-#transcript-content span.transcript-grey:hover {  
+#transcript-content span.transcript-grey:hover, #target-content span.transcript-grey:hover {  
 	color: #f07d00; 
 }
    
 
-#transcript-content span:hover {  
+#transcript-content span:hover, #target-content span:hover  {  
 	color: #f07d00; 
 }
 
-#transcript-content span.highlight {  
+#transcript-content span.highlight, #target-content span.highlight {  
 	color: #fff; 
 }       
 
-#transcript-content span.transcript-grey {
+#transcript-content span.transcript-grey, #target-content span.transcript-grey {
     color: #999;
 }   
    

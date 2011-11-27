@@ -23,7 +23,6 @@
     <link rel="stylesheet" type="text/css" media="all" href="scrollpane.css" />  
 	
 
-	<!-- Move jQuery Local! -->
      
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/jquery.jplayer.js"></script>      
@@ -31,6 +30,7 @@
 	<script type="text/javascript" src="js/popcorn.transcript.js"></script> 
     <script type="text/javascript" src="js/jscrollpane.js"></script> 
 	<script type="text/javascript" src="js/jquery.bbq.js"></script>   
+	<script type="text/javascript" src="js/jquery.scrollto.min.js"></script>  
 	
 	<script type="text/javascript">
 	
@@ -40,15 +40,15 @@
 		var audioDir = "../audio";
 		var transcriptDir = "transcripts";  
 		var latency = 1000;
-        console.log('start');                    
+        //console.log('start');                    
 		// Grab the script from the URL
 		var theScriptState = $.bbq.getState();  
-		console.dir(theScript);  
+		//console.dir(theScript);  
 		var theScriptLength = theScript.length; 
 		
 		//console.log(theScript[0].m);         
-	    console.log(theScriptLength); 
-		console.log(theScript.length);   
+	    //console.log(theScriptLength); 
+		//console.log(theScript.length);   
 		
 		/*if (theScriptLength > 0) {   
 			
@@ -61,6 +61,7 @@
 		} */
 		
 		
+		var currentyLoaded = "";
 		
 		
 	  	var myPlayer = $("#jquery_jplayer_1");
@@ -90,7 +91,7 @@
                 
 				// repeated code use loadFile with a callback 
 				
-				console.log('snippet --------------- > '+i);
+				//console.log('snippet --------------- > '+i);
 
 				var timespan = {};
 				timespan.s = parseInt(theScriptState[i].s);
@@ -102,7 +103,7 @@
 				var audioogg = audioDir+'/'+timespan.m+'.ogg';
 				var audiomp3 = audioDir+'/'+timespan.m+'.mp3';
 				
-				console.log('file = '+audioogg);       
+				//console.log('file = '+audioogg);       
 				//console.log(myPlayer.data('jPlayer').status.src);
 				//timespan.src = myPlayer.data('jPlayer').status.src; 
 				 
@@ -119,7 +120,7 @@
 					//load success!!!     
 					initPopcorn('#' + myPlayer.data("jPlayer").internal.audio.id);      
 
-					console.log('hissss');  
+					//console.log('hissss');  
 
 					// load in the audio      
 
@@ -154,7 +155,7 @@
 					}   
 					$('#target-content').append('</p>');       
 					
-					console.log('end found'); 
+					//console.log('end found'); 
 
 				  }
 				});
@@ -167,12 +168,12 @@
 				//$('#target-content').append();
 
 				i++;
-				console.log('New snippet');      
+				//console.log('New snippet');      
 			 } 
 		   
 		}  
 		
-		console.log('EXITED');
+		//console.log('EXITED');
    
 
 		// These events are fired as play time increments  
@@ -184,7 +185,7 @@
 
 		$('#transcript').delegate('span','click',function(){  
 			var jumpTo = $(this).attr('m')/1000; 
-            console.log('playing from '+jumpTo);
+            //console.log('playing from '+jumpTo);
 			myPlayer.jPlayer("play",jumpTo);    
 		   
 			return false;
@@ -198,24 +199,31 @@
 		
 		
 		$('#target-content').delegate('span','click',function(){ 
-			$('#transcript-content').html(''); 
+			//$('#transcript-content').html('');
+			
+			 
+
 			var jumpTo = $(this).attr('m')/1000;   
 			
 			index = $(this).parent().attr('i'); 
 			
-			console.log("The Script");
-			console.dir(theScript);
+			//console.log("The Script");
+			//console.dir(theScript);
 			          
-			console.log("....");      
+			//console.log("....");      
 			
 			//src = theScript[index].src;   
 			
 			//console.log("Src = "+src);   
 			
-			console.log('index = '+index);
-			console.dir(theScript);
+			//console.log('index = '+index);
+			//console.dir(theScript);
 			
 			mediaId = theScript[index].m; 
+
+			if (currentlyPlaying != mediaId) {
+				loadFile(mediaId);				
+			}
 				
 			var audiomp3 = audioDir+"/"+mediaId+".mp3";
 			var audioogg = audioDir+"/"+mediaId+".ogg";
@@ -225,7 +233,7 @@
 			   oga: audioogg  
 	       	}); 
             
-            console.log('playing from .......'+jumpTo); 
+            //console.log('playing from .......'+jumpTo); 
             
 			myPlayer.jPlayer("play");
 			myPlayer.jPlayer("pause");   
@@ -236,7 +244,12 @@
 			end = $(this).parent().attr('e');  
 			start = $(this).parent().attr('s'); 
 			index = $(this).parent().attr('i'); 
-		   
+
+			// scroll not working yet
+
+			//var target = $('#transcript-content span[m="'+start+'"]');
+			//$('#transcript-content').scrollTo(target, 800, {axis:'y',margin:true});
+
 			return false;
 		});
 
@@ -259,7 +272,7 @@
 			   start: 0,
 		       end: 2000,
 		       onStart: function (options) {
-		         console.log('start')
+		         //console.log('start')
 		       },
 		       onFrame: (function () {
 		          var count = 0;
@@ -286,15 +299,15 @@
 							
 							index = index + 1;       
 					   	 		// end of the script
-							console.log('switcherooo.............................');      
+							//console.log('switcherooo.............................');      
 						  
-							console.log(index);
+							//console.log(index);
 							//src = theScript[index].src;
 							start = theScript[index].s;   
 							end = theScript[index].e;
 						    mediaId = theScript[index].m;
 						
-							console.log('src = '+src);   
+							//console.log('src = '+src);   
 							
 							
 							myPlayer.bind($.jPlayer.event.progress + ".fixStart", function(event) {
@@ -305,6 +318,8 @@
 						
 							/*var audiomp3 = src.replace('.mp3','').replace('.ogg','')+'.mp3';
 							var audioogg = src.replace('.mp3','').replace('.ogg','')+'.ogg';*/  
+
+							loadFile(mediaId);
 							
 							var audiomp3 = audioDir+"/"+mediaId+".mp3";
 							var audioogg = audioDir+"/"+mediaId+".ogg";
@@ -329,7 +344,7 @@
 		         }
 		       })(),
 		       onEnd: function (options) {
-		         console.log('end');
+		         //console.log('end');
 		       }
 			});  
 
@@ -358,8 +373,9 @@
 			var audioogg = audioDir+'/'+id+'.ogg';
 			var audiomp3 = audioDir+'/'+id+'.mp3';  
 			
-			console.log('file = '+audioogg); 
-			
+			//console.log('file = '+audioogg);
+			 
+			currentlyPlaying = id;
 			   
             $('#transcript-content').html('loading ...');
 			$('#transcript-content').load(file, function() {
@@ -376,9 +392,8 @@
 				$.data(myPlayer,'mediaId',id);
 	
 				$('.scroll-pane').jScrollPane();
-	
 				
-			});			
+			});		
 		} 
 		
 		
@@ -401,12 +416,19 @@
 			return txt;
 		}
 
+		// Causes issues when content is scrolled
+
+		/*$('#transcript-content').mousedown(function(){ 
+			$(this).focus();
+		});*/
+
 		// Sets the excerpt  
 		
 
 
-		$('#transcript-content').mouseup(function(e){     
-
+		$('#transcript-content').mouseup(function(e){ 
+		
+			//$(this).blur();    
 
 	 		var select = getSelText(); 
 	  		var tweetable = select+"";  
@@ -424,7 +446,7 @@
 				}
 			}     
 			
-			console.log('start span ..... ');
+			/*console.log('start span ..... ');
 			console.dir(startSpan);
 			console.log('start span');    
 			console.log(startSpan); 
@@ -433,7 +455,7 @@
 			console.dir(endSpan);
 			console.log('end span');  
 			console.log(endSpan); 
-			console.log('--------');
+			console.log('--------');*/
 			   
 			// if either are null we have a problem basically, a problem that should be solved
 			if (startSpan != null && endSpan != null) {
@@ -443,12 +465,12 @@
 				var startTime = parseInt(startSpan.getAttribute('m'));
 				var endTime = parseInt(endSpan.getAttribute('m'));   
 				
-				console.log('startTime'); 
+				/*console.log('startTime'); 
 				console.log(startTime); 
 				console.log('--------');
 				console.log('endTime');    
 				console.log(endTime); 
-				console.log('--------');
+				console.log('--------');*/
 		        
 				var tempSpan = endSpan;
 				var tempTime = endTime;
@@ -479,8 +501,8 @@
 					
 					
 					while(nextSpan != endSpan) { 
-						console.log('nextspan');   
-						console.log(nextSpan);         
+						//console.log('nextspan');   
+						//console.log(nextSpan);         
 						// $(nextSpan).clone().appendTo('#target-content');
 						$(nextSpan).clone().appendTo(selectedStuff); 
 						// $(' ').appendTo(selectedStuff);
@@ -500,7 +522,11 @@
 					theScript.push(timespan);     
 					
                     $.bbq.pushState(theScript);
-					console.dir(theScript);
+					//console.dir(theScript);
+
+					//alert('here');
+
+					//$('#target-content span').addClass('transcript-grey');
 				}
 			}
 			
@@ -526,6 +552,18 @@
 				         //|| getNextNode(node.parentNode, true, endNode);
 		
 		};  
+
+
+		$('#clear-btn').click(function(){   
+			
+			$.bbq.removeState();
+			theScript = [];
+			$('#transcript-content').html('');
+			$('#target-content').html('');
+
+			return false;
+		});
+
 		
 		$('#instructions-btn').click(function(){   
 			
@@ -535,9 +573,10 @@
 				$('#instructions').fadeIn();
 			}
 			 
-			
 			return false;
 		});
+
+
 
 		
     });    
@@ -578,7 +617,7 @@
 	<div id="content">
        	<div id="sidebar"> 
 	
-			<ul><li><a id="home" href="index.htm">✪ home</a></li></ul>
+			<ul><li><a id="home" href="index.htm">✪ home</a> | <a id="clear-btn" href="#" tabindex="2">clear</a></li></ul>
             
 			<!-- player -->
 			<div id="jquery_jplayer_1" class="jp-jplayer"></div>
@@ -591,6 +630,7 @@
               
 			<!-- transcript loader -->
 			
+
 
 			<ul>
 				<li><a class="transcript-file" href="nitotmozilla-m" >Nitot on Firefox</a></li>
