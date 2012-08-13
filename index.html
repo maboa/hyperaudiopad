@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8 />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<link href="css/hap.css" rel="stylesheet" type="text/css" />
+	</head>
+	<body>
+
+		<div id="jquery_jplayer_1" class="jp-jplayer"></div>
+
+		<div id="control-hldr">
+			<div class="control">
+				<span class="logo">◨</span>The Hyperaudio Pad
+				<span style="float:right">alpha</span>
+			</div>
+		</div>
+
+		<!-- transcript file chooser -->
+
+		<div class="left col">
+			<div class="header row">
+				Transcripts
+			</div>
+			<div class="body row scroll-y">
+				<ul class="listview">
+					<li><a class="transcript-file" href="nitotmozilla-m" >Nitot on Firefox</a></li>
+					<li><a class="transcript-file" href="mbjkaudio" >HTML5 Audio</a></li>  
+				</ul>
+			</div>
+			<div class="footer row">
+				<div id="transcript-file-hint" class="hint">
+					<strong>Hint :</strong> Start by selecting a transcript.
+				</div>
+			</div>
+		</div>
+
+		<!-- transcript content -->
+
+		<div id="transcript" class="middle col">
+			<div class="header row">
+				<span id="script-title"></span> <span id="load-status"></span> <span id="source-header-ctrl" class="header-ctrl" style="display:none"><a id="play-btn-source" href="#">play</a><a id="pause-btn-source" href="#" style="display:none">pause</a></span>
+			</div>
+
+			<div id="transcript-content" class="body row scroll-y">
+
+			</div>
+
+			<div class="footer row">
+				<div id="transcript-content-hint" class="hint" style="display:none">
+					<strong>Hint :</strong> Highlight text in the transcript above to move it into your target panel.
+				</div>
+			</div>
+		</div>
+
+		<!-- target content -->
+
+		<div class="right col">
+			<div class="header row">
+				<span class="header-ctrl" style="display:none"><a href="#">play</a> | <a href="#">clear</a></span>
+			</div>
+
+			<div id="target-content" class="body row scroll-y" contenteditable="true">
+			</div>
+
+			<div class="footer row">
+			</div>
+		</div>
+
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/jquery.jplayer.js"></script>      
+		<script type="text/javascript" src="js/popcorn.js"></script> 
+		<script type="text/javascript" src="js/popcorn.transcript.js"></script> 
+		<script type="text/javascript" src="js/jquery.bbq.js"></script>   
+		<script type="text/javascript" src="js/iemobile-fix.js"></script>
+		<script type="text/javascript" src="js/hap.js"></script>
+	</body>
+</html>

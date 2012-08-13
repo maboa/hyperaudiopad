@@ -1,0 +1,137 @@
+body {
+	/*overflow: hidden;*/
+	font: 18px/28px "Droid Serif", Georgia, Times, serif;
+	background: #fcfcfc;
+	color: #444;
+}
+
+.logo {
+	padding-right: 16px;
+	padding-left: 8px;
+}
+
+.hint {
+	background-color: #ff0;
+	padding: 12px 16px 12px 16px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 12px;
+	line-height: 14px;
+	height: 100%;
+}
+
+.hint:hover {
+	cursor: pointer;
+}
+
+a {
+	text-decoration: none;
+	color: #f07d00;
+}
+
+a:hover {
+	text-decoration: underline;
+	color: #666;
+}
+
+li {
+	list-style: none;
+}
+
+ul {
+	padding-left: 12px;
+}
+
+#control-hldr {
+	z-index: 100;
+	min-width: 865px;
+	height: 48px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	background-color: #e0e0e0;
+	position: absolute;
+}
+
+.control {
+	padding: 12px;
+	white-space: nowrap;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.header-ctrl {
+	padding-right: 16px;
+	float: right;
+}
+
+
+#transcript-content span, #target-content span  {
+	cursor: pointer;
+}    
+
+#transcript-content span.transcript-grey:hover, #target-content span.transcript-grey:hover {  
+	color: #f07d00; 
+}
+   
+
+#transcript-content span:hover, #target-content span:hover  {  
+	color: #f07d00; 
+}
+
+#transcript-content span.highlight, #target-content span.highlight {  
+	color: #fff; 
+}       
+
+#transcript-content span.transcript-grey, #target-content span.transcript-grey {
+   color: #888;
+}  
+
+/* Generic pane rules */
+body { margin: 0; -webkit-text-size-adjust: 100%; }
+.page { left: 0; right: 0; top: 0; bottom: 0; }
+.row, .col, .page { overflow: hidden; position: absolute; }
+.row { left: 0; right: 0; }
+.col { top: 0; bottom: 0; border-left: 4px solid #eee;}
+.scroll-y { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.fill, .pane { position: absolute; left: 0; top: 0; right: 0; bottom: 0; width: 100%; height: 100% }
+.pane { display: none; }
+
+
+/* Workaround: in landscape mode, IEMobile makes bottom toolbar overlap the page, so shorten the page by 75px to compensate */
+.iemobile .page { bottom: -6px; }
+@media screen and (orientation:landscape) { .iemobile .page { bottom: 75px; } }
+
+.header, .footer {
+    color: #444; background: #eee;
+}
+.header { font-size: 16px; }
+.body, .pane { background: #fcfcfc; }
+.right.col .body { padding: 0 1em; }
+.middle.col .body { padding: 0 1em; }
+.listview { padding-top: 16px; padding-left: 0px; margin: 0; font-weight: bold; color: #444; }
+.listview li { 
+	list-style-type: none; 
+	background: #fcfcfc; 
+	padding-left: 16px; 
+	cursor: pointer; 
+	font-size: 14px; 
+}
+.listview li.selected { background-color: #37F; color: White; }
+.left, .header.row {
+	font-family: 'Helvetica Neue', Arial, Sans-Serif;
+	border-right: 1px solid #eee;
+}
+
+.header {
+	font-size: 16px;
+	font-weight: bold;
+	padding-left: 16px;
+}
+
+
+/* Pane configuration */
+.left.col { width: 150px; }
+.middle.col { left: 150px; width: 454px; }
+.right.col { left: 608px; right: 0; }
+.header.row { top: 48px; height: 30px; }
+.body.row { top: 78px; bottom: 50px; }
+.footer.row { height: 50px; bottom: 0;}
