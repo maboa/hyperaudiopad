@@ -3,6 +3,8 @@ $(document).ready(function(){
 	var theScript = [];  
 	var mediaDir = "http://happyworm.com/video";
 	var transcriptDir = "transcripts";  
+	var exposedTranscripts = [{'id':'internetindians','title':'Internet Indians'},{'id':'raidsinrainforest','title':'Rainforest Raids'}];
+
 	var latency = 1000;
         //console.log('start');                    
 		// Grab the script from the URL
@@ -50,6 +52,12 @@ $(document).ready(function(){
     //errorAlerts: "true",
 		//warningAlerts: "true"
   });  
+
+
+	$('#transcript-files').empty();
+	for (var j = 0; j < exposedTranscripts.length; j++) {
+	    $('#transcript-files').append('<li><a class="transcript-file" href="'+exposedTranscripts[j].id+'" >'+exposedTranscripts[j].title+'</a></li>');
+	}
 
 
 	var i = 0;
@@ -164,7 +172,7 @@ $(document).ready(function(){
 			/*e.stopPropagation();
 			e.preventDefault(); 
     	e.stopImmediatePropagation();*/
-			//console.log('click');
+			console.log('click');
 		   
 			return false;
 		});     
@@ -537,8 +545,9 @@ $(document).ready(function(){
 					timespan.e = nextSpanStartTime;  
 					timespan.m = $.data(myPlayer,'mediaId'); 
 
-					//console.log(endTime);
-					//console.log(nextSpanStartTime);
+					console.log("s="+startTime);
+					console.log("e="+endTime);
+					console.log("n="+nextSpanStartTime);
 
 					//console.log(myPlayer.data('jPlayer').status.src);
 					//timespan.src = myPlayer.data('jPlayer').status.src;
