@@ -164,7 +164,7 @@ $(document).ready(function(){
 			/*e.stopPropagation();
 			e.preventDefault(); 
     	e.stopImmediatePropagation();*/
-			console.log('click');
+			//console.log('click');
 		   
 			return false;
 		});     
@@ -537,8 +537,8 @@ $(document).ready(function(){
 					timespan.e = nextSpanStartTime;  
 					timespan.m = $.data(myPlayer,'mediaId'); 
 
-					console.log(endTime);
-					console.log(nextSpanStartTime);
+					//console.log(endTime);
+					//console.log(nextSpanStartTime);
 
 					//console.log(myPlayer.data('jPlayer').status.src);
 					//timespan.src = myPlayer.data('jPlayer').status.src;
