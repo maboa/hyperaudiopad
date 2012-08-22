@@ -135,3 +135,9 @@ body { margin: 0; -webkit-text-size-adjust: 100%; }
 .header.row { top: 48px; height: 30px; }
 .body.row { top: 78px; bottom: 50px; }
 .footer.row { height: 50px; bottom: 0;}
+
+
+.media-hldr {
+	position:absolute;
+	top: 78px;
+}

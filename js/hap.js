@@ -1,7 +1,7 @@
 $(document).ready(function(){   
 		
 	var theScript = [];  
-	var audioDir = "../audio";
+	var mediaDir = "http://happyworm.com/video";
 	var transcriptDir = "transcripts";  
 	var latency = 1000;
         //console.log('start');                    
@@ -38,14 +38,14 @@ $(document).ready(function(){
 	myPlayer.jPlayer({
  		ready: function (event) {
   
-			if(event.jPlayer.html.used && event.jPlayer.html.audio.available) {
+			if(event.jPlayer.html.used && event.jPlayer.html.video.available) {
 					//initPopcorn('#' + $(this).data("jPlayer").internal.audio.id);
 			}
     }, 
   			
 		solution: "html, flash",
     swfPath: "js",
-    supplied: "mp3,oga",
+    supplied: "m4v,webmv",
 		preload: "auto"
     //errorAlerts: "true",
 		//warningAlerts: "true"
@@ -71,8 +71,8 @@ $(document).ready(function(){
 				
 				//var id = theScriptState[i].m;
         var file = transcriptDir+'/'+timespan.m+'.htm'; 
-				var audioogg = audioDir+'/'+timespan.m+'.ogg';
-				var audiomp3 = audioDir+'/'+timespan.m+'.mp3';
+				var mediaMp4 = mediaDir+'/'+timespan.m+'.mp4';
+				var mediaWebM = mediaDir+'/'+timespan.m+'.webm';
 				
 				//console.log('file = '+audioogg);       
 				//console.log(myPlayer.data('jPlayer').status.src);
@@ -91,13 +91,13 @@ $(document).ready(function(){
 				  success: function(data) {  
 
 						//load success!!!     
-						initPopcorn('#' + myPlayer.data("jPlayer").internal.audio.id);      
+						initPopcorn('#' + myPlayer.data("jPlayer").internal.video.id);      
 
 						// load in the audio      
 
 				  	myPlayer.jPlayer("setMedia", {
-		        	mp3: audiomp3, 
-							oga: audioogg  
+		        	m4v: mediaMp4,
+		        	webmv: mediaWebM
 		      	});
 
 						$.data(myPlayer,'mediaId',timespan.m);
@@ -190,12 +190,12 @@ $(document).ready(function(){
 				loadFile(mediaId);				
 			}
 				
-			var audiomp3 = audioDir+"/"+mediaId+".mp3";
-			var audioogg = audioDir+"/"+mediaId+".ogg";
+			var mediaMp4 = mediaDir+"/"+mediaId+".mp4";
+			var mediaWebM = mediaDir+'/'+mediaId+'.webm';
 
 			myPlayer.jPlayer("setMedia", {
-	      mp3: audiomp3, 
-			  oga: audioogg  
+	      m4v: mediaMp4,
+	      webmv: mediaWebM  
 	    }); 
             
 			myPlayer.jPlayer("play");
@@ -272,13 +272,11 @@ $(document).ready(function(){
 
 								loadFile(mediaId);
 							
-								var audiomp3 = audioDir+"/"+mediaId+".mp3";
-								var audioogg = audioDir+"/"+mediaId+".ogg";
+								var mediaMp4 = mediaDir+"/"+mediaId+".mp4";
      
 								myPlayer.jPlayer("setMedia", {
-				         	mp3: audiomp3, 
-									oga: audioogg  
-				       	});   
+				         	m4v: mediaMp4
+				       	}); 
 				
 								myPlayer.jPlayer("pause",start);   
 							}    
@@ -312,8 +310,8 @@ $(document).ready(function(){
 		
 		function loadFile(id) { 
 			var file = transcriptDir+'/'+id+'.htm'; 
-			var audioogg = audioDir+'/'+id+'.ogg';
-			var audiomp3 = audioDir+'/'+id+'.mp3';  
+			var mediaMp4 = mediaDir+'/'+id+'.mp4';
+			var mediaWebM = mediaDir+'/'+id+'.webm';
 			
 			//console.log('file = '+audioogg);
 			 
@@ -324,14 +322,14 @@ $(document).ready(function(){
       $('#load-status').html('loading ...');
 			$('#transcript-content').load(file, function() {
 			  	//load success!!!     
-				initPopcorn('#' + myPlayer.data("jPlayer").internal.audio.id);   
+				initPopcorn('#' + myPlayer.data("jPlayer").internal.video.id);   
 
 				// load in the audio
 
-			    myPlayer.jPlayer("setMedia", {
-	         		mp3: audiomp3, 
-					oga: audioogg  
-	       		});   
+			  myPlayer.jPlayer("setMedia", {
+	        m4v: mediaMp4,
+	        webmv: mediaWebM
+	      });   
 	
 				$.data(myPlayer,'mediaId',id);
 				$('#load-status').html('');
@@ -511,11 +509,23 @@ $(document).ready(function(){
 						} else {
 							nextSpan = getNextNode(nextSpan,true,endSpan);	
 						}
-						
 					}
 
 					$(endSpan).clone().appendTo(selectedStuff); 
 
+					// grab the span after the endSpan to get proper end time
+
+					var nextSpanStart = getNextNode(nextSpan,true,endSpan);
+
+					if (nextSpanStart instanceof HTMLParagraphElement) {
+						nextSpanStart = nextSpanStart.firstChild;
+					}
+
+					var nextSpanStartTime = parseInt(nextSpanStart.getAttribute('m'));
+
+					if (isNaN(nextSpanStartTime)) { // checking for end of text select
+						nextSpanStartTime = Math.floor(myPlayer.data('jPlayer').status.duration * 1000);
+					}
 					//console.log(selectedStuff);
 
 
@@ -524,8 +534,12 @@ $(document).ready(function(){
 					
 					var timespan = {};
 					timespan.s = startTime;
-					timespan.e = endTime;  
-					timespan.m = $.data(myPlayer,'mediaId');  
+					timespan.e = nextSpanStartTime;  
+					timespan.m = $.data(myPlayer,'mediaId'); 
+
+					console.log(endTime);
+					console.log(nextSpanStartTime);
+
 					//console.log(myPlayer.data('jPlayer').status.src);
 					//timespan.src = myPlayer.data('jPlayer').status.src;
 					theScript.push(timespan);     
@@ -559,9 +573,9 @@ $(document).ready(function(){
 
 			//console.dir(node);
 		  //if there are child nodes and we didn't come from a child node
-		  if (endNode == node) {
+		  /*if (endNode == node) {
 		    return null;
-		  }
+		  }*/
 		  if (node.firstChild && !skipChildren) {
 		    return node.firstChild;
 		  }
@@ -609,6 +623,15 @@ $(document).ready(function(){
 				$('#instructions').fadeIn();
 			}
 			 
+			return false;
+		});
+
+		/* test stuff */
+
+		$('#show-video').click(function(){   
+
+			$('#transcript-content').css('top','350px');
+
 			return false;
 		});
 		

@@ -4,10 +4,11 @@
 		<meta charset=utf-8 />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<link href="css/hap.css" rel="stylesheet" type="text/css" />
+		<link rel="icon" href="favicon.ico" type="image/x-icon"> 
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> 
 	</head>
 	<body>
 
-		<div id="jquery_jplayer_1" class="jp-jplayer"></div>
 
 		<div id="control-hldr">
 			<div class="control">
@@ -24,8 +25,8 @@
 			</div>
 			<div class="body row scroll-y">
 				<ul class="listview">
-					<li><a class="transcript-file" href="nitotmozilla-m" >Nitot on Firefox</a></li>
-					<li><a class="transcript-file" href="mbjkaudio" >HTML5 Audio</a></li>  
+					<li><a class="transcript-file" href="internetindians" >Internet Indians</a></li>
+					<li><a class="transcript-file" href="raidsinrainforest" >Rainforest Raids</a></li>
 				</ul>
 			</div>
 			<div class="footer row">
@@ -39,7 +40,14 @@
 
 		<div id="transcript" class="middle col">
 			<div class="header row">
-				<span id="script-title"></span> <span id="load-status"></span> <span id="source-header-ctrl" class="header-ctrl" style="display:none"><a id="play-btn-source" href="#">play</a><a id="pause-btn-source" href="#" style="display:none">pause</a></span>
+				<span id="script-title"></span> <span id="load-status"></span> <span id="source-header-ctrl" class="header-ctrl" style="display:none"><a id="show-video" href="#">show video</a> . <a id="play-btn-source" href="#">play</a><a id="pause-btn-source" href="#" style="display:none">pause</a></span>
+
+			</div>
+
+			<!-- video display (when required) -->
+
+			<div id="media-content" class="media-hldr">
+				<div id="jquery_jplayer_1" class="jp-jplayer"></div>
 			</div>
 
 			<div id="transcript-content" class="body row scroll-y">
