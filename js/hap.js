@@ -6,25 +6,25 @@ $(document).ready(function(){
 	var exposedTranscripts = [{'id':'internetindians','title':'Internet Amazonians'},{'id':'raidsinrainforest','title':'Rainforest Raids'}];
 
 	var latency = 1000;
-        //console.log('start');                    
-		// Grab the script from the URL
+
+	// Grab the script from the URL
 	var theScriptState = [];
-	//var theScriptState = $.bbq.getState();  
-		//console.dir(theScript);  
+	//var theScriptState = $.bbq.getState();
+	//console.dir(theScript);  
 	var theScriptLength = theScript.length; 
 		
-		//console.log(theScript[0].m);         
-	    //console.log(theScriptLength); 
-		//console.log(theScript.length);   
+		//console.log(theScript[0].m);
+		//console.log(theScriptLength);
+		//console.log(theScript.length);
 		
-		/*if (theScriptLength > 0) {   
+		/*if (theScriptLength > 0) {
 			
 			for (var i=0; i < theScriptLength; i++) {
 				loadFile(theScript[i].m);
 			}
 			
 		} else {
-		  theScript = [];   
+		  theScript = [];
 		} */
 		
 		
@@ -76,100 +76,6 @@ $(document).ready(function(){
 	}
 
 
-	var i = 0;
-
-
-	// The below block of code is used to load saved scripts. Previously state was stored RESTfully in the URL, but due to size limits in some browsers and generally unweildlyness of long URLS it is *maybe* better to read and write stat from a db. I have taken this out for now.
-
-	if (theScriptState[i] != false) { 
-		 	while (theScriptState[i] != undefined) {
-
-				//loadFile(theScriptState[i].m); 
-                
-				// repeated code use loadFile with a callback 
-				
-				//console.log('snippet --------------- > '+i);
-
-				var timespan = {};
-				timespan.s = parseInt(theScriptState[i].s);
-				timespan.e = parseInt(theScriptState[i].e);  
-				timespan.m = theScriptState[i].m; 
-				
-				//var id = theScriptState[i].m;
-        var file = transcriptDir+'/'+timespan.m+'.htm'; 
-				var mediaMp4 = mediaDir+'/'+timespan.m+'.mp4';
-				var mediaWebM = mediaDir+'/'+timespan.m+'.webm';
-				
-				//console.log('file = '+audioogg);       
-				//console.log(myPlayer1.data('jPlayer').status.src);
-				//timespan.src = myPlayer1.data('jPlayer').status.src; 
-				 
-				
-				theScript.push(timespan);  
-				
-				//console.log(theScriptState[i].s);   
-
-
-				
-				$.ajax({
-				  url: file,
-				  async: false,
-				  success: function(data) {  
-
-						//load success!!!     
-						initPopcorn('#' + myPlayer1.data("jPlayer").internal.video.id);      
-
-						// load in the audio      
-
-				  	myPlayer1.jPlayer("setMedia", {
-		        	m4v: mediaMp4,
-		        	webmv: mediaWebM
-		      	});
-
-						$.data(myPlayer1,'mediaId',timespan.m);
-
-				  	$('#transcript-content').html(data); 
-
-						//$('.scroll-panel').jScrollPane(); 
-					
-						// We need to paste the appropriate parts in the target pane here     
- 
-						var thisSpan = $('#transcript-content span[m="'+timespan.s+'"]');     
-					      
-						var endFound = false;
- 
-					
-						var selectedStuff = $('<p i="'+i+'" s="'+timespan.s+'" e="'+timespan.e+'"  f="'+myPlayer1.data('jPlayer').status.src+'">');
-					 
-						$('#target-content').append( selectedStuff ); 
-
-						while (endFound == false) {
-
-							$(thisSpan).clone().appendTo(selectedStuff);   
-							thisSpan = thisSpan.next();    
-							selectedStuff.append(' ');
-							if (thisSpan.attr('m') == timespan.e) endFound = true; 
-						} 
-
-						$('#target-content').append('</p>');       
-
-				  }
-				});
-
-
-
-
-				//while (theScript
-
-				//$('#target-content').append();
-
-				i++;
-				//console.log('New snippet');      
-			 } 
-		   
-		}  
-		
-		//console.log('EXITED');
    
 
 		// These events are fired as play time increments  
@@ -209,13 +115,11 @@ $(document).ready(function(){
 		var mediaId = "";
 		
 		
-		$('#target-content').delegate('span','click',function(){ 		
-
-
+		$('#target-content').delegate('span','click',function(){
 
 			playSource = false;	
- 
-			var jumpTo = $(this).attr('m')/1000;   
+
+			var jumpTo = $(this).attr('m')/1000;
 			
 			index = $(this).parent().attr('i'); 
 		
@@ -231,7 +135,15 @@ $(document).ready(function(){
 			//console.log("index="+index);
 			//console.log("jumpTo="+jumpTo);
 
+			console.log(mediaId);
+
 			if (player1MediaId == mediaId) {
+
+				//var file = transcriptDir+'/'+mediaId+'.htm'; 
+
+				//if (currentlyLoaded != 1) {
+				//	$('#transcript-content').load(file);
+				//}
 
 				$('#jquery_jplayer_2').hide();
 				$('#jquery_jplayer_1').show();
@@ -241,15 +153,18 @@ $(document).ready(function(){
 
 			} else {
 
+				//if (currentlyLoaded != 2) {
+				//	$('#transcript-content').load(file);
+				//}
+
 				$('#jquery_jplayer_1').hide();
 				$('#jquery_jplayer_2').show();
 	
 				myPlayer1.jPlayer("pause");
 				myPlayer2.jPlayer("play",jumpTo);
 			}
-       
 			
-		  filename = $(this).parent().attr('f');  
+			filename = $(this).parent().attr('f');  
 			end = $(this).parent().attr('e');  
 			start = $(this).parent().attr('s'); 
 			index = $(this).parent().attr('i'); 
@@ -332,7 +247,6 @@ $(document).ready(function(){
 		myPlayer1.bind($.jPlayer.event.ended, function() {  
 			// 
 		}); 
-		     
 		
 		/* hyperaudiopad stuff */
 
@@ -343,23 +257,23 @@ $(document).ready(function(){
 		function initPopcorn(id) {   
 			var p = Popcorn(id)
 			.code({
-			   start: 0,
-		       end: 2000,
-		       onStart: function (options) {
-		         //console.log('start')
-		       },
-		       onFrame: (function () {
-		        var count = 0;
-		        return function (options) {
+					start: 0,
+					end: 2000,
+					onStart: function (options) {
+						//console.log('start')
+					},
+					onFrame: (function () {
+						var count = 0;
+						return function (options) {
 					
-            //var now = this.Popcorn.instances[0].media.currentTime*1000;   
+						//var now = this.Popcorn.instances[0].media.currentTime*1000;   
 
-            var now;
+						var now;
 
-            //console.log(mediaId);
+						//console.log(mediaId);
 
-            if (player1MediaId == mediaId) {
-            	now = myPlayer1.data('jPlayer').status.currentTime * 1000;
+						if (player1MediaId == mediaId) {
+							now = myPlayer1.data('jPlayer').status.currentTime * 1000;
 						} else {
 							now = myPlayer2.data('jPlayer').status.currentTime * 1000;
 						}
@@ -375,14 +289,15 @@ $(document).ready(function(){
 
 						//console.log(playSource);
 					
-						if (now > end && playSource == false) {  
+						if (now > end && playSource == false) {
+							// BUG this bit of code is executed infintely after the piece has stopped playing
 
 
 
 							//console.log('tick');
 
-          		//myPlayer1.jPlayer("pause");
-          		//myPlayer2.jPlayer("pause");
+							//myPlayer1.jPlayer("pause");
+							//myPlayer2.jPlayer("pause");
 							index = parseInt(index);
 
 							// check for the end
@@ -403,24 +318,24 @@ $(document).ready(function(){
 							if (theScript.length > (index+1)) {  
 
 								var fadeSpeed = 100; //ms
-						    var fadeColor = "black";
+								var fadeColor = "black";
 
-						    console.log(index);
+								//console.log(index);
 
-						    if (theScript[index].action == 'fade') {
-						    	console.log('action fade detected');
+								if (theScript[index].action == 'fade') {
+									console.log('action fade detected');
 
-						    	if (theScript[index].color) {
-						    		fadeColor = theScript[index].color;
-						    	}
+									if (theScript[index].color) {
+										fadeColor = theScript[index].color;
+									}
 
-						    	if (theScript[index].time) {
-						    		fadeSpeed = theScript[index].time*1000;
-						    	}
-						    }
+									if (theScript[index].time) {
+										fadeSpeed = theScript[index].time*1000;
+									}
+								}
 
-						    console.log(fadeColor);
-						    console.log(fadeSpeed);
+								console.log(fadeColor);
+								console.log(fadeSpeed);
 
 								// moving to the next block in the target
 
@@ -429,22 +344,23 @@ $(document).ready(function(){
 								//if (log) console.dir(theScript);
 								start = theScript[index].s;   
 								end = theScript[index].e;
-						    mediaId = theScript[index].m;
+								mediaId = theScript[index].m;
 
 
 
 
-						    $('#fader-content').css('background-color',fadeColor);
+							$('#fader-content').css('background-color',fadeColor);
 
-						    if (player1MediaId == mediaId) {
+								if (player1MediaId == mediaId) {
 									$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 										//console.log('ping');
 										$('#jquery_jplayer_2').hide();
 										$('#jquery_jplayer_1').show();
 										$('#fader-content').fadeTo(fadeSpeed, 0);
 									});
+									console.log("switch to 1");
 									myPlayer2.jPlayer("pause");
-									myPlayer1.jPlayer("play",start/1000);    
+									myPlayer1.jPlayer("play",start/1000);
 								} else {
 									$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 										//console.log('pong');
@@ -452,6 +368,7 @@ $(document).ready(function(){
 										$('#jquery_jplayer_2').show();
 										$('#fader-content').fadeTo(fadeSpeed, 0);
 									});
+									console.log("switch to 2");
 									myPlayer1.jPlayer("pause");
 									myPlayer2.jPlayer("play",start/1000); 
 								}
@@ -480,17 +397,19 @@ $(document).ready(function(){
 					time: $(this).attr("m") / 1000, // seconds
 					futureClass: "transcript-grey",
 					target: this
-				});  
+				});
 			});
 		};
 
 
 		$('.transcript-file').live('click',function(){ 
-			var id = $(this).attr('href');  
+			var id = $(this).attr('href');
+
+			//console.log(id);
 			
-			$('#script-title').text($(this).text());  
+			$('#script-title').text($(this).text());
 			
-			loadFile(id); 
+			loadFile(id);
 
 			return false;
 		}); 
@@ -747,9 +666,9 @@ $(document).ready(function(){
 					timespan.s = startTime;
 					timespan.e = nextSpanStartTime;  
 					if (currentlyLoaded == 1) {
-						timespan.m = $.data(myPlayer1,'mediaId'); 
+						timespan.m = $.data(myPlayer1,'mediaId');
 					} else {
-						timespan.m = $.data(myPlayer2,'mediaId'); 						
+						timespan.m = $.data(myPlayer2,'mediaId');
 					}
 					
 
@@ -875,4 +794,4 @@ $(document).ready(function(){
 			return false;
 		});
 		
-});    
+});
