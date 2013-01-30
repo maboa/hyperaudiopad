@@ -3,7 +3,7 @@ $(document).ready(function(){
 	var theScript = [];  
 	var mediaDir = "http://happyworm.com/video";
 	var transcriptDir = "transcripts";  
-	var exposedTranscripts = [{'id':'internetindians','title':'Internet Indians'},{'id':'raidsinrainforest','title':'Rainforest Raids'}];
+	var exposedTranscripts = [{'id':'internetindians','title':'Internet Amazonians'},{'id':'raidsinrainforest','title':'Rainforest Raids'}];
 
 	var latency = 1000;
         //console.log('start');                    
@@ -28,16 +28,20 @@ $(document).ready(function(){
 		} */
 		
 		
-	var currentyLoaded = "";
+	var currentlyLoaded = 0;
 	var hints = true;
 	var playSource = true;
 		
-
+	// we need two instances so that we can do transitions
 		
-	var myPlayer = $("#jquery_jplayer_1");
+	var myPlayer1 = $("#jquery_jplayer_1");
+	var myPlayer2 = $("#jquery_jplayer_2");
+
+	var player1MediaId = "";
+	var player2MediaId = "";
 	
 	
-	myPlayer.jPlayer({
+	myPlayer1.jPlayer({
  		ready: function (event) {
   
 			if(event.jPlayer.html.used && event.jPlayer.html.video.available) {
@@ -49,9 +53,21 @@ $(document).ready(function(){
     swfPath: "js",
     supplied: "m4v,webmv",
 		preload: "auto"
-    //errorAlerts: "true",
-		//warningAlerts: "true"
   });  
+
+  myPlayer2.jPlayer({
+ 		ready: function (event) {
+  
+			if(event.jPlayer.html.used && event.jPlayer.html.video.available) {
+					//initPopcorn('#' + $(this).data("jPlayer").internal.audio.id);
+			}
+    }, 
+  			
+		solution: "html, flash",
+    swfPath: "js",
+    supplied: "m4v,webmv",
+		preload: "auto"
+  }); 
 
 
 	$('#transcript-files').empty();
@@ -63,9 +79,11 @@ $(document).ready(function(){
 	var i = 0;
 
 
+	// The below block of code is used to load saved scripts. Previously state was stored RESTfully in the URL, but due to size limits in some browsers and generally unweildlyness of long URLS it is *maybe* better to read and write stat from a db. I have taken this out for now.
 
 	if (theScriptState[i] != false) { 
 		 	while (theScriptState[i] != undefined) {
+
 				//loadFile(theScriptState[i].m); 
                 
 				// repeated code use loadFile with a callback 
@@ -83,8 +101,8 @@ $(document).ready(function(){
 				var mediaWebM = mediaDir+'/'+timespan.m+'.webm';
 				
 				//console.log('file = '+audioogg);       
-				//console.log(myPlayer.data('jPlayer').status.src);
-				//timespan.src = myPlayer.data('jPlayer').status.src; 
+				//console.log(myPlayer1.data('jPlayer').status.src);
+				//timespan.src = myPlayer1.data('jPlayer').status.src; 
 				 
 				
 				theScript.push(timespan);  
@@ -99,16 +117,16 @@ $(document).ready(function(){
 				  success: function(data) {  
 
 						//load success!!!     
-						initPopcorn('#' + myPlayer.data("jPlayer").internal.video.id);      
+						initPopcorn('#' + myPlayer1.data("jPlayer").internal.video.id);      
 
 						// load in the audio      
 
-				  	myPlayer.jPlayer("setMedia", {
+				  	myPlayer1.jPlayer("setMedia", {
 		        	m4v: mediaMp4,
 		        	webmv: mediaWebM
 		      	});
 
-						$.data(myPlayer,'mediaId',timespan.m);
+						$.data(myPlayer1,'mediaId',timespan.m);
 
 				  	$('#transcript-content').html(data); 
 
@@ -121,7 +139,7 @@ $(document).ready(function(){
 						var endFound = false;
  
 					
-						var selectedStuff = $('<p i="'+i+'" s="'+timespan.s+'" e="'+timespan.e+'"  f="'+myPlayer.data('jPlayer').status.src+'">');
+						var selectedStuff = $('<p i="'+i+'" s="'+timespan.s+'" e="'+timespan.e+'"  f="'+myPlayer1.data('jPlayer').status.src+'">');
 					 
 						$('#target-content').append( selectedStuff ); 
 
@@ -162,17 +180,24 @@ $(document).ready(function(){
 		// transcript links to audio
 
 		$('#transcript').delegate('span','click',function(e){ 
+
 			playSource = true; 
 			var jumpTo = $(this).attr('m')/1000; 
             //console.log('playing from '+jumpTo);
-			myPlayer.jPlayer("play",jumpTo);  
+
+      if (currentlyLoaded == 1) {
+      	myPlayer1.jPlayer("play",jumpTo);
+      } else {
+      	myPlayer2.jPlayer("play",jumpTo);
+      }     
+			
 			$('#play-btn-source').hide();
 			$('#pause-btn-source').show();  
 
 			/*e.stopPropagation();
 			e.preventDefault(); 
     	e.stopImmediatePropagation();*/
-			console.log('click');
+			//console.log('click');
 		   
 			return false;
 		});     
@@ -186,6 +211,8 @@ $(document).ready(function(){
 		
 		$('#target-content').delegate('span','click',function(){ 		
 
+
+
 			playSource = false;	
  
 			var jumpTo = $(this).attr('m')/1000;   
@@ -194,22 +221,33 @@ $(document).ready(function(){
 		
 			mediaId = theScript[index].m; 
 
-			if (currentlyPlaying != mediaId) {
-				loadFile(mediaId);				
-			}
 				
 			var mediaMp4 = mediaDir+"/"+mediaId+".mp4";
 			var mediaWebM = mediaDir+'/'+mediaId+'.webm';
 
-			myPlayer.jPlayer("setMedia", {
-	      m4v: mediaMp4,
-	      webmv: mediaWebM  
-	    }); 
-            
-			myPlayer.jPlayer("play");
-			myPlayer.jPlayer("pause");   
-			
-			setTimeout(function(){myPlayer.jPlayer("play",jumpTo); }, latency);           
+
+			//console.log(mediaId);
+			//console.log(player1MediaId);
+			//console.log("index="+index);
+			//console.log("jumpTo="+jumpTo);
+
+			if (player1MediaId == mediaId) {
+
+				$('#jquery_jplayer_2').hide();
+				$('#jquery_jplayer_1').show();
+
+				myPlayer2.jPlayer("pause");
+				myPlayer1.jPlayer("play",jumpTo); 
+
+			} else {
+
+				$('#jquery_jplayer_1').hide();
+				$('#jquery_jplayer_2').show();
+	
+				myPlayer1.jPlayer("pause");
+				myPlayer2.jPlayer("play",jumpTo);
+			}
+       
 			
 		  filename = $(this).parent().attr('f');  
 			end = $(this).parent().attr('e');  
@@ -219,11 +257,79 @@ $(document).ready(function(){
 			return false;
 		});
 
+		// Listen to contenteditable
 
- 
+ 		document.addEventListener("DOMCharacterDataModified", function(event) {
+    	console.log($(event.target).parent()[0].tagName);
+    	console.dir(event);
+    	console.log($(event.target).parent().attr("m"));
+    	var index = $(event.target).parents('p').attr("i");
+    	var newText = event.newValue;
+    	console.log(event.newValue);
+    	var commands = newText.substring(newText.indexOf('[')+1,newText.indexOf(']'));
+    	console.log(commands);
+    	var commandList = commands.split(" ");
+    	console.dir(commandList);
+
+
+    	var action,time,color;
+    	    	
+
+    	console.log("cm length = "+commandList.length);
+
+    	for (var i=0; i < commandList.length; i++) {
+
+    		console.log("word "+i);
+
+    		// detecting fade
+    		if (commandList[i] == 'fade') {
+    			action = commandList[i];
+    		}
+
+    		console.log(commandList[i]+ 'a number? = '+isNumber(commandList[i]) );
+
+    		if (isNumber(commandList[i])) {
+    			time = commandList[i];
+    		}
+
+    		if (isColor(commandList[i])) {
+    			color = commandList[i];
+    		}
+
+    	}
+
+  
+  		console.log(action);
+  		console.log(time);
+  		console.log(color);
+
+  		if ( newText.indexOf(']') > 0 ) {
+  			theScript[index].action = action;
+  			theScript[index].time = time;
+  			theScript[index].color = color;
+  		}
+
+
+    	//console.dir(commandList);
+    	console.dir(theScript);
+		});
+
+ 		function isNumber(n) {
+  		return !isNaN(parseFloat(n)) && isFinite(n);
+		}
+
+		var legalColors = ['black','silver','gray','white','maroon','red','purple','fuchsia','green','lime','olive','yellow','navy','blue','teal','aqua'];
+
+		function isColor(c) {
+			for (i = 0; i < legalColors.length; i++) {
+				if (c == legalColors[i]) {
+					return true;
+				}
+			}
+		}
 
 		
-		myPlayer.bind($.jPlayer.event.ended, function() {  
+		myPlayer1.bind($.jPlayer.event.ended, function() {  
 			// 
 		}); 
 		     
@@ -231,6 +337,8 @@ $(document).ready(function(){
 		/* hyperaudiopad stuff */
 
 		/* load in the file */  
+
+
 
 		function initPopcorn(id) {   
 			var p = Popcorn(id)
@@ -244,51 +352,122 @@ $(document).ready(function(){
 		        var count = 0;
 		        return function (options) {
 					
-            var now = this.Popcorn.instances[0].media.currentTime*1000;   
+            //var now = this.Popcorn.instances[0].media.currentTime*1000;   
+
+            var now;
+
+            //console.log(mediaId);
+
+            if (player1MediaId == mediaId) {
+            	now = myPlayer1.data('jPlayer').status.currentTime * 1000;
+						} else {
+							now = myPlayer2.data('jPlayer').status.currentTime * 1000;
+						}
+
+						//console.log(now);
 					
 						var src = "";
 
 						//console.log("now="+now+" end="+end+"theScript.length="+theScript.length+" index="+index);
 
-					
-						if (now > end && playSource == false) {   
+						//console.log('end = '+end);
+						//console.log('now = '+now);
 
-          		myPlayer.jPlayer("pause");
+						//console.log(playSource);
+					
+						if (now > end && playSource == false) {  
+
+
+
+							//console.log('tick');
+
+          		//myPlayer1.jPlayer("pause");
+          		//myPlayer2.jPlayer("pause");
 							index = parseInt(index);
 
 							// check for the end
 
+
+
 							if (theScript.length <= (index+1) && now > end) {
-								myPlayer.jPlayer("pause");
-							} 
+								//console.log(end);
+								//console.log(now);
+								//if (log2) console.log('end reached '+end+" now "+now);
+								//log2 = false;
+								myPlayer1.jPlayer("pause");
+								myPlayer2.jPlayer("pause");
+							}
+
+
 							
 							if (theScript.length > (index+1)) {  
+
+								var fadeSpeed = 100; //ms
+						    var fadeColor = "black";
+
+						    console.log(index);
+
+						    if (theScript[index].action == 'fade') {
+						    	console.log('action fade detected');
+
+						    	if (theScript[index].color) {
+						    		fadeColor = theScript[index].color;
+						    	}
+
+						    	if (theScript[index].time) {
+						    		fadeSpeed = theScript[index].time*1000;
+						    	}
+						    }
+
+						    console.log(fadeColor);
+						    console.log(fadeSpeed);
 
 								// moving to the next block in the target
 
 								index = index + 1;       
-
+								//if (log) console.log('index incremented now ='+index);
+								//if (log) console.dir(theScript);
 								start = theScript[index].s;   
 								end = theScript[index].e;
 						    mediaId = theScript[index].m;
+
+
+
+
+						    $('#fader-content').css('background-color',fadeColor);
+
+						    if (player1MediaId == mediaId) {
+									$('#fader-content').fadeTo(fadeSpeed, 1, function() {
+										//console.log('ping');
+										$('#jquery_jplayer_2').hide();
+										$('#jquery_jplayer_1').show();
+										$('#fader-content').fadeTo(fadeSpeed, 0);
+									});
+									myPlayer2.jPlayer("pause");
+									myPlayer1.jPlayer("play",start/1000);    
+								} else {
+									$('#fader-content').fadeTo(fadeSpeed, 1, function() {
+										//console.log('pong');
+										$('#jquery_jplayer_1').hide();
+										$('#jquery_jplayer_2').show();
+										$('#fader-content').fadeTo(fadeSpeed, 0);
+									});
+									myPlayer1.jPlayer("pause");
+									myPlayer2.jPlayer("play",start/1000); 
+								}
+
+
+
 							
-								myPlayer.bind($.jPlayer.event.progress + ".fixStart", function(event) {
+								/*myPlayer1.bind($.jPlayer.event.progress + ".fixStart", function(event) {
 									// Warning: The variable 'start' must not be changed before this handler is called.
 							    $(this).unbind(".fixStart"); 
 									$(this).jPlayer("play",start/1000);
 								});     
-
-								loadFile(mediaId);
-							
-								var mediaMp4 = mediaDir+"/"+mediaId+".mp4";
-     
-								myPlayer.jPlayer("setMedia", {
-				         	m4v: mediaMp4
-				       	}); 
 				
-								myPlayer.jPlayer("pause",start);   
+								myPlayer1.jPlayer("pause",start);   */
 							}    
-						}   
+						}
 		      }
 		    })(),
 		    onEnd: function (options) {
@@ -315,31 +494,52 @@ $(document).ready(function(){
 
 			return false;
 		}); 
+
+
 		
 		function loadFile(id) { 
 			var file = transcriptDir+'/'+id+'.htm'; 
 			var mediaMp4 = mediaDir+'/'+id+'.mp4';
 			var mediaWebM = mediaDir+'/'+id+'.webm';
 			
-			//console.log('file = '+audioogg);
-			 
-			currentlyPlaying = id;
 
 			//$('.direct').html('loading ...');
 			   
       $('#load-status').html('loading ...');
 			$('#transcript-content').load(file, function() {
 			  	//load success!!!     
-				initPopcorn('#' + myPlayer.data("jPlayer").internal.video.id);   
+				
 
 				// load in the audio
 
-			  myPlayer.jPlayer("setMedia", {
-	        m4v: mediaMp4,
-	        webmv: mediaWebM
-	      });   
+				// check which player to load media into
+
+				if (myPlayer1.data('jPlayer').status.src && currentlyLoaded < 2) {
+					initPopcorn('#' + myPlayer2.data("jPlayer").internal.video.id);   
+					myPlayer2.jPlayer("setMedia", {
+	        	m4v: mediaMp4,
+	        	webmv: mediaWebM
+	      	});
+	      	$.data(myPlayer2,'mediaId',id);
+	      	currentlyLoaded = 2;
+	      	player2MediaId = id;
+	      	$('#jquery_jplayer_1').hide();
+	      	$('#jquery_jplayer_2').show();
+				} else {
+					initPopcorn('#' + myPlayer1.data("jPlayer").internal.video.id);   
+					myPlayer1.jPlayer("setMedia", {
+	        	m4v: mediaMp4,
+	        	webmv: mediaWebM
+	      	});
+	      	$.data(myPlayer1,'mediaId',id);
+	      	currentlyLoaded = 1;
+	      	player1MediaId = id;
+	      	$('#jquery_jplayer_2').hide();
+	      	$('#jquery_jplayer_1').show();
+				}
+   
 	
-				$.data(myPlayer,'mediaId',id);
+				
 				$('#load-status').html('');
 
 				if (hints == true) {
@@ -494,8 +694,8 @@ $(document).ready(function(){
 
 
 					var nextSpan = startSpan; 
-					// $('#target-content').append('<p s="'+startTime+'" e="'+endTime+'" f="'+myPlayer.data('jPlayer').status.src+'">');
-					var selectedStuff = $('<p i="'+theScript.length+'" s="'+startTime+'" e="'+endTime+'"  f="'+myPlayer.data('jPlayer').status.src+'">'); 
+					// $('#target-content').append('<p s="'+startTime+'" e="'+endTime+'" f="'+myPlayer1.data('jPlayer').status.src+'">');
+					var selectedStuff = $('<p i="'+theScript.length+'" s="'+startTime+'" e="'+endTime+'"  f="'+myPlayer1.data('jPlayer').status.src+'">'); 
 					$('#target-content').append( selectedStuff ); 
 					
 					//console.log('selected....');
@@ -532,25 +732,33 @@ $(document).ready(function(){
 					var nextSpanStartTime = parseInt(nextSpanStart.getAttribute('m'));
 
 					if (isNaN(nextSpanStartTime)) { // checking for end of text select
-						nextSpanStartTime = Math.floor(myPlayer.data('jPlayer').status.duration * 1000);
+						nextSpanStartTime = Math.floor(myPlayer1.data('jPlayer').status.duration * 1000);
 					}
+
+
 					//console.log(selectedStuff);
 
 
 					$('#target-content').append('</p>');   
 
+
 					
 					var timespan = {};
 					timespan.s = startTime;
 					timespan.e = nextSpanStartTime;  
-					timespan.m = $.data(myPlayer,'mediaId'); 
+					if (currentlyLoaded == 1) {
+						timespan.m = $.data(myPlayer1,'mediaId'); 
+					} else {
+						timespan.m = $.data(myPlayer2,'mediaId'); 						
+					}
+					
 
-					console.log("s="+startTime);
-					console.log("e="+endTime);
-					console.log("n="+nextSpanStartTime);
+					//console.log("s="+startTime);
+					//console.log("e="+endTime);
+					//console.log("n="+nextSpanStartTime);
 
-					//console.log(myPlayer.data('jPlayer').status.src);
-					//timespan.src = myPlayer.data('jPlayer').status.src;
+					//console.log(myPlayer1.data('jPlayer').status.src);
+					//timespan.src = myPlayer1.data('jPlayer').status.src;
 					theScript.push(timespan);     
 					
           //$.bbq.pushState(theScript);
@@ -600,16 +808,37 @@ $(document).ready(function(){
 		};  
 
 		$('#play-btn-source').click(function(){
-			myPlayer.jPlayer("play");
-			$(this).hide();
-			$('#pause-btn-source').show();
+			if (currentlyLoaded == 1) {
+				myPlayer1.jPlayer("play");
+			}
+
+			if (currentlyLoaded == 2) {
+				myPlayer2.jPlayer("play");
+			}
+			
+			if (currentlyLoaded > 0) {
+				$(this).hide();
+				$('#pause-btn-source').show();
+			}
+
 			return false;
 		});
 
 		$('#pause-btn-source').click(function(){
-			myPlayer.jPlayer("pause");
-			$(this).hide();
-			$('#play-btn-source').show();
+
+			if (currentlyLoaded == 1) {
+				myPlayer1.jPlayer("pause");
+			}
+
+			if (currentlyLoaded == 2) {
+				myPlayer2.jPlayer("pause");
+			}
+			
+			if (currentlyLoaded > 0) {
+				$(this).hide();
+				$('#play-btn-source').show();
+			}
+
 			return false;
 		});
 
@@ -619,6 +848,8 @@ $(document).ready(function(){
 			theScript = [];
 			$('#transcript-content').html('');
 			$('#target-content').html('');
+
+			Popcorn.destroy(p);
 
 			return false;
 		});
