@@ -402,7 +402,7 @@ $(document).ready(function(){
 		};
 
 
-		$('.transcript-file').live('click',function(){ 
+		$('.transcript-file').on('click',function(){ 
 			var id = $(this).attr('href');
 
 			//console.log(id);
