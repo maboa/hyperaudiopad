@@ -159,7 +159,9 @@ $(document).ready(function(){
 	};
 
 	function fitVideo(c) {
-		c.find('video').css('width',c.css('width')).css('height',c.css('height'));
+		var s = c.data('jPlayer').options.size;
+		// c.find('video').css('width',c.css('width')).css('height',c.css('height'));
+		c.find('video').css('width',s.width).css('height',s.height);
 	}
 
 	myPlayer1.jPlayer({
@@ -167,7 +169,7 @@ $(document).ready(function(){
 
 			if(event.jPlayer.html.used && event.jPlayer.html.video.available) {
 				// sets size of video to that of container
-				fitVideo($(this));
+				// fitVideo($(this));
 			}
 		},
 		timeupdate: function(event) {
@@ -184,7 +186,7 @@ $(document).ready(function(){
 
 			if(event.jPlayer.html.used && event.jPlayer.html.video.available) {
 				// sets size of video to that of container
-				fitVideo($(this));
+				// fitVideo($(this));
 			}
 		},
 		timeupdate: function(event) {
@@ -418,14 +420,15 @@ $(document).ready(function(){
 			if (myPlayer1.data('jPlayer').status.src && currentlyLoaded < 2) {
 				initPopcorn('#' + myPlayer2.data("jPlayer").internal.video.id);
 				myPlayer2.jPlayer("setMedia", {
-				m4v: mediaMp4,
+					m4v: mediaMp4,
 					webmv: mediaWebM
-			});
-			$.data(myPlayer2,'mediaId',id);
+				});
+				$.data(myPlayer2,'mediaId',id);
 				currentlyLoaded = 2;
 				player2MediaId = id;
 				$('#jquery_jplayer_1').hide();
 				$('#jquery_jplayer_2').show();
+				fitVideo(myPlayer2);
 			} else {
 				initPopcorn('#' + myPlayer1.data("jPlayer").internal.video.id);
 				myPlayer1.jPlayer("setMedia", {
@@ -437,6 +440,7 @@ $(document).ready(function(){
 				player1MediaId = id;
 				$('#jquery_jplayer_2').hide();
 				$('#jquery_jplayer_1').show();
+				fitVideo(myPlayer1);
 			}
 
 			$('#load-status').html('');
