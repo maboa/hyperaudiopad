@@ -76,11 +76,14 @@ $(document).ready(function(){
 
 			// check for the end
 
+			console.log("end ="+end);
+			console.log("now = "+now);
+			console.log("theScript.length = "+theScript.length);
+			console.log("index = "+index);
 
 
 			if (theScript.length <= (index+1) && now > end) {
-				//console.log(end);
-				//console.log(now);
+				console.log("PAUSE ALL");
 				//if (log2) console.log('end reached '+end+" now "+now);
 				//log2 = false;
 				myPlayer1.jPlayer("pause");
@@ -260,10 +263,11 @@ $(document).ready(function(){
 		var mediaMp4 = mediaDir+"/"+mediaId+".mp4";
 		var mediaWebM = mediaDir+'/'+mediaId+'.webm';
 
-		//console.log(mediaId);
-		//console.log(player1MediaId);
-		//console.log("index="+index);
-		//console.log("jumpTo="+jumpTo);
+		console.log("-----------");
+		console.log(mediaId);
+		console.log(player1MediaId);
+		console.log("index="+index);
+		console.log("jumpTo="+jumpTo);
 
 		console.log(mediaId);
 
