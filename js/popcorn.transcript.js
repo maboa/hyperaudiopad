@@ -31,23 +31,30 @@
    *
    */
 
+  // This plugin assumes that you are generating the plugins in the order of the text.
+  // So that the parent may be compared to the previous ones parent.
+  var pParent;
+
   Popcorn.plugin( "transcript" , {
     
       manifest: {
         about:{
           name: "Popcorn Transcript Plugin",
-          version: "0.1",
+          version: "0.2",
           author:  "Mark Panaghiston",
           website: "http://www.jplayer.org/"
         },
         options:{
           time      : {elem:'input', type:'text', label:'In'},
           target  :  'Transcript-container',
-          futureClass     : {elem:'input', type:'text', label:'Class'}
+          futureClass     : {elem:'input', type:'text', label:'Class'},
+          onNewPara: function() {}
         }
       },
 
       _setup: function( options ) {
+
+        var parent, iAmNewPara;
 
         // if a target is specified and is a string, use that - Requires every word <span> to have a unique ID.
         // else if target is specified and is an object, use object as DOM reference
@@ -67,11 +74,20 @@
           options.futureClass = "transcript-future"
         }
 
+        parent = options.target.parentNode;
+        if(parent !== pParent) {
+          iAmNewPara = true;
+          pParent = parent;
+        }
+
         options.transcriptRead = function() {
           if( options.container.classList ) {
             options.container.classList.remove(options.futureClass);
           } else {
             options.container.className = "";
+          }
+          if(iAmNewPara && typeof options.onNewPara === 'function') {
+            options.onNewPara(options.target.parentNode);
           }
         };
 

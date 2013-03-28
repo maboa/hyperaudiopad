@@ -376,12 +376,21 @@ $(document).ready(function(){
 
 	function initPopcorn(id) {
 		var p = Popcorn(id);
-
 		$("#transcript-content span").each(function(i) {  
+/*
 			p.transcript({
 				time: $(this).attr("m") / 1000, // seconds
 				futureClass: "transcript-grey",
 				target: this
+			});
+*/
+			p.transcript({
+				time: $(this).attr("m") / 1000, // seconds
+				futureClass: "transcript-grey",
+				target: this,
+				onNewPara: function(parent) {
+					$("#transcript-content").stop().scrollTo($(parent), 800, {axis:'y',margin:true,offset:{top:0}});
+				}
 			});
 		});
 	};
@@ -411,11 +420,11 @@ $(document).ready(function(){
 		$('#transcript-content').load(file, function() {
 			//load success!!!
 
+			// Scroll the transcript to the top
+			$("#transcript-content").stop().scrollTo($("#transcript-content p:first"), 800, {axis:'y',margin:true,offset:{top:0}});
+
 			// load in the audio
-
 			// check which player to load media into
-
-
 
 			if (myPlayer1.data('jPlayer').status.src && currentlyLoaded < 2) {
 				initPopcorn('#' + myPlayer2.data("jPlayer").internal.video.id);
