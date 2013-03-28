@@ -81,17 +81,24 @@ $(document).ready(function(){
 			console.log("theScript.length = "+theScript.length);
 			console.log("index = "+index);
 
+			var myPlayer1Paused = myPlayer1.data('jPlayer').status.paused;
+			var myPlayer2Paused = myPlayer2.data('jPlayer').status.paused;
 
 			if (theScript.length <= (index+1) && now > end) {
-				console.log("PAUSE ALL");
+				console.log("Attempting to pause");
 				//if (log2) console.log('end reached '+end+" now "+now);
 				//log2 = false;
-				myPlayer1.jPlayer("pause");
-				myPlayer2.jPlayer("pause");
+				if (myPlayer1Paused == false) {
+					myPlayer1.jPlayer("pause");
+					console.log("paused player 1");
+				}
+				
+				if (myPlayer2Paused == false) {
+					myPlayer2.jPlayer("pause");
+					console.log("paused player 1");
+				}
 			}
 
-
-			
 			if (theScript.length > (index+1)) {
 
 				var fadeSpeed = 100; //ms
