@@ -774,7 +774,7 @@ $(document).ready(function(){
 		});
 
 		
-		$('#instructions-btn').click(function(){   
+		$('#instructions-btn').click(function(){
 			
 			if($('#instructions').is(':visible')){
 				$('#instructions').fadeOut();
@@ -787,9 +787,20 @@ $(document).ready(function(){
 
 		/* test stuff */
 
-		$('#show-video').click(function(){   
+		$('#show-video').click(function(){
 
 			$('#transcript-content').css('top','350px');
+			$(this).hide();
+			$('#hide-video').show();
+
+			return false;
+		});
+
+		$('#hide-video').click(function(){
+
+			$('#transcript-content').css('top','78px');
+			$(this).hide();
+			$('#show-video').show();
 
 			return false;
 		});
