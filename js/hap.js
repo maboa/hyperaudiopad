@@ -50,7 +50,9 @@ $(document).ready(function(){
 				fitVideo($(this));
 			}
 		},
-
+		timeupdate: function(event) {
+			//checkState(event);
+		},
 		solution: "html, flash",
 		swfPath: "js",
 		supplied: "m4v,webmv",
@@ -65,7 +67,9 @@ $(document).ready(function(){
 				fitVideo($(this));
 			}
 		},
-
+		timeupdate: function(event) {
+			//checkState(event);
+		},
 		solution: "html, flash",
 		swfPath: "js",
 		supplied: "m4v,webmv",
