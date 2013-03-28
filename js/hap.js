@@ -143,6 +143,7 @@ $(document).ready(function(){
 						$('#fader-content').fadeTo(fadeSpeed, 0);
 					});
 					console.log("switch to 2");
+					console.log(start);
 					myPlayer1.jPlayer("pause");
 					myPlayer2.jPlayer("play",start/1000); 
 				}
