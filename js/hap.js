@@ -38,11 +38,16 @@ $(document).ready(function(){
 	var player1MediaId = "";
 	var player2MediaId = "";
 
+	function fitVideo(c) {
+		c.find('video').css('width',c.css('width')).css('height',c.css('height'));
+	}
+
 	myPlayer1.jPlayer({
 		ready: function (event) {
 
 			if(event.jPlayer.html.used && event.jPlayer.html.video.available) {
-					//initPopcorn('#' + $(this).data("jPlayer").internal.audio.id);
+				// sets size of video to that of container
+				fitVideo($(this));
 			}
 		},
 
@@ -56,7 +61,8 @@ $(document).ready(function(){
 		ready: function (event) {
 
 			if(event.jPlayer.html.used && event.jPlayer.html.video.available) {
-					//initPopcorn('#' + $(this).data("jPlayer").internal.audio.id);
+				// sets size of video to that of container
+				fitVideo($(this));
 			}
 		},
 
@@ -65,6 +71,7 @@ $(document).ready(function(){
 		supplied: "m4v,webmv",
 		preload: "auto"
 	});
+
 
 
 	$('#transcript-files').empty();
@@ -106,19 +113,19 @@ $(document).ready(function(){
 	var index = "";
 	var filename = "";
 	var end = "";
-	var start = ""; 
+	var start = "";
 	var mediaId = "";
 
 
 	$('#target-content').delegate('span','click',function(){
 
-		playSource = false;	
+		playSource = false;
 
 		var jumpTo = $(this).attr('m')/1000;
 
-		index = $(this).parent().attr('i'); 
+		index = $(this).parent().attr('i');
 
-		mediaId = theScript[index].m; 
+		mediaId = theScript[index].m;
 
 		var mediaMp4 = mediaDir+"/"+mediaId+".mp4";
 		var mediaWebM = mediaDir+'/'+mediaId+'.webm';
@@ -414,8 +421,10 @@ $(document).ready(function(){
 
 			// check which player to load media into
 
+
+
 			if (myPlayer1.data('jPlayer').status.src && currentlyLoaded < 2) {
-				initPopcorn('#' + myPlayer2.data("jPlayer").internal.video.id);   
+				initPopcorn('#' + myPlayer2.data("jPlayer").internal.video.id);
 				myPlayer2.jPlayer("setMedia", {
 				m4v: mediaMp4,
 					webmv: mediaWebM
@@ -426,7 +435,7 @@ $(document).ready(function(){
 				$('#jquery_jplayer_1').hide();
 				$('#jquery_jplayer_2').show();
 			} else {
-				initPopcorn('#' + myPlayer1.data("jPlayer").internal.video.id);   
+				initPopcorn('#' + myPlayer1.data("jPlayer").internal.video.id);
 				myPlayer1.jPlayer("setMedia", {
 					m4v: mediaMp4,
 					webmv: mediaWebM
@@ -757,7 +766,6 @@ $(document).ready(function(){
 		return false;
 	});
 
-	/* test stuff */
 
 	$('#show-video').click(function(){
 
