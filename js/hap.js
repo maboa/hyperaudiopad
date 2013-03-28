@@ -417,12 +417,21 @@ $(document).ready(function(){
 
 		//$('.direct').html('loading ...');
 
+		// Reset the play/pause button
+		$('#play-btn-source').show();
+		$('#pause-btn-source').hide();
+
+		 // Stop the players
+		myPlayer1.jPlayer("pause");
+		myPlayer2.jPlayer("pause");
+
 		$('#load-status').html('loading ...');
 		$('#transcript-content').load(file, function() {
 			//load success!!!
 
 			// Scroll the transcript to the top
 			$("#transcript-content").stop().scrollTo($("#transcript-content p:first"), 800, {axis:'y',margin:true,offset:{top:0}});
+
 
 			// load in the audio
 			// check which player to load media into
