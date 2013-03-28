@@ -125,6 +125,9 @@ $(document).ready(function(){
 
 				$('#fader-content').css('background-color',fadeColor);
 
+				console.log("player1MediaId = "+player1MediaId);
+				console.log("player2MediaId = "+player2MediaId);
+
 				if (player1MediaId == mediaId) {
 					$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 						//console.log('ping');
