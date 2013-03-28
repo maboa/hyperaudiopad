@@ -38,6 +38,126 @@ $(document).ready(function(){
 	var player1MediaId = "";
 	var player2MediaId = "";
 
+	function checkState(event) {
+	
+		//var now = this.Popcorn.instances[0].media.currentTime*1000;   
+
+		var now;
+
+		//console.log(mediaId);
+
+		if (player1MediaId == mediaId) {
+			now = myPlayer1.data('jPlayer').status.currentTime * 1000;
+		} else {
+			now = myPlayer2.data('jPlayer').status.currentTime * 1000;
+		}
+
+		//console.log(now);
+	
+		var src = "";
+
+		//console.log("now="+now+" end="+end+"theScript.length="+theScript.length+" index="+index);
+
+		//console.log('end = '+end);
+		//console.log('now = '+now);
+
+		//console.log(playSource);
+	
+		if (now > end && playSource == false) {
+			// BUG this bit of code is executed infintely after the piece has stopped playing
+
+
+
+			//console.log('tick');
+
+			//myPlayer1.jPlayer("pause");
+			//myPlayer2.jPlayer("pause");
+			index = parseInt(index);
+
+			// check for the end
+
+
+
+			if (theScript.length <= (index+1) && now > end) {
+				//console.log(end);
+				//console.log(now);
+				//if (log2) console.log('end reached '+end+" now "+now);
+				//log2 = false;
+				myPlayer1.jPlayer("pause");
+				myPlayer2.jPlayer("pause");
+			}
+
+
+			
+			if (theScript.length > (index+1)) {
+
+				var fadeSpeed = 100; //ms
+				var fadeColor = "black";
+
+				//console.log(index);
+
+				if (theScript[index].action == 'fade') {
+					console.log('action fade detected');
+
+					if (theScript[index].color) {
+						fadeColor = theScript[index].color;
+					}
+
+					if (theScript[index].time) {
+						fadeSpeed = theScript[index].time*1000;
+					}
+				}
+
+				console.log(fadeColor);
+				console.log(fadeSpeed);
+
+				// moving to the next block in the target
+
+				index = index + 1;
+				//if (log) console.log('index incremented now ='+index);
+				//if (log) console.dir(theScript);
+				start = theScript[index].s;
+				end = theScript[index].e;
+				mediaId = theScript[index].m;
+
+
+
+
+				$('#fader-content').css('background-color',fadeColor);
+
+				if (player1MediaId == mediaId) {
+					$('#fader-content').fadeTo(fadeSpeed, 1, function() {
+						//console.log('ping');
+						$('#jquery_jplayer_2').hide();
+						$('#jquery_jplayer_1').show();
+						$('#fader-content').fadeTo(fadeSpeed, 0);
+					});
+					console.log("switch to 1");
+					myPlayer2.jPlayer("pause");
+					myPlayer1.jPlayer("play",start/1000);
+				} else {
+					$('#fader-content').fadeTo(fadeSpeed, 1, function() {
+						//console.log('pong');
+						$('#jquery_jplayer_1').hide();
+						$('#jquery_jplayer_2').show();
+						$('#fader-content').fadeTo(fadeSpeed, 0);
+					});
+					console.log("switch to 2");
+					myPlayer1.jPlayer("pause");
+					myPlayer2.jPlayer("play",start/1000); 
+				}
+
+				/*myPlayer1.bind($.jPlayer.event.progress + ".fixStart", function(event) {
+					// Warning: The variable 'start' must not be changed before this handler is called.
+					$(this).unbind(".fixStart"); 
+					$(this).jPlayer("play",start/1000);
+				});
+
+				myPlayer1.jPlayer("pause",start);   */
+			}
+		}
+	};
+
 	function fitVideo(c) {
 		c.find('video').css('width',c.css('width')).css('height',c.css('height'));
 	}
@@ -51,7 +171,7 @@ $(document).ready(function(){
 			}
 		},
 		timeupdate: function(event) {
-			//checkState(event);
+			checkState(event);
 		},
 		solution: "html, flash",
 		swfPath: "js",
@@ -68,7 +188,7 @@ $(document).ready(function(){
 			}
 		},
 		timeupdate: function(event) {
-			//checkState(event);
+			checkState(event);
 		},
 		solution: "html, flash",
 		swfPath: "js",
@@ -253,139 +373,7 @@ $(document).ready(function(){
 
 
 	function initPopcorn(id) {
-		var p = Popcorn(id)
-		.code({
-				start: 0,
-				end: 2000,
-				onStart: function (options) {
-					//console.log('start')
-				},
-				onFrame: (function () {
-					var count = 0;
-					return function (options) {
-				
-					//var now = this.Popcorn.instances[0].media.currentTime*1000;   
-
-					var now;
-
-					//console.log(mediaId);
-
-					if (player1MediaId == mediaId) {
-						now = myPlayer1.data('jPlayer').status.currentTime * 1000;
-					} else {
-						now = myPlayer2.data('jPlayer').status.currentTime * 1000;
-					}
-
-					//console.log(now);
-				
-					var src = "";
-
-					//console.log("now="+now+" end="+end+"theScript.length="+theScript.length+" index="+index);
-
-					//console.log('end = '+end);
-					//console.log('now = '+now);
-
-					//console.log(playSource);
-				
-					if (now > end && playSource == false) {
-						// BUG this bit of code is executed infintely after the piece has stopped playing
-
-
-
-						//console.log('tick');
-
-						//myPlayer1.jPlayer("pause");
-						//myPlayer2.jPlayer("pause");
-						index = parseInt(index);
-
-						// check for the end
-
-
-
-						if (theScript.length <= (index+1) && now > end) {
-							//console.log(end);
-							//console.log(now);
-							//if (log2) console.log('end reached '+end+" now "+now);
-							//log2 = false;
-							myPlayer1.jPlayer("pause");
-							myPlayer2.jPlayer("pause");
-						}
-
-
-						
-						if (theScript.length > (index+1)) {
-
-							var fadeSpeed = 100; //ms
-							var fadeColor = "black";
-
-							//console.log(index);
-
-							if (theScript[index].action == 'fade') {
-								console.log('action fade detected');
-
-								if (theScript[index].color) {
-									fadeColor = theScript[index].color;
-								}
-
-								if (theScript[index].time) {
-									fadeSpeed = theScript[index].time*1000;
-								}
-							}
-
-							console.log(fadeColor);
-							console.log(fadeSpeed);
-
-							// moving to the next block in the target
-
-							index = index + 1;
-							//if (log) console.log('index incremented now ='+index);
-							//if (log) console.dir(theScript);
-							start = theScript[index].s;
-							end = theScript[index].e;
-							mediaId = theScript[index].m;
-
-
-
-
-							$('#fader-content').css('background-color',fadeColor);
-
-							if (player1MediaId == mediaId) {
-								$('#fader-content').fadeTo(fadeSpeed, 1, function() {
-									//console.log('ping');
-									$('#jquery_jplayer_2').hide();
-									$('#jquery_jplayer_1').show();
-									$('#fader-content').fadeTo(fadeSpeed, 0);
-								});
-								console.log("switch to 1");
-								myPlayer2.jPlayer("pause");
-								myPlayer1.jPlayer("play",start/1000);
-							} else {
-								$('#fader-content').fadeTo(fadeSpeed, 1, function() {
-									//console.log('pong');
-									$('#jquery_jplayer_1').hide();
-									$('#jquery_jplayer_2').show();
-									$('#fader-content').fadeTo(fadeSpeed, 0);
-								});
-								console.log("switch to 2");
-								myPlayer1.jPlayer("pause");
-								myPlayer2.jPlayer("play",start/1000); 
-							}
-
-							/*myPlayer1.bind($.jPlayer.event.progress + ".fixStart", function(event) {
-								// Warning: The variable 'start' must not be changed before this handler is called.
-								$(this).unbind(".fixStart"); 
-								$(this).jPlayer("play",start/1000);
-							});
-			
-							myPlayer1.jPlayer("pause",start);   */
-						}
-					}
-				}
-			})(),
-			onEnd: function (options) {
-				//console.log('end');
-			}
-		});
+		var p = Popcorn(id);
 
 		$("#transcript-content span").each(function(i) {  
 			p.transcript({
