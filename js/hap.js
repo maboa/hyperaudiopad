@@ -30,6 +30,8 @@ $(document).ready(function(){
 	var hints = true;
 	var playSource = true;
 
+	var myPlayerSource = $("#jquery_jplayer_source");
+
 	// we need two instances so that we can do transitions
 
 	var myPlayer1 = $("#jquery_jplayer_1");
@@ -178,6 +180,16 @@ $(document).ready(function(){
 		c.find('video').css('width',s.width).css('height',s.height);
 	}
 
+	myPlayerSource.jPlayer({
+		ready: function (event) {
+			// Err Umm... Could set a flag here if we think user could react within a few ms.
+		},
+		solution: "html, flash",
+		swfPath: "js",
+		supplied: "webmv,m4v",
+		preload: "auto"
+	});
+
 	myPlayer1.jPlayer({
 		ready: function (event) {
 
@@ -191,7 +203,7 @@ $(document).ready(function(){
 		},
 		solution: "html, flash",
 		swfPath: "js",
-		supplied: "m4v,webmv",
+		supplied: "webmv,m4v",
 		preload: "auto"
 	});
 
@@ -208,7 +220,7 @@ $(document).ready(function(){
 		},
 		solution: "html, flash",
 		swfPath: "js",
-		supplied: "m4v,webmv",
+		supplied: "webmv,m4v",
 		preload: "auto"
 	});
 
@@ -227,18 +239,21 @@ $(document).ready(function(){
 
 	// transcript links to audio
 
-	$('#transcript').delegate('span','click',function(e){ 
+	$('#transcript-content').delegate('span','click',function(e){ 
 
 		playSource = true; 
 		var jumpTo = $(this).attr('m')/1000; 
 		//console.log('playing from '+jumpTo);
 
+/*
 		if (currentlyLoaded == 1) {
 			myPlayer1.jPlayer("play",jumpTo);
 		} else {
 			myPlayer2.jPlayer("play",jumpTo);
 		}
-		
+*/
+		myPlayerSource.jPlayer("play",jumpTo);
+
 		$('#play-btn-source').hide();
 		$('#pause-btn-source').show();  
 
@@ -418,13 +433,13 @@ $(document).ready(function(){
 		
 		$('#script-title').text($(this).text());
 
-		loadFile(id);
+		loadFileSource(id);
 
 		return false;
 	}); 
 
 
-	function loadFile(id) { 
+	function loadFileSource(id) { 
 		var file = transcriptDir+'/'+id+'.htm'; 
 		var mediaMp4 = mediaDir+'/'+id+'.mp4';
 		var mediaWebM = mediaDir+'/'+id+'.webm';
@@ -435,11 +450,10 @@ $(document).ready(function(){
 		$('#play-btn-source').show();
 		$('#pause-btn-source').hide();
 
-		 // Stop the players
-		myPlayer1.jPlayer("pause");
-		myPlayer2.jPlayer("pause");
+		 // Stop the player
+		myPlayerSource.jPlayer("pause");
 
-		$('#load-status').html('loading ...');
+		$('#load-status-source').html('loading ...');
 		$('#transcript-content').load(file, function() {
 			//load success!!!
 
@@ -450,33 +464,15 @@ $(document).ready(function(){
 			// load in the audio
 			// check which player to load media into
 
-			if (myPlayer1.data('jPlayer').status.src && currentlyLoaded < 2) {
-				initPopcorn('#' + myPlayer2.data("jPlayer").internal.video.id);
-				myPlayer2.jPlayer("setMedia", {
-					m4v: mediaMp4,
-					webmv: mediaWebM
-				});
-				$.data(myPlayer2,'mediaId',id);
-				currentlyLoaded = 2;
-				player2MediaId = id;
-				$('#jquery_jplayer_1').hide();
-				$('#jquery_jplayer_2').show();
-				fitVideo(myPlayer2);
-			} else {
-				initPopcorn('#' + myPlayer1.data("jPlayer").internal.video.id);
-				myPlayer1.jPlayer("setMedia", {
-					m4v: mediaMp4,
-					webmv: mediaWebM
-				});
-				$.data(myPlayer1,'mediaId',id);
-				currentlyLoaded = 1;
-				player1MediaId = id;
-				$('#jquery_jplayer_2').hide();
-				$('#jquery_jplayer_1').show();
-				fitVideo(myPlayer1);
-			}
+			initPopcorn('#' + myPlayerSource.data("jPlayer").internal.video.id);
+			myPlayerSource.jPlayer("setMedia", {
+				m4v: mediaMp4,
+				webmv: mediaWebM
+			});
+			$.data(myPlayerSource,'mediaId',id);
+			fitVideo(myPlayerSource);
 
-			$('#load-status').html('');
+			$('#load-status-source').html('');
 
 			if (hints == true) {
 				$('#transcript-content-hint').fadeIn('slow');
@@ -484,8 +480,64 @@ $(document).ready(function(){
 			}
 
 			$('#source-header-ctrl').fadeIn();
-			
 		});
+	}
+
+	function loadFileTarget(id) { 
+		var file = transcriptDir+'/'+id+'.htm'; 
+		var mediaMp4 = mediaDir+'/'+id+'.mp4';
+		var mediaWebM = mediaDir+'/'+id+'.webm';
+
+		//$('.direct').html('loading ...');
+
+		// Reset the play/pause button
+		$('#play-btn-target').show();
+		$('#pause-btn-target').hide();
+
+		 // Stop the players
+		myPlayer1.jPlayer("pause");
+		myPlayer2.jPlayer("pause");
+
+		$('#load-status-target').html('loading ...');
+
+		// load in the audio
+		// check which player to load media into
+
+		if (myPlayer1.data('jPlayer').status.src && currentlyLoaded < 2) {
+			// initPopcorn('#' + myPlayer2.data("jPlayer").internal.video.id);
+			myPlayer2.jPlayer("setMedia", {
+				m4v: mediaMp4,
+				webmv: mediaWebM
+			});
+			$.data(myPlayer2,'mediaId',id);
+			currentlyLoaded = 2;
+			player2MediaId = id;
+			$('#jquery_jplayer_1').hide();
+			$('#jquery_jplayer_2').show();
+			fitVideo(myPlayer2);
+		} else {
+			// initPopcorn('#' + myPlayer1.data("jPlayer").internal.video.id);
+			myPlayer1.jPlayer("setMedia", {
+				m4v: mediaMp4,
+				webmv: mediaWebM
+			});
+			$.data(myPlayer1,'mediaId',id);
+			currentlyLoaded = 1;
+			player1MediaId = id;
+			$('#jquery_jplayer_2').hide();
+			$('#jquery_jplayer_1').show();
+			fitVideo(myPlayer1);
+		}
+
+		$('#load-status-target').html('');
+
+		if (hints == true) {
+			$('#transcript-content-hint').fadeIn('slow');
+			$('#transcript-file-hint').fadeOut('slow');
+		}
+
+		$('#target-header-ctrl').fadeIn();
+		
 	}
 
 	// select text function
@@ -663,7 +715,7 @@ $(document).ready(function(){
 				var nextSpanStartTime = parseInt(nextSpanStart.getAttribute('m'));
 
 				if (isNaN(nextSpanStartTime)) { // checking for end of text select
-					nextSpanStartTime = Math.floor(myPlayer1.data('jPlayer').status.duration * 1000);
+					nextSpanStartTime = Math.floor(myPlayerSource.data('jPlayer').status.duration * 1000);
 				}
 
 
@@ -677,12 +729,19 @@ $(document).ready(function(){
 				var timespan = {};
 				timespan.s = startTime;
 				timespan.e = nextSpanStartTime;  
+/*
 				if (currentlyLoaded == 1) {
 					timespan.m = $.data(myPlayer1,'mediaId');
 				} else {
 					timespan.m = $.data(myPlayer2,'mediaId');
 				}
-				
+*/				
+
+				timespan.m = $.data(myPlayerSource,'mediaId');
+
+				// This next line in here is a hack to just make it work for the time being.
+				loadFileTarget(timespan.m);
+
 
 				//console.log("s="+startTime);
 				//console.log("e="+endTime);
@@ -699,11 +758,14 @@ $(document).ready(function(){
 
 				//$('#target-content span').addClass('transcript-grey');
 
+				$('#target-header-ctrl').fadeIn();
+
 				//e.preventDefault(); 
 				//e.stopImmediatePropagation();
 				return false; 
 			}
 		}
+
 
 		$('#transcript-content-hint').fadeOut();
 		hints = false;
@@ -736,7 +798,24 @@ $(document).ready(function(){
 
 	};
 
+	// play and pause for the source area.
 	$('#play-btn-source').click(function(){
+		myPlayerSource.jPlayer("play");
+		$(this).hide();
+		$('#pause-btn-source').show();
+		return false;
+	});
+	$('#pause-btn-source').click(function(){
+		myPlayerSource.jPlayer("pause");
+		$(this).hide();
+		$('#play-btn-source').show();
+		return false;
+	});
+
+
+	// play and pause for the target area.
+
+	$('#play-btn-target').click(function(){
 		if (currentlyLoaded == 1) {
 			myPlayer1.jPlayer("play");
 		}
@@ -747,13 +826,13 @@ $(document).ready(function(){
 		
 		if (currentlyLoaded > 0) {
 			$(this).hide();
-			$('#pause-btn-source').show();
+			$('#pause-btn-target').show();
 		}
 
 		return false;
 	});
 
-	$('#pause-btn-source').click(function(){
+	$('#pause-btn-target').click(function(){
 
 		if (currentlyLoaded == 1) {
 			myPlayer1.jPlayer("pause");
@@ -765,7 +844,7 @@ $(document).ready(function(){
 		
 		if (currentlyLoaded > 0) {
 			$(this).hide();
-			$('#play-btn-source').show();
+			$('#play-btn-target').show();
 		}
 
 		return false;
@@ -796,20 +875,38 @@ $(document).ready(function(){
 	});
 
 
-	$('#show-video').click(function(){
+	$('#show-video-source').click(function(){
 
 		$('#transcript-content').css('top','350px');
 		$(this).hide();
-		$('#hide-video').show();
+		$('#hide-video-source').show();
 
 		return false;
 	});
 
-	$('#hide-video').click(function(){
+	$('#hide-video-source').click(function(){
 
 		$('#transcript-content').css('top','78px');
 		$(this).hide();
-		$('#show-video').show();
+		$('#show-video-source').show();
+
+		return false;
+	});
+
+	$('#show-video-target').click(function(){
+
+		$('#target-content').css('top','350px');
+		$(this).hide();
+		$('#hide-video-target').show();
+
+		return false;
+	});
+
+	$('#hide-video-target').click(function(){
+
+		$('#target-content').css('top','78px');
+		$(this).hide();
+		$('#show-video-target').show();
 
 		return false;
 	});
