@@ -42,6 +42,14 @@ $(document).ready(function(){
 	var myPlayer1 = $("#jquery_jplayer_1");
 	var myPlayer2 = $("#jquery_jplayer_2");
 
+	// WIP: Want to migrate all the target player Flags and controls into this object
+	var targetPlayer = {
+		play: false,
+		index: 0, // ref to theScript[]
+		start: 0,
+		end: 0
+	};
+
 	var player1MediaId = "";
 	var player2MediaId = "";
 
@@ -310,13 +318,7 @@ $(document).ready(function(){
 
 		console.log(mediaId);
 
-		if (player1MediaId == mediaId) {
-
-			//var file = transcriptDir+'/'+mediaId+'.htm'; 
-
-			//if (currentlyLoaded != 1) {
-			//	$('#transcript-content').load(file);
-			//}
+		if(player1MediaId == mediaId) {
 
 			$('#jquery_jplayer_2').hide();
 			$('#jquery_jplayer_1').show();
@@ -324,17 +326,16 @@ $(document).ready(function(){
 			myPlayer2.jPlayer("pause");
 			myPlayer1.jPlayer("play",jumpTo); 
 
-		} else {
-
-			//if (currentlyLoaded != 2) {
-			//	$('#transcript-content').load(file);
-			//}
+		} else if(player2MediaId == mediaId) {
 
 			$('#jquery_jplayer_1').hide();
 			$('#jquery_jplayer_2').show();
 
 			myPlayer1.jPlayer("pause");
 			myPlayer2.jPlayer("play",jumpTo);
+		} else {
+			// Can we fix it? - Yes we can!
+			loadTranscriptTarget(mediaId);
 		}
 		
 		filename = $(this).parent().attr('f');  
@@ -519,11 +520,11 @@ $(document).ready(function(){
 
 	// loadTranscriptTarget(id)
 
-	function loadFileTarget(id) { 
+	function loadTranscriptTarget(id) { 
 
 		// The id is the index reference to the transcripts array.
 
-		console.log('loadFileTarget('+id+')');
+		console.log('loadTranscriptTarget('+id+')');
 /*
 		var file = transcriptDir+'/'+id+'.htm'; 
 		var mediaMp4 = mediaDir+'/'+id+'.mp4';
@@ -775,7 +776,7 @@ $(document).ready(function(){
 				timespan.m = $.data(myPlayerSource,'mediaId');
 
 				// This next line in here is a hack to just make it work for the time being.
-				loadFileTarget(timespan.m);
+				loadTranscriptTarget(timespan.m);
 
 
 				//console.log("s="+startTime);
