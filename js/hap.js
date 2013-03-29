@@ -1,5 +1,7 @@
 $(document).ready(function(){
 
+	$.jPlayer.timeFormat.padMin = false;
+
 	var log = true;
 
 	var theScript = [];  

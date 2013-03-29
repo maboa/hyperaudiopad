@@ -1,0 +1,93 @@
+	.jp-pause:before { content: '\2389'; } /* '⎉' */
+	.jp-play:before { content: '\25b6'; } /* '▶' */
+
+	a.jp-play,
+	a.jp-pause {
+		text-decoration: none;
+		line-height:68px;
+		font-size: 32px;
+		margin-left: -38px;
+		/* define your pause/play buton color here */
+		color: #ffffff;
+	}
+
+	.jp-video {
+		position: relative;
+		height:64px;
+		color:black;
+		text-align:center;
+		cursor: pointer;
+		font: 16px 'SourceSansProSemibold', Arial, sans-serif;
+		color: #444;
+		line-height: 64px;
+	}
+
+	.jp-controls {
+		position:absolute;
+		top: 0;
+		width:64px;
+		height:100%;
+		background-color: #f07d00;
+	}
+
+	.jp-controls a{
+		padding-left: 48px;
+	}
+
+	.fb-bar {
+		position:absolute;
+		top: 0;
+		left: 64px;
+		width: 416px;
+		height: 100%;
+		background-color: #eee;
+	}
+
+	.jp-seek-bar {
+		z-index: 9;
+		position:absolute;
+		top: 0;
+		height: 100%;
+		width: 100%;
+	}
+
+	.fp-play-bar {
+		z-index: 9;
+		position:absolute;
+		top: 0;
+		height:100%;
+		background-color: #ff0;
+	}
+
+	.jp-duration {
+		z-index: 10;
+		position:absolute;
+		top:0;
+		right:0;
+		width:64px;
+		height:100%;
+	}
+
+	.fb-title {
+		position: absolute;
+		text-align: left;
+		top:0;
+		left:0;
+		width:240px;
+		padding-left:12px;
+		z-index: 10;
+		height: 100%;
+	}
+
+	.unselectable {
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
+
+	div.jp-video-270p {
+		width: 480px;
+	}

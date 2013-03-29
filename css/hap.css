@@ -13,7 +13,7 @@ body {
 .hint {
 	background-color: #ff0;
 	padding: 12px 16px 12px 16px;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-family: 'SourceSansProSemibold', Helvetica, Arial, sans-serif;
 	font-size: 12px;
 	line-height: 14px;
 	height: 100%;
@@ -55,7 +55,7 @@ ul {
 .control {
 	padding: 12px;
 	white-space: nowrap;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-family: 'SourceSansProSemibold', Helvetica, Arial, sans-serif;
 }
 
 .header-ctrl {
@@ -111,7 +111,7 @@ body { margin: 0; -webkit-text-size-adjust: 100%; }
 .body, .pane { background: #fcfcfc; }
 .right.col .body { padding: 0 1em; }
 .middle.col .body { padding: 0 1em; }
-.listview { padding-top: 16px; padding-left: 0px; margin: 0; font-weight: bold; color: #444; }
+.listview { padding-top: 16px; padding-left: 0px; margin: 0; color: #444; }
 .listview li { 
 	list-style-type: none; 
 	background: #fcfcfc; 
@@ -121,13 +121,12 @@ body { margin: 0; -webkit-text-size-adjust: 100%; }
 }
 .listview li.selected { background-color: #37F; color: White; }
 .left, .header.row {
-	font-family: 'Helvetica Neue', Arial, Sans-Serif;
+	font-family: 'SourceSansProSemibold', Arial, Sans-Serif;
 	border-right: 1px solid #eee;
 }
 
 .header {
 	font-size: 16px;
-	font-weight: bold;
 	padding-left: 16px;
 }
 
