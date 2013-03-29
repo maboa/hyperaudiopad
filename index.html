@@ -4,6 +4,9 @@
 		<meta charset=utf-8 />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<link href="css/hap.css" rel="stylesheet" type="text/css" />
+		<link href="css/hap-player.css" rel="stylesheet" type="text/css" />
+		<link href="css/font.css" rel="stylesheet" type="text/css" />
+		<link href="font/SourceSansPro-Semibold-webfont.css" rel="stylesheet" type="text/css" />
 		<link rel="icon" href="favicon.ico" type="image/x-icon"> 
 		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> 
 	</head>
@@ -49,6 +52,22 @@
 
 			<div id="media-source" class="media-hldr">
 				<div id="jquery_jplayer_source" class="jp-jplayer"></div>
+
+				<!-- Player controls -->
+				<div id="jp_container_1" class="jp-video jp-video-270p">
+					<div class="jp-controls unselectable">
+						<a href="#" class="jp-play"></a>
+						<a href="#" class="jp-pause"></a>
+					</div>
+					<div class="fb-bar">
+						<div class="jp-seek-bar">
+							<div class="fb-title unselectable"></div>
+							<div class="jp-duration unselectable"></div>
+							<div class="fp-play-bar"></div>
+						</div>
+					</div>
+				</div>
+
 			</div>
 
 			<div id="transcript-content" class="body row scroll-y">

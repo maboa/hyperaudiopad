@@ -1,4 +1,8 @@
-$(document).ready(function(){   
+$(document).ready(function(){
+
+	$.jPlayer.timeFormat.padMin = false;
+
+	var log = true;
 
 	var theScript = [];  
 /*
@@ -151,7 +155,7 @@ $(document).ready(function(){
 
 				index = index + 1;
 				//if (log) console.log('index incremented now ='+index);
-				//if (log) console.dir(theScript);
+				if (log) console.dir(theScript);
 				start = theScript[index].s;
 				end = theScript[index].e;
 				mediaId = theScript[index].m;
