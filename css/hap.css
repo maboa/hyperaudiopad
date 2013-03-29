@@ -63,6 +63,10 @@ ul {
 	float: right;
 }
 
+#transcript-content, #target-content {
+	top: 350px;
+}
+
 
 #transcript-content span, #target-content span  {
 	cursor: pointer;
