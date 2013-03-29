@@ -42,6 +42,21 @@ $(document).ready(function(){
 	var player1MediaId = "";
 	var player2MediaId = "";
 
+	// This JSON object would be loaded in.
+
+	// There would be different types of JSON:
+	//  - Transcript Definition.
+	//  - MIX Definition.
+	//  - List of Transcripts/Mixes.
+
+	var transcript = {
+		//
+		title: "State Of The Union Address (Jan 2012)",
+		color: "#d62728",
+		transcript: "sotu2012.htm",
+		poster: "2012Poster.jpg"
+	}
+
 	function checkState(event) {
 	
 		//var now = this.Popcorn.instances[0].media.currentTime*1000;   
