@@ -1,4 +1,6 @@
-$(document).ready(function(){   
+$(document).ready(function(){
+
+	var log = true;
 
 	var theScript = [];  
 	var mediaDir = "http://happyworm.com/video";
@@ -127,7 +129,7 @@ $(document).ready(function(){
 
 				index = index + 1;
 				//if (log) console.log('index incremented now ='+index);
-				//if (log) console.dir(theScript);
+				if (log) console.dir(theScript);
 				start = theScript[index].s;
 				end = theScript[index].e;
 				mediaId = theScript[index].m;
