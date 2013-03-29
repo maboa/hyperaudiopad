@@ -960,6 +960,6 @@ $(document).ready(function(){
 	$('#jp_container_1').on("mouseenter",function(){
 		$(this).delay(800).fadeTo("slow", 0.9);
 	}).on("mouseleave",function(){
-		$(this).delay(800).fadeTo("slow", 0.5);
+		//$('#jp_container_1').delay(800).fadeTo("slow", 0.5);
 	});
 });
