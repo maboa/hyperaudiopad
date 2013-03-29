@@ -212,6 +212,7 @@ $(document).ready(function(){
 		ready: function (event) {
 			// Err Umm... Could set a flag here if we think user could react within a few ms.
 		},
+		cssSelectorAncestor: "#jp_container_source",
 		solution: "html, flash",
 		swfPath: "js",
 		supplied: "webmv,m4v",
@@ -515,7 +516,7 @@ $(document).ready(function(){
 			}
 
 			$('#source-header-ctrl').fadeIn();
-			$('#jp_container_1').delay(800).fadeTo("slow", 0.9);
+			$('#jp_container_source').delay(800).fadeTo("slow", 0.9);
 		});
 	}
 
@@ -957,9 +958,9 @@ $(document).ready(function(){
 		return false;
 	});
 
-	$('#jp_container_1').on("mouseenter",function(){
+	$('#jp_container_source').on("mouseenter",function(){
 		$(this).delay(800).fadeTo("slow", 0.9);
 	}).on("mouseleave",function(){
-		//$('#jp_container_1').delay(800).fadeTo("slow", 0.5);
+		//$('#jp_container_source').delay(800).fadeTo("slow", 0.5);
 	});
 });
