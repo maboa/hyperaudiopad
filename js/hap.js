@@ -449,8 +449,7 @@ $(document).ready(function(){
 	$.each(transcripts, function(i) {
 		var $transBtn = $('<a class="transcript-file">' + this.title + '</a>').click(function(e) {
 			e.preventDefault();
-			// $('#script-title').text($(this).text()); // Move to loadFileSource()
-			loadFileSource(i);
+			loadTranscriptSource(i);
 		});
 		$transFiles.append($('<li></li>').append($transBtn));
 	});
@@ -467,22 +466,22 @@ $(document).ready(function(){
 		
 		$('#script-title').text($(this).text());
 
-		loadFileSource(id);
+		loadTranscriptSource(id);
 
 		return false;
 	}); 
 */
 
+	// For loading Transcripts into the source area.
 
-	function loadFileSource(id) { 
+	function loadTranscriptSource(id) { 
 
-		console.log('loadFileSource('+id+')');
-/*
-		var file = transcriptDir+'/'+id+'.htm'; 
-		var mediaMp4 = mediaDir+'/'+id+'.mp4';
-		var mediaWebM = mediaDir+'/'+id+'.webm';
-*/
-		//$('.direct').html('loading ...');
+		// The id is the index reference to the transcripts array.
+
+		console.log('loadTranscriptSource('+id+')');
+
+		// Set the title
+		$('#script-title').text(transcripts[id].title); // Move to loadTranscriptSource()
 
 		// Reset the play/pause button
 		$('#play-btn-source').show();
@@ -498,13 +497,14 @@ $(document).ready(function(){
 			// Scroll the transcript to the top
 			$("#transcript-content").stop().scrollTo($("#transcript-content p:first"), 800, {axis:'y',margin:true,offset:{top:0}});
 
-
-			// load in the audio
-			// check which player to load media into
-
+			// Setup popcorn and load in the media
 			initPopcorn('#' + myPlayerSource.data("jPlayer").internal.video.id);
 			myPlayerSource.jPlayer("setMedia", transcripts[id].media);
+
+			// Store reference to the transcript
 			$.data(myPlayerSource,'mediaId',id);
+
+			// Correct the initial video display without a poster.
 			fitVideo(myPlayerSource);
 
 			$('#load-status-source').html('');
@@ -518,11 +518,18 @@ $(document).ready(function(){
 		});
 	}
 
+	// loadTranscriptTarget(id)
+
 	function loadFileTarget(id) { 
+
+		// The id is the index reference to the transcripts array.
+
+		console.log('loadFileTarget('+id+')');
+/*
 		var file = transcriptDir+'/'+id+'.htm'; 
 		var mediaMp4 = mediaDir+'/'+id+'.mp4';
 		var mediaWebM = mediaDir+'/'+id+'.webm';
-
+*/
 		//$('.direct').html('loading ...');
 
 		// Reset the play/pause button
@@ -540,10 +547,7 @@ $(document).ready(function(){
 
 		if (myPlayer1.data('jPlayer').status.src && currentlyLoaded < 2) {
 			// initPopcorn('#' + myPlayer2.data("jPlayer").internal.video.id);
-			myPlayer2.jPlayer("setMedia", {
-				m4v: mediaMp4,
-				webmv: mediaWebM
-			});
+			myPlayer2.jPlayer("setMedia", transcripts[id].media);
 			$.data(myPlayer2,'mediaId',id);
 			currentlyLoaded = 2;
 			player2MediaId = id;
@@ -552,10 +556,7 @@ $(document).ready(function(){
 			fitVideo(myPlayer2);
 		} else {
 			// initPopcorn('#' + myPlayer1.data("jPlayer").internal.video.id);
-			myPlayer1.jPlayer("setMedia", {
-				m4v: mediaMp4,
-				webmv: mediaWebM
-			});
+			myPlayer1.jPlayer("setMedia", transcripts[id].media);
 			$.data(myPlayer1,'mediaId',id);
 			currentlyLoaded = 1;
 			player1MediaId = id;
