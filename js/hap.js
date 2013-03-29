@@ -499,6 +499,7 @@ $(document).ready(function(){
 			}
 
 			$('#source-header-ctrl').fadeIn();
+			$('#jp_container_1').delay(800).fadeTo("slow", 0.9);
 		});
 	}
 
@@ -818,7 +819,7 @@ $(document).ready(function(){
 	};
 
 	// play and pause for the source area.
-	$('#play-btn-source').click(function(){
+	/*$('#play-btn-source').click(function(){
 		myPlayerSource.jPlayer("play");
 		$(this).hide();
 		$('#pause-btn-source').show();
@@ -829,7 +830,7 @@ $(document).ready(function(){
 		$(this).hide();
 		$('#play-btn-source').show();
 		return false;
-	});
+	});*/
 
 
 	// play and pause for the target area.
@@ -928,5 +929,20 @@ $(document).ready(function(){
 		$('#show-video-target').show();
 
 		return false;
+	});
+
+	$('#jp_video_0').mouseout(function(){
+
+		$('#target-content').css('top','78px');
+		$(this).hide();
+		$('#show-video-target').show();
+
+		return false;
+	});
+
+	$('#jp_container_1').on("mouseenter",function(){
+		$(this).delay(800).fadeTo("slow", 0.9);
+	}).on("mouseleave",function(){
+		$(this).delay(800).fadeTo("slow", 0.5);
 	});
 });
