@@ -949,18 +949,16 @@ $(document).ready(function(){
 		return false;
 	});
 
-	$('#jp_video_0').mouseout(function(){
 
-		$('#target-content').css('top','78px');
-		$(this).hide();
-		$('#show-video-target').show();
-
-		return false;
+	$('#jquery_jplayer_source').on("mouseenter",function(){
+		$('#jp_container_source').trigger("mouseenter");
+	}).on("mouseleave",function(){
+		$('#jp_container_source').trigger("mouseleave");
 	});
 
 	$('#jp_container_source').on("mouseenter",function(){
-		$(this).delay(800).fadeTo("slow", 0.9);
+		$(this).stop(true,true).fadeTo("slow", 0.9);
 	}).on("mouseleave",function(){
-		//$('#jp_container_source').delay(800).fadeTo("slow", 0.5);
+		$(this).stop(true,true).delay(800).fadeTo("slow", 0.5);
 	});
 });
