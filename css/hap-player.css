@@ -4,7 +4,7 @@
 	a.jp-play,
 	a.jp-pause {
 		text-decoration: none;
-		line-height:68px;
+		line-height:52px;
 		font-size: 32px;
 		margin-left: -38px;
 		/* define your pause/play buton color here */
@@ -12,20 +12,21 @@
 	}
 
 	.jp-video {
-		position: relative;
-		height:64px;
+		position: absolute;
+		height:48px;
 		color:black;
 		text-align:center;
 		cursor: pointer;
 		font: 16px 'SourceSansProSemibold', Arial, sans-serif;
 		color: #444;
-		line-height: 64px;
+		line-height: 48px;
+		top: 222px;
 	}
 
 	.jp-controls {
 		position:absolute;
 		top: 0;
-		width:64px;
+		width:48px;
 		height:100%;
 		background-color: #f07d00;
 	}
@@ -34,11 +35,11 @@
 		padding-left: 48px;
 	}
 
-	.fb-bar {
+	.jp-bar {
 		position:absolute;
 		top: 0;
-		left: 64px;
-		width: 416px;
+		left: 48px;
+		width: 432px;
 		height: 100%;
 		background-color: #eee;
 	}
@@ -51,7 +52,7 @@
 		width: 100%;
 	}
 
-	.fp-play-bar {
+	.jp-play-bar {
 		z-index: 9;
 		position:absolute;
 		top: 0;
@@ -64,7 +65,7 @@
 		position:absolute;
 		top:0;
 		right:0;
-		width:64px;
+		width:48px;
 		height:100%;
 	}
 
