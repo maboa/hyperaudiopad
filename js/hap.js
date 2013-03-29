@@ -1,10 +1,11 @@
 $(document).ready(function(){   
 
 	var theScript = [];  
+/*
 	var mediaDir = "http://happyworm.com/video";
 	var transcriptDir = "transcripts";  
 	var exposedTranscripts = [{'id':'internetindians','title':'Internet Amazonians'},{'id':'raidsinrainforest','title':'Rainforest Raids'}];
-
+*/
 	var latency = 1000;
 
 	// Grab the script from the URL
@@ -40,20 +41,28 @@ $(document).ready(function(){
 	var player1MediaId = "";
 	var player2MediaId = "";
 
-	// This JSON object would be loaded in.
+	// These JSON object would be loaded in.
 
 	// There would be different types of JSON:
 	//  - Transcript Definition.
 	//  - MIX Definition.
 	//  - List of Transcripts/Mixes.
 
-	var transcript = {
-		//
-		title: "State Of The Union Address (Jan 2012)",
-		color: "#d62728",
-		transcript: "sotu2012.htm",
-		poster: "2012Poster.jpg"
-	}
+	var transcripts = [{
+		title: "Internet Amazonians",
+		url: "transcripts/internetindians.htm",
+		media: {
+			m4v: 'http://happyworm.com/video/internetindians.mp4',
+			webmv: 'http://happyworm.com/video/internetindians.webm'
+		}
+	}, {
+		title: "Rainforest Raids",
+		url: "transcripts/raidsinrainforest.htm",
+		media: {
+			m4v: 'http://happyworm.com/video/raidsinrainforest.mp4',
+			webmv: 'http://happyworm.com/video/raidsinrainforest.webm'
+		}
+	}];
 
 	function checkState(event) {
 	
@@ -238,15 +247,6 @@ $(document).ready(function(){
 		supplied: "webmv,m4v",
 		preload: "auto"
 	});
-
-
-
-	$('#transcript-files').empty();
-	for (var j = 0; j < exposedTranscripts.length; j++) {
-		$('#transcript-files').append('<li><a class="transcript-file" href="'+exposedTranscripts[j].id+'" >'+exposedTranscripts[j].title+'</a></li>');
-	}
-
-
 
 	// These events are fired as play time increments  
 
@@ -441,6 +441,21 @@ $(document).ready(function(){
 	};
 
 
+	var $transFiles = $('#transcript-files').empty();
+	$.each(transcripts, function(i) {
+		var $transBtn = $('<a class="transcript-file">' + this.title + '</a>').click(function(e) {
+			e.preventDefault();
+			// $('#script-title').text($(this).text()); // Move to loadFileSource()
+			loadFileSource(i);
+		});
+		$transFiles.append($('<li></li>').append($transBtn));
+	});
+/*
+	$('#transcript-files').empty();
+	for (var j = 0; j < exposedTranscripts.length; j++) {
+		$('#transcript-files').append('<li><a class="transcript-file" href="'+exposedTranscripts[j].id+'" >'+exposedTranscripts[j].title+'</a></li>');
+	}
+
 	$('.transcript-file').on('click',function(){ 
 		var id = $(this).attr('href');
 
@@ -452,13 +467,17 @@ $(document).ready(function(){
 
 		return false;
 	}); 
+*/
 
 
 	function loadFileSource(id) { 
+
+		console.log('loadFileSource('+id+')');
+/*
 		var file = transcriptDir+'/'+id+'.htm'; 
 		var mediaMp4 = mediaDir+'/'+id+'.mp4';
 		var mediaWebM = mediaDir+'/'+id+'.webm';
-
+*/
 		//$('.direct').html('loading ...');
 
 		// Reset the play/pause button
@@ -469,7 +488,7 @@ $(document).ready(function(){
 		myPlayerSource.jPlayer("pause");
 
 		$('#load-status-source').html('loading ...');
-		$('#transcript-content').load(file, function() {
+		$('#transcript-content').load(transcripts[id].url, function() {
 			//load success!!!
 
 			// Scroll the transcript to the top
@@ -480,10 +499,7 @@ $(document).ready(function(){
 			// check which player to load media into
 
 			initPopcorn('#' + myPlayerSource.data("jPlayer").internal.video.id);
-			myPlayerSource.jPlayer("setMedia", {
-				m4v: mediaMp4,
-				webmv: mediaWebM
-			});
+			myPlayerSource.jPlayer("setMedia", transcripts[id].media);
 			$.data(myPlayerSource,'mediaId',id);
 			fitVideo(myPlayerSource);
 
