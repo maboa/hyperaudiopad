@@ -302,9 +302,6 @@ $(document).ready(function(){
 
 		mediaId = theScript[index].m;
 
-		var mediaMp4 = mediaDir+"/"+mediaId+".mp4";
-		var mediaWebM = mediaDir+'/'+mediaId+'.webm';
-
 		console.log("-----------");
 		console.log(mediaId);
 		console.log(player1MediaId);
