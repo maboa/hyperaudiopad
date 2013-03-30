@@ -33,7 +33,6 @@ $(document).ready(function(){
 
 	var currentlyLoaded = 0;
 	var hints = true;
-	var playSource = true;
 
 	var myPlayerSource = $("#jquery_jplayer_source");
 
@@ -45,13 +44,13 @@ $(document).ready(function(){
 	// WIP: Want to migrate all the target player Flags and controls into this object
 	var targetPlayer = {
 		play: false,
-		index: 0, // ref to theScript[]
+		scriptIndex: 0, // ref to theScript[]
 		start: 0,
-		end: 0
+		end: 0,
+		currentMediaId: null,
+		player1MediaId: null,
+		player2MediaId: null
 	};
-
-	var player1MediaId = "";
-	var player2MediaId = "";
 
 	// These JSON object would be loaded in.
 
@@ -82,9 +81,9 @@ $(document).ready(function(){
 
 		var now;
 
-		//console.log(mediaId);
+		//console.log(targetPlayer.currentMediaId);
 
-		if (player1MediaId == mediaId) {
+		if (targetPlayer.player1MediaId == targetPlayer.currentMediaId) {
 			now = myPlayer1.data('jPlayer').status.currentTime * 1000;
 		} else {
 			now = myPlayer2.data('jPlayer').status.currentTime * 1000;
@@ -94,14 +93,14 @@ $(document).ready(function(){
 	
 		var src = "";
 
-		//console.log("now="+now+" end="+end+"theScript.length="+theScript.length+" index="+index);
+		//console.log("now="+now+" targetPlayer.end="+targetPlayer.end+"theScript.length="+theScript.length+" targetPlayer.scriptIndex="+targetPlayer.scriptIndex);
 
-		//console.log('end = '+end);
+		//console.log('targetPlayer.end = '+targetPlayer.end);
 		//console.log('now = '+now);
 
-		//console.log(playSource);
+		//console.log(targetPlayer.play);
 	
-		if (now > end && playSource == false) {
+		if (now > targetPlayer.end && targetPlayer.play) {
 			// BUG this bit of code is executed infintely after the piece has stopped playing
 
 
@@ -110,49 +109,46 @@ $(document).ready(function(){
 
 			//myPlayer1.jPlayer("pause");
 			//myPlayer2.jPlayer("pause");
-			index = parseInt(index);
+			targetPlayer.scriptIndex = parseInt(targetPlayer.scriptIndex);
 
-			// check for the end
+			// check for the targetPlayer.end
 
-			console.log("end ="+end);
+			console.log("targetPlayer.end ="+targetPlayer.end);
 			console.log("now = "+now);
 			console.log("theScript.length = "+theScript.length);
-			console.log("index = "+index);
+			console.log("targetPlayer.scriptIndex = "+targetPlayer.scriptIndex);
 
-			var myPlayer1Paused = myPlayer1.data('jPlayer').status.paused;
-			var myPlayer2Paused = myPlayer2.data('jPlayer').status.paused;
-
-			if (theScript.length <= (index+1) && now > end) {
+			if (theScript.length <= (targetPlayer.scriptIndex+1) && now > targetPlayer.end) {
 				console.log("Attempting to pause");
-				//if (log2) console.log('end reached '+end+" now "+now);
+				//if (log2) console.log('targetPlayer.end reached '+targetPlayer.end+" now "+now);
 				//log2 = false;
-				if (myPlayer1Paused == false) {
+				if (!myPlayer1.data('jPlayer').status.paused) {
 					myPlayer1.jPlayer("pause");
 					console.log("paused player 1");
 				}
 				
-				if (myPlayer2Paused == false) {
+				if (!myPlayer2.data('jPlayer').status.paused) {
 					myPlayer2.jPlayer("pause");
 					console.log("paused player 1");
 				}
 			}
 
-			if (theScript.length > (index+1)) {
+			if (theScript.length > (targetPlayer.scriptIndex+1)) {
 
 				var fadeSpeed = 100; //ms
 				var fadeColor = "black";
 
-				//console.log(index);
+				//console.log(targetPlayer.scriptIndex);
 
-				if (theScript[index].action == 'fade') {
+				if (theScript[targetPlayer.scriptIndex].action == 'fade') {
 					console.log('action fade detected');
 
-					if (theScript[index].color) {
-						fadeColor = theScript[index].color;
+					if (theScript[targetPlayer.scriptIndex].color) {
+						fadeColor = theScript[targetPlayer.scriptIndex].color;
 					}
 
-					if (theScript[index].time) {
-						fadeSpeed = theScript[index].time*1000;
+					if (theScript[targetPlayer.scriptIndex].time) {
+						fadeSpeed = theScript[targetPlayer.scriptIndex].time*1000;
 					}
 				}
 
@@ -161,22 +157,22 @@ $(document).ready(function(){
 
 				// moving to the next block in the target
 
-				index = index + 1;
-				//if (log) console.log('index incremented now ='+index);
+				targetPlayer.scriptIndex = targetPlayer.scriptIndex + 1;
+				//if (log) console.log('targetPlayer.scriptIndex incremented now ='+targetPlayer.scriptIndex);
 				if (log) console.dir(theScript);
-				start = theScript[index].s;
-				end = theScript[index].e;
-				mediaId = theScript[index].m;
+				targetPlayer.start = theScript[targetPlayer.scriptIndex].s;
+				targetPlayer.end = theScript[targetPlayer.scriptIndex].e;
+				targetPlayer.currentMediaId = theScript[targetPlayer.scriptIndex].m;
 
 
 
 
 				$('#fader-content').css('background-color',fadeColor);
 
-				console.log("player1MediaId = "+player1MediaId);
-				console.log("player2MediaId = "+player2MediaId);
+				console.log("targetPlayer.player1MediaId = "+targetPlayer.player1MediaId);
+				console.log("targetPlayer.player2MediaId = "+targetPlayer.player2MediaId);
 
-				if (player1MediaId == mediaId) {
+				if (targetPlayer.player1MediaId === targetPlayer.currentMediaId) {
 					$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 						//console.log('ping');
 						$('#jquery_jplayer_2').hide();
@@ -185,8 +181,8 @@ $(document).ready(function(){
 					});
 					console.log("switch to 1");
 					myPlayer2.jPlayer("pause");
-					myPlayer1.jPlayer("play",start/1000);
-				} else {
+					myPlayer1.jPlayer("play",targetPlayer.start/1000);
+				} else if (targetPlayer.player2MediaId === targetPlayer.currentMediaId) {
 					$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 						//console.log('pong');
 						$('#jquery_jplayer_1').hide();
@@ -194,18 +190,20 @@ $(document).ready(function(){
 						$('#fader-content').fadeTo(fadeSpeed, 0);
 					});
 					console.log("switch to 2");
-					console.log(start);
+					console.log(targetPlayer.start);
 					myPlayer1.jPlayer("pause");
-					myPlayer2.jPlayer("play",start/1000); 
+					myPlayer2.jPlayer("play",targetPlayer.start/1000); 
+				} else {
+					// Would need to change the media
 				}
 
 				/*myPlayer1.bind($.jPlayer.event.progress + ".fixStart", function(event) {
-					// Warning: The variable 'start' must not be changed before this handler is called.
+					// Warning: The variable 'targetPlayer.start' must not be changed before this handler is called.
 					$(this).unbind(".fixStart"); 
-					$(this).jPlayer("play",start/1000);
+					$(this).jPlayer("play",targetPlayer.start/1000);
 				});
 
-				myPlayer1.jPlayer("pause",start);   */
+				myPlayer1.jPlayer("pause",targetPlayer.start);   */
 			}
 		}
 	};
@@ -269,7 +267,7 @@ $(document).ready(function(){
 
 	$('#transcript-content').delegate('span','click',function(e){ 
 
-		playSource = true; 
+		targetPlayer.play = false; 
 		var jumpTo = $(this).attr('m')/1000; 
 		//console.log('playing from '+jumpTo);
 
@@ -293,32 +291,31 @@ $(document).ready(function(){
 		return false;
 	});
 
-	var index = "";
 	var filename = "";
-	var end = "";
-	var start = "";
-	var mediaId = "";
 
 
 	$('#target-content').delegate('span','click',function(){
 
-		playSource = false;
+		targetPlayer.play = true;
 
 		var jumpTo = $(this).attr('m')/1000;
 
-		index = $(this).parent().attr('i');
+		targetPlayer.scriptIndex = $(this).parent().attr('i');
 
-		mediaId = theScript[index].m;
+		filename = $(this).parent().attr('f');  
+		targetPlayer.start = $(this).parent().attr('s'); 
+		targetPlayer.end = $(this).parent().attr('e');  
+
+		targetPlayer.currentMediaId = theScript[targetPlayer.scriptIndex].m;
 
 		console.log("-----------");
-		console.log(mediaId);
-		console.log(player1MediaId);
-		console.log("index="+index);
+		console.log(targetPlayer.currentMediaId);
+		console.log(targetPlayer.player1MediaId);
+		console.log("targetPlayer.scriptIndex="+targetPlayer.scriptIndex);
 		console.log("jumpTo="+jumpTo);
 
-		console.log(mediaId);
 
-		if(player1MediaId == mediaId) {
+		if(targetPlayer.player1MediaId == targetPlayer.currentMediaId) {
 
 			$('#jquery_jplayer_2').hide();
 			$('#jquery_jplayer_1').show();
@@ -326,7 +323,7 @@ $(document).ready(function(){
 			myPlayer2.jPlayer("pause");
 			myPlayer1.jPlayer("play",jumpTo); 
 
-		} else if(player2MediaId == mediaId) {
+		} else if(targetPlayer.player2MediaId == targetPlayer.currentMediaId) {
 
 			$('#jquery_jplayer_1').hide();
 			$('#jquery_jplayer_2').show();
@@ -335,14 +332,9 @@ $(document).ready(function(){
 			myPlayer2.jPlayer("play",jumpTo);
 		} else {
 			// Can we fix it? - Yes we can!
-			loadTranscriptTarget(mediaId);
+			loadTranscriptTarget(targetPlayer.currentMediaId);
 		}
 		
-		filename = $(this).parent().attr('f');  
-		end = $(this).parent().attr('e');  
-		start = $(this).parent().attr('s'); 
-		index = $(this).parent().attr('i'); 
-
 		return false;
 	});
 
@@ -548,18 +540,18 @@ $(document).ready(function(){
 		if (myPlayer1.data('jPlayer').status.src && currentlyLoaded < 2) {
 			// initPopcorn('#' + myPlayer2.data("jPlayer").internal.video.id);
 			myPlayer2.jPlayer("setMedia", transcripts[id].media);
-			$.data(myPlayer2,'mediaId',id);
+			// $.data(myPlayer2,'mediaId',id);
 			currentlyLoaded = 2;
-			player2MediaId = id;
+			targetPlayer.player2MediaId = id;
 			$('#jquery_jplayer_1').hide();
 			$('#jquery_jplayer_2').show();
 			fitVideo(myPlayer2);
 		} else {
 			// initPopcorn('#' + myPlayer1.data("jPlayer").internal.video.id);
 			myPlayer1.jPlayer("setMedia", transcripts[id].media);
-			$.data(myPlayer1,'mediaId',id);
+			// $.data(myPlayer1,'mediaId',id);
 			currentlyLoaded = 1;
-			player1MediaId = id;
+			targetPlayer.player1MediaId = id;
 			$('#jquery_jplayer_2').hide();
 			$('#jquery_jplayer_1').show();
 			fitVideo(myPlayer1);
@@ -765,13 +757,6 @@ $(document).ready(function(){
 				var timespan = {};
 				timespan.s = startTime;
 				timespan.e = nextSpanStartTime;  
-/*
-				if (currentlyLoaded == 1) {
-					timespan.m = $.data(myPlayer1,'mediaId');
-				} else {
-					timespan.m = $.data(myPlayer2,'mediaId');
-				}
-*/				
 
 				timespan.m = $.data(myPlayerSource,'mediaId');
 
