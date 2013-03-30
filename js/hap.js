@@ -473,6 +473,8 @@ $(document).ready(function(){
 
 	// For loading Transcripts into the source area.
 
+	var sourceLoaded = false;
+
 	function loadTranscriptSource(id) { 
 
 		// The id is the index reference to the transcripts array.
@@ -515,6 +517,7 @@ $(document).ready(function(){
 
 			$('#source-header-ctrl').fadeIn();
 			$('#jp_container_source').delay(800).fadeTo("slow", 0.9);
+			sourceLoaded = true;
 		});
 	}
 
@@ -955,8 +958,12 @@ $(document).ready(function(){
 	});
 
 	$('#jp_container_source').on("mouseenter",function(){
-		$(this).stop(true,true).fadeTo("slow", 0.9);
+		if (sourceLoaded == true) {
+			$(this).stop(true,true).fadeTo("slow", 0.9);
+		}
 	}).on("mouseleave",function(){
-		$(this).stop(true,true).delay(800).fadeTo("slow", 0.5);
+		if (sourceLoaded == true) {
+			$(this).stop(true,true).delay(800).fadeTo("slow", 0.5);
+		}
 	});
 });
