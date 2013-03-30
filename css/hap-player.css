@@ -69,6 +69,15 @@
 		height:100%;
 	}
 
+	.jp-current-time {
+		z-index: 10;
+		position:absolute;
+		top:0;
+		right:3em;
+		width:48px;
+		height:100%;
+	}
+
 	.fb-title {
 		position: absolute;
 		text-align: left;
