@@ -967,5 +967,25 @@ $(document).ready(function(){
 		}
 	});
 
+	// testing drag stuff
+
+	$('.drag-bar').drag(function( ev, dd ){
+		$( this ).css({
+			left: dd.offsetX
+		});
+		$('.right.col').css({
+			left: dd.offsetX
+		});
+
+		var middleWidth = dd.offsetX - $('.middle.col').css('left')-4;
+
+		console.log(middleWidth);
+		
+		/*$('.middle.col').css({
+			right: middleWidth;
+		});*/
+
+		console.log("dd.offsetX:"+dd.offsetX);
+	});
 
 });

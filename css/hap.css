@@ -159,3 +159,15 @@ body { margin: 0; -webkit-text-size-adjust: 100%; }
 	opacity: 0;
 	filter:alpha(opacity=0); /* For IE8 and earlier */
 }
+
+div.drag-bar {
+	z-index: 1000;
+	width: 5px;
+	height: 100%;
+	left: 654px;
+}
+
+div.drag-bar:hover {
+	cursor: ew-resize;
+}
+
