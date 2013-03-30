@@ -966,4 +966,6 @@ $(document).ready(function(){
 			$(this).stop(true,true).delay(800).fadeTo("slow", 0.5);
 		}
 	});
+
+
 });
