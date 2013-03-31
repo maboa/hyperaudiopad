@@ -26,6 +26,7 @@ body {
 a {
 	text-decoration: none;
 	color: #f07d00;
+	cursor: pointer; /* For the moissing href */
 }
 
 a:hover {
@@ -116,7 +117,6 @@ body { margin: 0; -webkit-text-size-adjust: 100%; }
 	list-style-type: none; 
 	background: #fcfcfc; 
 	padding-left: 16px; 
-	cursor: pointer; 
 	font-size: 14px; 
 }
 .listview li.selected { background-color: #37F; color: White; }
