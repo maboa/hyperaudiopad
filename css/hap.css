@@ -71,12 +71,12 @@ ul {
 
 #transcript-content span, #target-content span  {
 	cursor: pointer;
-}    
+}
 
 #transcript-content span.transcript-grey:hover, #target-content span.transcript-grey:hover {  
 	color: #f07d00; 
 }
-   
+
 
 #transcript-content span:hover, #target-content span:hover  {  
 	color: #f07d00; 
@@ -84,11 +84,11 @@ ul {
 
 #transcript-content span.highlight, #target-content span.highlight {  
 	color: #fff; 
-}       
+}
 
 #transcript-content span.transcript-grey, #target-content span.transcript-grey {
-   color: #888;
-}  
+	color: #888;
+}
 
 /* Generic pane rules */
 body { margin: 0; -webkit-text-size-adjust: 100%; }
@@ -106,7 +106,7 @@ body { margin: 0; -webkit-text-size-adjust: 100%; }
 @media screen and (orientation:landscape) { .iemobile .page { bottom: 75px; } }
 
 .header, .footer {
-    color: #444; background: #eee;
+	color: #444; background: #eee;
 }
 .header { font-size: 16px; }
 .body, .pane { background: #fcfcfc; }
@@ -170,4 +170,3 @@ div.drag-bar {
 div.drag-bar:hover {
 	cursor: ew-resize;
 }
-

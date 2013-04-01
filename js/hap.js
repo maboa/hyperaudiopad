@@ -1016,20 +1016,18 @@ $(document).ready(function(){
 	// testing drag stuff
 
 	$('.drag-bar').drag(function( ev, dd ){
-		$( this ).css({
-			left: dd.offsetX
-		});
-		$('.right.col').css({
-			left: dd.offsetX
-		});
+		$( this ).css('left', dd.offsetX);
+		$('.right.col').css('left',dd.offsetX);
 
-		var middleWidth = dd.offsetX - $('.middle.col').css('left')-4;
+		// second param is the base - not required in most browsers
+		var middleLeft = parseFloat($('.middle.col').css('left'),10);
+		var middleWidth = dd.offsetX - middleLeft-4;
 
 		console.log(middleWidth);
+		console.log(middleLeft);
+
 		
-		/*$('.middle.col').css({
-			right: middleWidth;
-		});*/
+		$('.middle.col').css('width', middleWidth);
 
 		console.log("dd.offsetX:"+dd.offsetX);
 	});
