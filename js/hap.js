@@ -65,7 +65,6 @@ $(document).ready(function(){
 		theScript = [];
 	} */
 
-	var currentlyLoaded = 0;
 	var hints = true;
 
 	var myPlayerSource = $("#jquery_jplayer_source");
@@ -81,29 +80,51 @@ $(document).ready(function(){
 		playerMediaId: [],
 		currentMediaId: null,
 		nextMediaId: null,
-		play: function(jumpTo) {
 
-			// Want to enable jumptTo being an undefined too.
+		lastPlayerPrimed: 1, // So the first instance used is #0, then second is #1
+
+		play: function(config) {
+
+			// Set play configuration
+			if(config) {
+				this.scriptIndex = config.scriptIndex;
+				this.start = config.start; 
+				this.end = config.end;  
+			} else {
+				config = {}; // So the config.jumpTo is happily undefined.
+			}
+
+			this.currentMediaId = theScript[this.scriptIndex].mediaId;
+			this.nextMediaId = this.scriptIndex+1 < theScript.length ? theScript[this.scriptIndex+1].mediaId : null;
 
 			this.paused = false;
 
-			if(this.playerMediaId[0] == this.currentMediaId) {
-				this.player[1].hide().jPlayer("pause");
-				this.player[0].show().jPlayer("play", jumpTo); 
-
-				// Then prepare other player
-
-			} else if(this.playerMediaId[1] == this.currentMediaId) {
-				this.player[0].hide().jPlayer("pause");
-				this.player[1].show().jPlayer("play", jumpTo);
-
-				// Then prepare other player
-
-			} else {
-				this.load(this.currentMediaId);
-				// Then call itself again as it will work this time.
-				this.play(jumpTo);
+			if(DEBUG) {
+				console.log("------Play Target Transcript------");
+				console.log("targetPlayer.currentMediaId="+this.currentMediaId);
+				console.log("targetPlayer.playerMediaId[0]="+this.playerMediaId[0]);
+				console.log("targetPlayer.playerMediaId[1]="+this.playerMediaId[1]);
+				console.log("targetPlayer.scriptIndex="+this.scriptIndex);
+				console.log("targetPlayer.start="+this.start);
+				console.log("targetPlayer.end="+this.end);
+				console.log("config.jumpTo="+config.jumpTo);
 			}
+
+			// Prepare a player for this media
+			this.load(this.currentMediaId);
+
+			if(this.playerMediaId[0] === this.currentMediaId) {
+				this.player[1].hide().jPlayer("pause");
+				this.player[0].show().jPlayer("play", config.jumpTo); 
+			} else if(this.playerMediaId[1] === this.currentMediaId) {
+				this.player[0].hide().jPlayer("pause");
+				this.player[1].show().jPlayer("play", config.jumpTo);
+			} else {
+				// we have a problem
+			}
+
+			// Prepare the other player for the next media
+			this.load(this.nextMediaId);
 		},
 		pause: function() {
 			this.paused = true;
@@ -115,44 +136,159 @@ $(document).ready(function(){
 
 			if(DEBUG) console.log('loadTranscriptTarget('+id+')');
 
+			if(typeof id !== 'number') {
+				if(DEBUG) console.log('Ignoring: id='+id);
+				return;
+			}
+
 			// Reset the play/pause button
-			$('#play-btn-target').show();
-			$('#pause-btn-target').hide();
+			// $('#play-btn-target').show();
+			// $('#pause-btn-target').hide();
 
 			// Stop the players
 			// this.player[0].jPlayer("pause");
 			// this.player[1].jPlayer("pause");
 
-			$('#load-status-target').html('loading ...');
+			// $('#load-status-target').html('loading ...');
 
 			// load in the audio
 			// check which player to load media into
 
-			if (this.player[0].data('jPlayer').status.src && currentlyLoaded < 2) {
-				this.player[1].jPlayer("setMedia", transcripts[id].media);
-				currentlyLoaded = 2;
-				this.playerMediaId[1] = id;
-				this.player[0].hide();
-				this.player[1].show();
-				fitVideo(this.player[1]);
-			} else {
-				this.player[0].jPlayer("setMedia", transcripts[id].media);
-				currentlyLoaded = 1;
-				this.playerMediaId[0] = id;
-				this.player[1].hide();
-				this.player[0].show();
-				fitVideo(this.player[0]);
+
+			// Check whether a player already setup to play this media.
+			if(this.playerMediaId[0] === id) {
+				this.lastPlayerPrimed = 0;
+				return;
+			} else if(this.playerMediaId[1] === id) {
+				this.lastPlayerPrimed = 1;
+				return;
 			}
 
-			$('#load-status-target').html('');
+			var nextPlayerUsed = (this.lastPlayerPrimed + 1) % 2;
+			if(DEBUG) console.log('[before] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
+
+			this.player[nextPlayerUsed].jPlayer("setMedia", transcripts[id].media);
+			this.playerMediaId[nextPlayerUsed] = id;
+			this.player[this.lastPlayerPrimed].hide();
+			this.player[nextPlayerUsed].show();
+			fitVideo(this.player[nextPlayerUsed]);
+
+			this.lastPlayerPrimed = nextPlayerUsed;
+
+			if(DEBUG) console.log('[after] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
 
 			$('#target-header-ctrl').fadeIn();
 			
+		},
+		manager: function(event) {
+		
+			var now;
+
+			if (!this.paused) {
+
+				var currentPlayerUsed = (this.lastPlayerPrimed + 1) % 2;
+
+				if (this.playerMediaId[0] === this.currentMediaId) {
+					now = this.player[0].data('jPlayer').status.currentTime * 1000;
+				} else {
+					now = this.player[1].data('jPlayer').status.currentTime * 1000;
+				}
+
+				//console.log("now="+now+" this.end="+this.end+"theScript.length="+theScript.length+" this.scriptIndex="+this.scriptIndex);
+
+				if(DEBUG) console.log("targetPlayer.manager(): this.end="+this.end);
+				if(DEBUG) console.log("targetPlayer.manager(): now="+now);
+
+				// If the chunk playing has ended...
+				if (now > this.end) {
+
+					// BUG this bit of code is executed infintely after the piece has stopped playing
+
+					// check for the this.end
+
+					if(DEBUG) console.log("theScript.length = "+theScript.length);
+					if(DEBUG) console.log("targetPlayer.scriptIndex = "+this.scriptIndex);
+
+					// Pause the player playing
+					if (theScript.length <= this.scriptIndex+1) {
+						if(DEBUG) console.log("Attempting to pause");
+						if (!this.player[0].data('jPlayer').status.paused) {
+							this.player[0].jPlayer("pause");
+							if(DEBUG) console.log("paused player 1");
+						}
+						
+						if (!this.player[1].data('jPlayer').status.paused) {
+							this.player[1].jPlayer("pause");
+							if(DEBUG) console.log("paused player 1");
+						}
+					}
+
+					if (this.scriptIndex+1 < theScript.length) {
+
+						var fadeSpeed = 100; //ms
+						var fadeColor = "black";
+
+						//console.log(this.scriptIndex);
+
+						if (theScript[this.scriptIndex].action == 'fade') {
+							if(DEBUG) console.log('action fade detected');
+
+							if (theScript[this.scriptIndex].color) {
+								fadeColor = theScript[this.scriptIndex].color;
+							}
+
+							if (theScript[this.scriptIndex].time) {
+								fadeSpeed = theScript[this.scriptIndex].time*1000;
+							}
+						}
+
+						if(DEBUG) console.log("fadeColor="+fadeColor);
+						if(DEBUG) console.log("fadeSpeed="+fadeSpeed);
+
+						// moving to the next block in the target
+						this.scriptIndex++;
+						if (DEBUG) console.dir(theScript);
+						this.start = theScript[this.scriptIndex].start;
+						this.end = theScript[this.scriptIndex].end;
+						this.currentMediaId = theScript[this.scriptIndex].mediaId;
+
+						$('#fader-content').css('background-color',fadeColor);
+
+						if(DEBUG) console.log("targetPlayer.playerMediaId[0] = "+this.playerMediaId[0]);
+						if(DEBUG) console.log("targetPlayer.playerMediaId[1] = "+this.playerMediaId[1]);
+
+						if (this.playerMediaId[0] === this.currentMediaId) {
+							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
+								//console.log('ping');
+								$('#jquery_jplayer_2').hide();
+								$('#jquery_jplayer_1').show();
+								$('#fader-content').fadeTo(fadeSpeed, 0);
+							});
+							if(DEBUG) console.log("switch to 1");
+							this.player[1].jPlayer("pause");
+							this.player[0].jPlayer("play",this.start/1000);
+						} else if (this.playerMediaId[1] === this.currentMediaId) {
+							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
+								//console.log('pong');
+								$('#jquery_jplayer_1').hide();
+								$('#jquery_jplayer_2').show();
+								$('#fader-content').fadeTo(fadeSpeed, 0);
+							});
+							if(DEBUG) console.log("switch to 2");
+							if(DEBUG) console.log(this.start);
+							this.player[0].jPlayer("pause");
+							this.player[1].jPlayer("play",this.start/1000); 
+						} else {
+							// Would need to change the media
+						}
+					}
+				}
+			}
 		}
 	};
 
-	// TODO: Move checkState to targetPlayer.manager() method
-
+/*
+	// WIP: Move checkState to targetPlayer.manager() method
 	function checkState(event) {
 	
 		var now;
@@ -258,18 +394,18 @@ $(document).ready(function(){
 						// Would need to change the media
 					}
 
-					/*targetPlayer.player[0].bind($.jPlayer.event.progress + ".fixStart", function(event) {
+					// targetPlayer.player[0].bind($.jPlayer.event.progress + ".fixStart", function(event) {
 						// Warning: The variable 'targetPlayer.start' must not be changed before this handler is called.
-						$(this).unbind(".fixStart"); 
-						$(this).jPlayer("play",targetPlayer.start/1000);
-					});
+						// $(this).unbind(".fixStart");
+						// $(this).jPlayer("play",targetPlayer.start/1000);
+					// });
 
-					targetPlayer.player[0].jPlayer("pause",targetPlayer.start);   */
+					// targetPlayer.player[0].jPlayer("pause",targetPlayer.start);
 				}
 			}
 		}
 	};
-
+*/
 	function fitVideo(c) {
 		var s = c.data('jPlayer').options.size;
 		// c.find('video').css('width',c.css('width')).css('height',c.css('height'));
@@ -296,7 +432,8 @@ $(document).ready(function(){
 			}
 		},
 		timeupdate: function(event) {
-			checkState(event);
+			// checkState(event);
+			targetPlayer.manager(event);
 		},
 		solution: "html, flash",
 		swfPath: "js",
@@ -313,7 +450,8 @@ $(document).ready(function(){
 			}
 		},
 		timeupdate: function(event) {
-			checkState(event);
+			// checkState(event);
+			targetPlayer.manager(event);
 		},
 		solution: "html, flash",
 		swfPath: "js",
@@ -333,13 +471,6 @@ $(document).ready(function(){
 		var jumpTo = $(this).attr('m')/1000; 
 		//console.log('playing from '+jumpTo);
 
-/*
-		if (currentlyLoaded == 1) {
-			targetPlayer.player[0].jPlayer("play",jumpTo);
-		} else {
-			targetPlayer.player[1].jPlayer("play",jumpTo);
-		}
-*/
 		myPlayerSource.jPlayer("play",jumpTo);
 
 		$('#play-btn-source').hide();
@@ -353,18 +484,19 @@ $(document).ready(function(){
 		return false;
 	});
 
-	var filename = "";
-
-
 	$('#target-content').delegate('span','click',function(){
 
-		// targetPlayer.paused = false; // Moved to targetPlayer.play()
+		var playConfig = {
+			jumpTo: $(this).attr('m')/1000,
+			scriptIndex: parseInt($(this).parent().attr('i'), 10),
+			start: parseInt($(this).parent().attr('start'), 10),
+			end: parseInt($(this).parent().attr('end'),  10)
+		}
 
+/*
+		playConfig
 		var jumpTo = $(this).attr('m')/1000;
-
 		targetPlayer.scriptIndex = parseInt($(this).parent().attr('i'), 10);
-
-		filename = $(this).parent().attr('f');  
 		targetPlayer.start = parseInt($(this).parent().attr('start'), 10); 
 		targetPlayer.end = parseInt($(this).parent().attr('end'),  10);  
 
@@ -378,29 +510,8 @@ $(document).ready(function(){
 		console.log("targetPlayer.start="+targetPlayer.start);
 		console.log("targetPlayer.end="+targetPlayer.end);
 		console.log("jumpTo="+jumpTo);
-
-/*
-		if(targetPlayer.playerMediaId[0] == targetPlayer.currentMediaId) {
-
-			$('#jquery_jplayer_2').hide();
-			$('#jquery_jplayer_1').show();
-
-			targetPlayer.player[1].jPlayer("pause");
-			targetPlayer.player[0].jPlayer("play",jumpTo); 
-
-		} else if(targetPlayer.playerMediaId[1] == targetPlayer.currentMediaId) {
-
-			$('#jquery_jplayer_1').hide();
-			$('#jquery_jplayer_2').show();
-
-			targetPlayer.player[0].jPlayer("pause");
-			targetPlayer.player[1].jPlayer("play",jumpTo);
-		} else {
-			// Can we fix it? - Yes we can!
-			loadTranscriptTarget(targetPlayer.currentMediaId);
-		}
 */
-		targetPlayer.play(jumpTo);
+		targetPlayer.play(playConfig);
 
 		return false;
 	});
@@ -580,58 +691,6 @@ $(document).ready(function(){
 		});
 	}
 
-/*
-
-	// Move this function to targetPlayer.load()
-
-	function loadTranscriptTarget(id) { 
-
-		// The id is the index reference to the transcripts array.
-
-		console.log('loadTranscriptTarget('+id+')');
-
-		// Reset the play/pause button
-		$('#play-btn-target').show();
-		$('#pause-btn-target').hide();
-
-		 // Stop the players
-		targetPlayer.player[0].jPlayer("pause");
-		targetPlayer.player[1].jPlayer("pause");
-
-		$('#load-status-target').html('loading ...');
-
-		// load in the audio
-		// check which player to load media into
-
-		if (targetPlayer.player[0].data('jPlayer').status.src && currentlyLoaded < 2) {
-			targetPlayer.player[1].jPlayer("setMedia", transcripts[id].media);
-			currentlyLoaded = 2;
-			targetPlayer.playerMediaId[1] = id;
-			$('#jquery_jplayer_1').hide();
-			$('#jquery_jplayer_2').show();
-			fitVideo(targetPlayer.player[1]);
-		} else {
-			targetPlayer.player[0].jPlayer("setMedia", transcripts[id].media);
-			currentlyLoaded = 1;
-			targetPlayer.playerMediaId[0] = id;
-			$('#jquery_jplayer_2').hide();
-			$('#jquery_jplayer_1').show();
-			fitVideo(targetPlayer.player[0]);
-		}
-
-		$('#load-status-target').html('');
-
-		if (hints == true) {
-			$('#transcript-content-hint').fadeIn('slow');
-			$('#transcript-file-hint').fadeOut('slow');
-		}
-
-		$('#target-header-ctrl').fadeIn();
-		
-	}
-*/
-
-
 	// select text function
 
 	function getSelText()
@@ -770,7 +829,7 @@ $(document).ready(function(){
 
 				var nextSpan = startSpan; 
 				// $('#target-content').append('<p s="'+startTime+'" e="'+endTime+'" f="'+targetPlayer.player[0].data('jPlayer').status.src+'">');
-				var selectedStuff = $('<p i="'+theScript.length+'" start="'+startTime+'" end="'+endTime+'"  f="'+targetPlayer.player[0].data('jPlayer').status.src+'">'); 
+				var selectedStuff = $('<p i="'+theScript.length+'" start="'+startTime+'" end="'+endTime+'">'); 
 				$('#target-content').append( selectedStuff ); 
 				
 				//console.log('selected....');
@@ -901,37 +960,16 @@ $(document).ready(function(){
 	// play and pause for the target area.
 
 	$('#play-btn-target').click(function(){
-		if (currentlyLoaded == 1) {
-			targetPlayer.player[0].jPlayer("play");
-		}
-
-		if (currentlyLoaded == 2) {
-			targetPlayer.player[1].jPlayer("play");
-		}
-		
-		if (currentlyLoaded > 0) {
-			$(this).hide();
-			$('#pause-btn-target').show();
-		}
-
+		targetPlayer.play();
+		$(this).hide();
+		$('#pause-btn-target').show();
 		return false;
 	});
 
 	$('#pause-btn-target').click(function(){
-
-		if (currentlyLoaded == 1) {
-			targetPlayer.player[0].jPlayer("pause");
-		}
-
-		if (currentlyLoaded == 2) {
-			targetPlayer.player[1].jPlayer("pause");
-		}
-		
-		if (currentlyLoaded > 0) {
-			$(this).hide();
-			$('#play-btn-target').show();
-		}
-
+		targetPlayer.pause();
+		$(this).hide();
+		$('#play-btn-target').show();
 		return false;
 	});
 
