@@ -110,6 +110,9 @@ $(document).ready(function(){
 				console.log("config.jumpTo="+config.jumpTo);
 			}
 
+			$('#play-btn-target').hide();
+			$('#pause-btn-target').show();
+
 			// Prepare a player for this media
 			this.load(this.currentMediaId);
 
@@ -129,6 +132,19 @@ $(document).ready(function(){
 		pause: function() {
 			this.paused = true;
 			// Then pause the player playing... or just pause both?
+			$('#play-btn-target').show();
+			$('#pause-btn-target').hide();
+
+			if(DEBUG) console.log("pause(): Attempting to pause");
+			if (!this.player[0].data('jPlayer').status.paused) {
+				this.player[0].jPlayer("pause");
+				if(DEBUG) console.log("pause(): paused player 1");
+			}
+			
+			if (!this.player[1].data('jPlayer').status.paused) {
+				this.player[1].jPlayer("pause");
+				if(DEBUG) console.log("pause(): paused player 2");
+			}
 		},
 		load: function(id) { 
 
@@ -186,12 +202,12 @@ $(document).ready(function(){
 
 			if (!this.paused) {
 
-				var currentPlayerUsed = (this.lastPlayerPrimed + 1) % 2;
-
 				if (this.playerMediaId[0] === this.currentMediaId) {
 					now = this.player[0].data('jPlayer').status.currentTime * 1000;
-				} else {
+				} else if (this.playerMediaId[1] === this.currentMediaId) {
 					now = this.player[1].data('jPlayer').status.currentTime * 1000;
+				} else {
+					// We have a problem
 				}
 
 				//console.log("now="+now+" this.end="+this.end+"theScript.length="+theScript.length+" this.scriptIndex="+this.scriptIndex);
@@ -210,6 +226,21 @@ $(document).ready(function(){
 					if(DEBUG) console.log("targetPlayer.scriptIndex = "+this.scriptIndex);
 
 					// Pause the player playing
+
+					if(DEBUG) console.log("Attempting to pause");
+					if (this.playerMediaId[0] === this.currentMediaId) {
+						if(DEBUG) console.log("pausing player 1");
+						this.player[0].jPlayer("pause");
+						if(DEBUG) console.log("paused player 1");
+					} else if (this.playerMediaId[1] === this.currentMediaId) {
+						if(DEBUG) console.log("pausing player 2");
+						this.player[1].jPlayer("pause");
+						if(DEBUG) console.log("paused player 2");
+					} else {
+						// We have a problem - something should have been setup and playing.
+					}
+
+/*
 					if (theScript.length <= this.scriptIndex+1) {
 						if(DEBUG) console.log("Attempting to pause");
 						if (!this.player[0].data('jPlayer').status.paused) {
@@ -219,9 +250,10 @@ $(document).ready(function(){
 						
 						if (!this.player[1].data('jPlayer').status.paused) {
 							this.player[1].jPlayer("pause");
-							if(DEBUG) console.log("paused player 1");
+							if(DEBUG) console.log("paused player 2");
 						}
 					}
+*/
 
 					if (this.scriptIndex+1 < theScript.length) {
 
@@ -250,7 +282,12 @@ $(document).ready(function(){
 						if (DEBUG) console.dir(theScript);
 						this.start = theScript[this.scriptIndex].start;
 						this.end = theScript[this.scriptIndex].end;
+
 						this.currentMediaId = theScript[this.scriptIndex].mediaId;
+						this.nextMediaId = this.scriptIndex+1 < theScript.length ? theScript[this.scriptIndex+1].mediaId : null;
+
+						// Prepare the other player for the next media
+						this.load(this.nextMediaId);
 
 						$('#fader-content').css('background-color',fadeColor);
 
@@ -279,8 +316,26 @@ $(document).ready(function(){
 							this.player[0].jPlayer("pause");
 							this.player[1].jPlayer("play",this.start/1000); 
 						} else {
-							// Would need to change the media
+							// Would need to change the media... But it should already be ready.
 						}
+					} else {
+						// Ended Target Transcript.
+						if (DEBUG) console.dir("Ended Target Transcript.");
+
+						this.paused = true; // FYI - If you do not set this flag, the player loops and auto-plays from the start again.
+
+						this.scriptIndex = 0;
+						this.start = theScript[this.scriptIndex].start;
+						this.end = theScript[this.scriptIndex].end;
+
+						// Show the correct control button
+						$('#play-btn-target').show();
+						$('#pause-btn-target').hide();
+
+						// Should not need the others set since we play though .play() method
+
+						// this.currentMediaId = theScript[this.scriptIndex].mediaId;
+						// this.nextMediaId = this.scriptIndex+1 < theScript.length ? theScript[this.scriptIndex+1].mediaId : null;
 					}
 				}
 			}
@@ -884,7 +939,7 @@ $(document).ready(function(){
 				timespan.mediaId = sourceMediaId;
 
 				// This next line in here is a hack to just make it work for the time being.
-				targetPlayer.load(timespan.mediaId);
+				// targetPlayer.load(timespan.mediaId);
 
 
 				//console.log("s="+startTime);
