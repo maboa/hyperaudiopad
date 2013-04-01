@@ -146,6 +146,44 @@ $(document).ready(function(){
 				if(DEBUG) console.log("pause(): paused player 2");
 			}
 		},
+		cue: function() {
+
+			var currentJumpTo, nextJumpTo;
+
+			this.start = theScript[this.scriptIndex].start;
+			this.end = theScript[this.scriptIndex].end;
+
+			this.currentMediaId = theScript[this.scriptIndex].mediaId;
+			currentJumpTo = theScript[this.scriptIndex].start / 1000;
+
+			if(this.scriptIndex+1 < theScript.length) {
+				this.nextMediaId = theScript[this.scriptIndex+1].mediaId;
+				nextJumpTo = theScript[this.scriptIndex+1].start / 1000;
+			} else {
+				this.nextMediaId = null;
+			}
+
+			if(this.paused) {
+				if(this.playerMediaId[0] === this.currentMediaId) {
+					this.player[1].hide();
+					this.player[0].show().jPlayer("pause", currentJumpTo); 
+				} else if(this.playerMediaId[1] === this.currentMediaId) {
+					this.player[0].hide();
+					this.player[1].show().jPlayer("pause", currentJumpTo);
+				} else {
+					this.load(this.currentMediaId);
+					this.player[(this.lastPlayerPrimed+1)%2].hide();
+					this.player[this.lastPlayerPrimed].show().jPlayer("pause", currentJumpTo);
+				}
+			}
+
+			if(this.currentMediaId !== this.nextMediaId) {
+				// Prepare the other player for the next media
+				if(this.load(this.nextMediaId)) {
+					this.player[this.lastPlayerPrimed].jPlayer("pause", nextJumpTo);
+				}
+			}
+		},
 		load: function(id) { 
 
 			// The id is the index reference to the transcripts array.
@@ -154,7 +192,7 @@ $(document).ready(function(){
 
 			if(typeof id !== 'number') {
 				if(DEBUG) console.log('Ignoring: id='+id);
-				return;
+				return false;
 			}
 
 			// Reset the play/pause button
@@ -174,31 +212,30 @@ $(document).ready(function(){
 			// Check whether a player already setup to play this media.
 			if(this.playerMediaId[0] === id) {
 				this.lastPlayerPrimed = 0;
-				return;
 			} else if(this.playerMediaId[1] === id) {
 				this.lastPlayerPrimed = 1;
-				return;
+			} else {
+
+				var nextPlayerUsed = (this.lastPlayerPrimed + 1) % 2;
+				if(DEBUG) console.log('[before] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
+
+				this.player[nextPlayerUsed].jPlayer("setMedia", transcripts[id].media);
+				this.playerMediaId[nextPlayerUsed] = id;
+				this.player[this.lastPlayerPrimed].hide();
+				this.player[nextPlayerUsed].show();
+				fitVideo(this.player[nextPlayerUsed]);
+
+				this.lastPlayerPrimed = nextPlayerUsed;
+
+				if(DEBUG) console.log('[after] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
 			}
-
-			var nextPlayerUsed = (this.lastPlayerPrimed + 1) % 2;
-			if(DEBUG) console.log('[before] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
-
-			this.player[nextPlayerUsed].jPlayer("setMedia", transcripts[id].media);
-			this.playerMediaId[nextPlayerUsed] = id;
-			this.player[this.lastPlayerPrimed].hide();
-			this.player[nextPlayerUsed].show();
-			fitVideo(this.player[nextPlayerUsed]);
-
-			this.lastPlayerPrimed = nextPlayerUsed;
-
-			if(DEBUG) console.log('[after] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
-
 			$('#target-header-ctrl').fadeIn();
-			
+			return true;
 		},
 		manager: function(event) {
 		
-			var now;
+			var self = this,
+				now;
 
 			if (!this.paused) {
 
@@ -280,6 +317,9 @@ $(document).ready(function(){
 						// moving to the next block in the target
 						this.scriptIndex++;
 						if (DEBUG) console.dir(theScript);
+
+						// This bit to...
+/*
 						this.start = theScript[this.scriptIndex].start;
 						this.end = theScript[this.scriptIndex].end;
 
@@ -288,6 +328,12 @@ $(document).ready(function(){
 
 						// Prepare the other player for the next media
 						this.load(this.nextMediaId);
+*/
+						// ...To this bit.
+
+						// Prepare the other player for the next media
+						// Also updates this.start, this.end, this.currentMediaId and this.nextMediaId
+						this.cue();
 
 						$('#fader-content').css('background-color',fadeColor);
 
@@ -297,8 +343,8 @@ $(document).ready(function(){
 						if (this.playerMediaId[0] === this.currentMediaId) {
 							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 								//console.log('ping');
-								$('#jquery_jplayer_2').hide();
-								$('#jquery_jplayer_1').show();
+								self.player[1].hide();
+								self.player[0].show();
 								$('#fader-content').fadeTo(fadeSpeed, 0);
 							});
 							if(DEBUG) console.log("switch to 1");
@@ -307,8 +353,8 @@ $(document).ready(function(){
 						} else if (this.playerMediaId[1] === this.currentMediaId) {
 							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 								//console.log('pong');
-								$('#jquery_jplayer_1').hide();
-								$('#jquery_jplayer_2').show();
+								self.player[0].hide();
+								self.player[1].show();
 								$('#fader-content').fadeTo(fadeSpeed, 0);
 							});
 							if(DEBUG) console.log("switch to 2");
@@ -320,13 +366,20 @@ $(document).ready(function(){
 						}
 					} else {
 						// Ended Target Transcript.
-						if (DEBUG) console.dir("Ended Target Transcript.");
+						if (DEBUG) console.log("Ended Target Transcript.");
 
 						this.paused = true; // FYI - If you do not set this flag, the player loops and auto-plays from the start again.
 
 						this.scriptIndex = 0;
 						this.start = theScript[this.scriptIndex].start;
 						this.end = theScript[this.scriptIndex].end;
+
+						// Hide both players.
+						this.player[0].hide();
+						this.player[1].hide();
+
+						// Cue up the players ready for if the play button is pressed.
+						this.cue();
 
 						// Show the correct control button
 						$('#play-btn-target').show();
@@ -941,7 +994,6 @@ $(document).ready(function(){
 				// This next line in here is a hack to just make it work for the time being.
 				// targetPlayer.load(timespan.mediaId);
 
-
 				//console.log("s="+startTime);
 				//console.log("e="+endTime);
 				//console.log("n="+nextSpanStartTime);
@@ -949,6 +1001,11 @@ $(document).ready(function(){
 				//console.log(targetPlayer.player[0].data('jPlayer').status.src);
 				//timespan.src = targetPlayer.player[0].data('jPlayer').status.src;
 				theScript.push(timespan);
+
+				if(theScript.length === 1) {
+					// Setup the target player for the start.
+					targetPlayer.cue();
+				}
 				
 				//$.bbq.pushState(theScript);
 				//console.dir(theScript);
