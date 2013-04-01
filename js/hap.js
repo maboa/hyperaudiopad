@@ -1029,6 +1029,7 @@ $(document).ready(function(){
 		
 		$('.middle.col').css('width', middleWidth);
 
+
 		console.log("dd.offsetX:"+dd.offsetX);
 	});
 

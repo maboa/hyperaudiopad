@@ -98,6 +98,6 @@
 		user-select: none;
 	}
 
-	div.jp-video-270p {
-		width: 480px;
+	div.jp-video-flex {
+		width: 100%;
 	}
