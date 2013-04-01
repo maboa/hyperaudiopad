@@ -114,7 +114,7 @@ $(document).ready(function(){
 			$('#pause-btn-target').show();
 
 			// Prepare a player for this media
-			this.load(this.currentMediaId);
+			this.load(this.currentMediaId, this.scriptIndex);
 
 			if(this.playerMediaId[0] === this.currentMediaId) {
 				this.player[1].hide().jPlayer("pause");
@@ -127,7 +127,7 @@ $(document).ready(function(){
 			}
 
 			// Prepare the other player for the next media
-			this.load(this.nextMediaId);
+			this.load(this.nextMediaId, this.scriptIndex+1);
 		},
 		pause: function() {
 			this.paused = true;
@@ -171,7 +171,7 @@ $(document).ready(function(){
 					this.player[0].hide();
 					this.player[1].show().jPlayer("pause", currentJumpTo);
 				} else {
-					this.load(this.currentMediaId);
+					this.load(this.currentMediaId, this.scriptIndex);
 					this.player[(this.lastPlayerPrimed+1)%2].hide();
 					this.player[this.lastPlayerPrimed].show().jPlayer("pause", currentJumpTo);
 				}
@@ -179,16 +179,16 @@ $(document).ready(function(){
 
 			if(this.currentMediaId !== this.nextMediaId) {
 				// Prepare the other player for the next media
-				if(this.load(this.nextMediaId)) {
+				if(this.load(this.nextMediaId, this.scriptIndex+1)) {
 					this.player[this.lastPlayerPrimed].jPlayer("pause", nextJumpTo);
 				}
 			}
 		},
-		load: function(id) { 
+		load: function(id, index) { 
 
 			// The id is the index reference to the transcripts array.
 
-			if(DEBUG) console.log('loadTranscriptTarget('+id+')');
+			if(DEBUG) console.log('loadTranscriptTarget('+id+', '+index+')');
 
 			if(typeof id !== 'number') {
 				if(DEBUG) console.log('Ignoring: id='+id);
@@ -229,6 +229,9 @@ $(document).ready(function(){
 
 				if(DEBUG) console.log('[after] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
 			}
+
+			initTargetPopcorn('#' + this.player[this.lastPlayerPrimed].data("jPlayer").internal.video.id, index);
+
 			$('#target-header-ctrl').fadeIn();
 			return true;
 		},
@@ -700,16 +703,9 @@ $(document).ready(function(){
 	/* load in the file */
 
 
-	function initPopcorn(id) {
+	function initSourcePopcorn(id) {
 		var p = Popcorn(id);
 		$("#transcript-content span").each(function(i) {  
-/*
-			p.transcript({
-				time: $(this).attr("m") / 1000, // seconds
-				futureClass: "transcript-grey",
-				target: this
-			});
-*/
 			p.transcript({
 				time: $(this).attr("m") / 1000, // seconds
 				futureClass: "transcript-grey",
@@ -721,6 +717,19 @@ $(document).ready(function(){
 		});
 	};
 
+	function initTargetPopcorn(id, index) {
+		var p = Popcorn(id);
+		$("#target-content p[i='" + index + "'] span").each(function(i) {  
+			p.transcript({
+				time: $(this).attr("m") / 1000, // seconds
+				futureClass: "transcript-grey",
+				target: this,
+				onNewPara: function(parent) {
+					$("#target-content").stop().scrollTo($(parent), 800, {axis:'y',margin:true,offset:{top:0}});
+				}
+			});
+		});
+	};
 
 	var $transFiles = $('#transcript-files').empty();
 	$.each(transcripts, function(i) {
@@ -777,7 +786,7 @@ $(document).ready(function(){
 			$("#transcript-content").stop().scrollTo($("#transcript-content p:first"), 800, {axis:'y',margin:true,offset:{top:0}});
 
 			// Setup popcorn and load in the media
-			initPopcorn('#' + myPlayerSource.data("jPlayer").internal.video.id);
+			initSourcePopcorn('#' + myPlayerSource.data("jPlayer").internal.video.id);
 			myPlayerSource.jPlayer("setMedia", transcripts[id].media);
 
 			// Store reference to the transcript
