@@ -89,6 +89,14 @@ $(document).ready(function(){
 
 		play: function(config) {
 
+			// Set play configuration
+			if(config) {
+				this.scriptIndex = config.scriptIndex;
+				this.start = config.start; 
+				this.end = config.end;  
+			} else {
+				config = {}; // So the config.jumpTo is happily undefined.
+			}
 
 			this.currentMediaId = theScript[this.scriptIndex].mediaId;
 			this.nextMediaId = this.scriptIndex+1 < theScript.length ? theScript[this.scriptIndex+1].mediaId : null;
@@ -142,15 +150,6 @@ $(document).ready(function(){
 			target.source = sourceVid;
 
 			seriously.go();
-
-			// Set play configuration
-			if(config) {
-				this.scriptIndex = config.scriptIndex;
-				this.start = config.start; 
-				this.end = config.end;  
-			} else {
-				config = {}; // So the config.jumpTo is happily undefined.
-			}
 		},
 		pause: function() {
 			this.paused = true;
