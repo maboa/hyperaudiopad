@@ -4,7 +4,7 @@ $(document).ready(function(){
 
 	$.jPlayer.timeFormat.padMin = false;
 
-	var DEBUG = true;
+	var DEBUG = false;
 
 	// These JSON object would be loaded in.
 
@@ -333,11 +333,13 @@ $(document).ready(function(){
 					}
 */
 
+					var effectIndex = 0;
+					var effectArray = [];
+
 					if (this.scriptIndex+1 < theScript.length) {
 
 						var fadeSpeed = 100; //ms
 						var fadeColor = "black";
-						var effect = "";
 
 						//console.log(this.scriptIndex);
 
@@ -356,9 +358,7 @@ $(document).ready(function(){
 						if (theScript[this.scriptIndex].action == 'apply') {
 							if(DEBUG) console.log('action apply detected');
 
-							if (theScript[this.scriptIndex].effect) {
-								effect = theScript[this.scriptIndex].effect;
-							}
+							effectArray = theScript[this.scriptIndex].effect;
 						}
 
 						if(DEBUG) console.log("fadeColor="+fadeColor);
@@ -420,19 +420,32 @@ $(document).ready(function(){
 							// Would need to change the media... But it should already be ready.
 						}
 
-						if (effect.length > 0) {
+						if (effectArray.length > 0) {
 
 							//seriously = null;
 							seriously = new Seriously();
 
 							var sourceVid = seriously.source("#"+nextVideoId);
 							var target = seriously.target('#target-canvas');
+							var seriouslyEffect = [];
 
-							var effect = seriously.effect(effect);
+							// add all the effects
+
+							for (var i=0; i < effectArray.length; i++) {
+								seriouslyEffect[i] = seriously.effect(effectArray[i]);
+								if (i > 0) {
+									seriouslyEffect[i].source = seriouslyEffect[i-1];
+									console.log("connecting up");
+								} else {
+									seriouslyEffect[0].source = sourceVid;
+								}
+							}
+
+							//console.log("EFFECT IS "+effectArray[0]);
 
 							// connect all our nodes in the right order
-							effect.source = sourceVid;
-							target.source = effect;
+							// seriouslyEffect[0].source = sourceVid;
+							target.source = seriouslyEffect[effectArray.length-1];
 
 							seriously.go();
 						}
@@ -722,6 +735,9 @@ $(document).ready(function(){
 		// We could use this list to load the appropriate JS files (also conceivably we could load on demand) -MB
 		var effects = ['ascii','bleach-bypass','invert','nightvision','noise','ripple','scanlines','sepia','sketch','tvglitch','vignette'];
 
+		var effectIndex = 0;
+		var effect = [];
+
 		for (var i=0; i < commandList.length; i++) {
 
 			console.log("word "+i);
@@ -733,7 +749,8 @@ $(document).ready(function(){
 
 			if (applyFlag == true && $.inArray(commandList[i], effects) >= 0) {
 				action = 'apply';
-				effect = commandList[i];
+				effect[effectIndex] = commandList[i];
+				effectIndex++;
 			}
 
 			if (commandList[i] == 'apply') {
