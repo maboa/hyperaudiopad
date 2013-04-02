@@ -1068,6 +1068,9 @@ $(document).ready(function(){
 
 				$('#target-header-ctrl').fadeIn();
 
+				$('#transcript-content-hint').fadeOut();
+				hints = false;
+
 				//e.preventDefault(); 
 				//e.stopImmediatePropagation();
 				return false; 
@@ -1075,8 +1078,6 @@ $(document).ready(function(){
 		}
 
 
-		$('#transcript-content-hint').fadeOut();
-		hints = false;
 		
 	});
 
