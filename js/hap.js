@@ -87,8 +87,8 @@ $(document).ready(function(){
 		playerMediaId: [],
 		currentMediaId: null,
 		nextMediaId: null,
-
 		lastPlayerPrimed: 1, // So the first instance used is #0, then second is #1
+		popcorn: null, // The popcorn instance use by the player.
 
 		play: function(config) {
 
@@ -133,11 +133,13 @@ $(document).ready(function(){
 
 			if(this.playerMediaId[0] === this.currentMediaId) {
 				if(DEBUG_MP) console.log('play(): already prepared for in player[0]');
+				initTargetPopcorn('#' + this.player[0].data("jPlayer").internal.video.id, this.scriptIndex);
 				this.player[1].hide().jPlayer("pause");
 				this.player[0].show().jPlayer("play", config.jumpTo);
 				currentVideoId = "jp_video_1";
 			} else if(this.playerMediaId[1] === this.currentMediaId) {
 				if(DEBUG_MP) console.log('play(): already prepared for in player[1]');
+				initTargetPopcorn('#' + this.player[1].data("jPlayer").internal.video.id, this.scriptIndex);
 				this.player[0].hide().jPlayer("pause");
 				this.player[1].show().jPlayer("play", config.jumpTo);
 				currentVideoId = "jp_video_2";
@@ -268,7 +270,7 @@ $(document).ready(function(){
 				if(DEBUG_MP) console.log('[after] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
 			}
 
-			initTargetPopcorn('#' + this.player[this.lastPlayerPrimed].data("jPlayer").internal.video.id, index);
+			// initTargetPopcorn('#' + this.player[this.lastPlayerPrimed].data("jPlayer").internal.video.id, index);
 
 			$('#target-header-ctrl').fadeIn();
 			return true;
@@ -363,7 +365,7 @@ $(document).ready(function(){
 
 						if(DEBUG_MP) console.log("fadeColor="+fadeColor);
 						if(DEBUG_MP) console.log("fadeSpeed="+fadeSpeed);
-						if(DEBUG_MP) console.log("effect="+effect);
+						// if(DEBUG_MP) console.log("effect="+effect);
 
 						// moving to the next block in the target
 						this.scriptIndex++;
@@ -402,6 +404,7 @@ $(document).ready(function(){
 								$('#fader-content').fadeTo(fadeSpeed, 0);
 							});
 							if(DEBUG_MP) console.log("switch to 1");
+							initTargetPopcorn('#' + this.player[0].data("jPlayer").internal.video.id, this.scriptIndex);
 							this.player[1].jPlayer("pause");
 							this.player[0].jPlayer("play",this.start/1000);
 						} else if (this.playerMediaId[1] === this.currentMediaId) {
@@ -413,7 +416,7 @@ $(document).ready(function(){
 								$('#fader-content').fadeTo(fadeSpeed, 0);
 							});
 							if(DEBUG_MP) console.log("switch to 2");
-							if(DEBUG_MP) console.log(this.start);
+							initTargetPopcorn('#' + this.player[1].data("jPlayer").internal.video.id, this.scriptIndex);
 							this.player[0].jPlayer("pause");
 							this.player[1].jPlayer("play",this.start/1000); 
 						} else {
@@ -836,9 +839,14 @@ $(document).ready(function(){
 	}
 
 	function initTargetPopcorn(id, index) {
-		var p = Popcorn(id);
+		if(targetPlayer.popcorn) {
+			if(DEBUG_MP) console.log('initTargetPopcorn('+id+', '+index+'): Destroying targetPlayer.popcorn');
+			targetPlayer.popcorn.destroy();
+		}
+		if(DEBUG_MP) console.log('initTargetPopcorn('+id+', '+index+'): Creating targetPlayer.popcorn');
+		targetPlayer.popcorn = Popcorn(id);
 		$("#target-content p[i='" + index + "'] span").each(function(i) {  
-			p.transcript({
+			targetPlayer.popcorn.transcript({
 				time: $(this).attr("m") / 1000, // seconds
 				futureClass: "transcript-grey",
 				target: this,
