@@ -1,6 +1,6 @@
 $(document).ready(function(){
 
-	var seriously = new Seriously(); // instance seriously lib for global use
+	// var seriously = new Seriously(); // instance seriously lib for global use
 
 	$.jPlayer.timeFormat.padMin = false;
 
@@ -92,6 +92,82 @@ $(document).ready(function(){
 		lastPlayerPrimed: 1, // So the first instance used is #0, then second is #1
 		popcorn: null, // The popcorn instance use by the player.
 
+		seriously: new Seriously(),
+		videoMap: {
+			videoSource: null,
+			canvasTarget: null,
+			effect: []
+		},
+		currentVideoId: "",
+
+		initVideoMap: function() {
+			// Might be able to clean up the map code a little...
+			this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
+		},
+		createVideoMap: function(effects) {
+
+			var i, iLen;
+
+			this.seriously.stop();
+
+			// Destroy the old node map
+			// this.seriously.destroy();
+			// Create a new node map
+			// this.seriously = new Seriously();
+
+			// this.videoMap.videoSource = this.seriously.source("#"+nextVideoId);
+			// this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
+
+			for (i=0, iLen=this.videoMap.effect.length; i < iLen; i++) {
+				this.videoMap.effect[i].destroy();
+				this.videoMap.effect[i] = null;
+			}
+
+			this.videoMap.effect = [];
+
+			// add all the effects
+
+			for (i=0, iLen=effects.length; i < iLen; i++) {
+				this.videoMap.effect[i] = this.seriously.effect(effects[i]);
+				if (i > 0) {
+					this.videoMap.effect[i].source = this.videoMap.effect[i-1];
+					if (DEBUG_MB) console.log("createVideoMap(): connecting up effect chain");
+				} else {
+					// this.videoMap.effect[0].source = this.videoMap.videoSource;
+				}
+			}
+
+			// Connect the last effect to the canvas
+			// this.videoMap.canvasTarget.source = this.videoMap.effect[this.videoMap.effect.length-1];
+		},
+		connectVideo: function(videoId) {
+
+			this.currentVideoId = videoId;
+
+			this.seriously.stop();
+
+			// Remove the previous video input and clean up.
+			if(this.videoMap.videoSource) {
+				this.videoMap.videoSource.destroy();
+				this.videoMap.videoSource = null;
+			}
+			// Create the new video source node
+			this.videoMap.videoSource = this.seriously.source("#"+videoId);
+
+			// If effects map, connect to it
+			if(this.videoMap.effect[0]) {
+				// Connect the video to the first effect
+				this.videoMap.effect[0].source = this.videoMap.videoSource;
+				// Connect the last effect to the canvas
+				this.videoMap.canvasTarget.source = this.videoMap.effect[this.videoMap.effect.length-1];
+			} else {
+				// Connect the video to the canvas
+				this.videoMap.canvasTarget.source = this.videoMap.videoSource;
+			}
+
+			this.seriously.go();
+		},
+
 		play: function(config) {
 
 
@@ -139,7 +215,7 @@ $(document).ready(function(){
 				setTargetHighlighting(this.scriptIndex);
 			}
 
-			var currentVideoId = "";
+			var nextVideoId = "";
 
 			if(this.playerMediaId[0] === this.currentMediaId) {
 				if(DEBUG_MP) console.log('play(): already prepared for in player[0]');
@@ -148,7 +224,7 @@ $(document).ready(function(){
 				}
 				this.player[1].hide().jPlayer("pause");
 				this.player[0].show().jPlayer("play", config.jumpTo);
-				currentVideoId = "jp_video_1";
+				nextVideoId = this.player[0].data("jPlayer").internal.video.id;
 			} else if(this.playerMediaId[1] === this.currentMediaId) {
 				if(DEBUG_MP) console.log('play(): already prepared for in player[1]');
 				if(config.jumpTo || !this.popcorn) {
@@ -156,7 +232,7 @@ $(document).ready(function(){
 				}
 				this.player[0].hide().jPlayer("pause");
 				this.player[1].show().jPlayer("play", config.jumpTo);
-				currentVideoId = "jp_video_2";
+				nextVideoId = this.player[1].data("jPlayer").internal.video.id;
 			} else {
 				// we have a problem
 			}
@@ -171,12 +247,19 @@ $(document).ready(function(){
 
 			if(DEBUG_MP) console.log("seriously ...");
 
-			var sourceVid = seriously.source('#'+currentVideoId);
-			var target = seriously.target('#target-canvas');
+			// This bit need review after refactoring the code in the manager
+/*
+			this.videoMap.videoSource = this.seriously.source('#'+currentVideoId);
+			this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
 
-			target.source = sourceVid;
+			this.videoMap.canvasTarget.source = this.videoMap.videoSource;
 
-			seriously.go();
+			this.seriously.go();
+*/
+
+			if (this.currentVideoId !== nextVideoId) {
+				this.connectVideo(nextVideoId);
+			}
 		},
 		pause: function() {
 			this.paused = true;
@@ -197,7 +280,7 @@ $(document).ready(function(){
 		},
 		cue: function() {
 
-			var currentJumpTo, nextJumpTo;
+			var currentJumpTo, nextJumpTo, nextVideoId;
 
 			this.start = theScript[this.scriptIndex].start;
 			this.end = theScript[this.scriptIndex].end;
@@ -217,18 +300,25 @@ $(document).ready(function(){
 					if(DEBUG_MP) console.log('cue(): already prepared for in player[0]');
 					this.player[1].hide();
 					this.player[0].show().jPlayer("pause", currentJumpTo); 
+					nextVideoId = this.player[0].data("jPlayer").internal.video.id;
 				} else if(this.playerMediaId[1] === this.currentMediaId) {
 					if(DEBUG_MP) console.log('cue(): already prepared for in player[1]');
 					this.player[0].hide();
 					this.player[1].show().jPlayer("pause", currentJumpTo);
+					nextVideoId = this.player[1].data("jPlayer").internal.video.id;
 				} else {
 					if(DEBUG_MP) console.log('cue(): prepare the current video');
 					this.load(this.currentMediaId);
 					this.player[(this.lastPlayerPrimed+1)%2].hide();
 					this.player[this.lastPlayerPrimed].show().jPlayer("pause", currentJumpTo);
+					nextVideoId = this.player[this.lastPlayerPrimed].data("jPlayer").internal.video.id;
 				}
 				killTargetPopcorn();
 				setTargetHighlighting(this.scriptIndex);
+
+				if (this.currentVideoId !== nextVideoId) {
+					this.connectVideo(nextVideoId);
+				}
 			}
 
 			if(this.currentMediaId !== this.nextMediaId) {
@@ -351,7 +441,6 @@ $(document).ready(function(){
 					}
 */
 
-					var effectIndex = 0;
 					var effectArray = [];
 
 					if (this.scriptIndex+1 < theScript.length) {
@@ -396,7 +485,7 @@ $(document).ready(function(){
 						if(DEBUG_MP) console.log("targetPlayer.playerMediaId[0] = "+this.playerMediaId[0]);
 						if(DEBUG_MP) console.log("targetPlayer.playerMediaId[1] = "+this.playerMediaId[1]);
 
-						// currentVideoId would be more appropriate.
+						// Compared with this.currentVideoId further down.
 						var nextVideoId = "";
 
 						if (this.playerMediaId[0] === this.currentMediaId) {
@@ -427,36 +516,46 @@ $(document).ready(function(){
 							// Would need to change the media... But it should already be ready.
 						}
 
+						if (effectArray.length) {
+							this.createVideoMap(effectArray);
+							this.connectVideo(nextVideoId);
+						} else if (this.currentVideoId !== nextVideoId) {
+							this.connectVideo(nextVideoId);
+						}
+/*
 						if (effectArray.length > 0) {
 
-							//seriously = null;
-							seriously = new Seriously();
+							// Destroy the old node map
+							this.seriously.destroy();
+							// Create a new node map
+							this.seriously = new Seriously();
 
-							var sourceVid = seriously.source("#"+nextVideoId);
-							var target = seriously.target('#target-canvas');
-							var seriouslyEffect = [];
+							this.videoMap.videoSource = this.seriously.source("#"+nextVideoId);
+							this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
+							this.videoMap.effect = [];
+
+							// var sourceVid = seriously.source("#"+nextVideoId);
+							// var target = seriously.target('#target-canvas');
+							// var seriouslyEffect = [];
 
 							// add all the effects
 
 							for (var i=0; i < effectArray.length; i++) {
-								seriouslyEffect[i] = seriously.effect(effectArray[i]);
+								this.videoMap.effect[i] = this.seriously.effect(effectArray[i]);
 								if (i > 0) {
-									seriouslyEffect[i].source = seriouslyEffect[i-1];
+									this.videoMap.effect[i].source = this.videoMap.effect[i-1];
 									if (DEBUG_MB) console.log("connecting up");
 								} else {
-									seriouslyEffect[0].source = sourceVid;
+									this.videoMap.effect[0].source = this.videoMap.videoSource;
 								}
 							}
 
-							//console.log("EFFECT IS "+effectArray[0]);
+							// Connect the last effect to the canvas
+							this.videoMap.canvasTarget.source = this.videoMap.effect[this.videoMap.effect.length-1];
 
-							// connect all our nodes in the right order
-							// seriouslyEffect[0].source = sourceVid;
-							target.source = seriouslyEffect[effectArray.length-1];
-
-							seriously.go();
+							this.seriously.go();
 						}
-
+*/
 
 					} else {
 						// Ended Target Transcript.
@@ -471,6 +570,9 @@ $(document).ready(function(){
 						// Hide both players.
 						this.player[0].hide();
 						this.player[1].hide();
+
+						// Reset the video map to the first one, or just remove it if no initial effect.
+						this.createVideoMap(theScript[0].effect || []);
 
 						// Cue up the players ready for if the play button is pressed.
 						this.cue();
@@ -488,6 +590,8 @@ $(document).ready(function(){
 			}
 		}
 	};
+
+	targetPlayer.initVideoMap();
 
 	function fitVideo(c) {
 		var s = c.data('jPlayer').options.size;
