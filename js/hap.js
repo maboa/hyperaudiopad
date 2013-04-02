@@ -19,19 +19,19 @@ $(document).ready(function(){
 		title: "Internet Amazonians",
 		url: "transcripts/internetindians.htm",
 		media: {
-			m4v: 'http://happyworm.com/video/internetindians.mp4',
-			webmv: 'http://happyworm.com/video/internetindians.webm'
-			/* m4v: '../video/internetindians.mp4',
-			webmv: '../video/internetindians.webm' */
+			/* m4v: 'http://happyworm.com/video/internetindians.mp4',
+			webmv: 'http://happyworm.com/video/internetindians.webm' */
+			m4v: '../video/internetindians.mp4',
+			webmv: '../video/internetindians.webm'
 		}
 	}, {
 		title: "Rainforest Raids",
 		url: "transcripts/raidsinrainforest.htm",
 		media: {
-			m4v: 'http://happyworm.com/video/raidsinrainforest.mp4',
-			webmv: 'http://happyworm.com/video/raidsinrainforest.webm'
-			/* m4v: '../video/raidsinrainforest.mp4',
-			webmv: '../video/raidsinrainforest.webm' */
+			/* m4v: 'http://happyworm.com/video/raidsinrainforest.mp4',
+			webmv: 'http://happyworm.com/video/raidsinrainforest.webm' */
+			m4v: '../video/raidsinrainforest.mp4',
+			webmv: '../video/raidsinrainforest.webm'
 		}
 	}/*, {
 		title: "SOTU 2013",
@@ -75,6 +75,7 @@ $(document).ready(function(){
 
 	var myPlayerSource = $("#jquery_jplayer_source");
 	var sourceMediaId = null;
+	var sourcePopcorn = null;
 
 	// Want to migrate all the target player Flags and controls into this object
 	var targetPlayer = {
@@ -799,9 +800,14 @@ $(document).ready(function(){
 
 
 	function initSourcePopcorn(id) {
-		var p = Popcorn(id);
+		if(sourcePopcorn) {
+			if(DEBUG) console.log('initSourcePopcorn('+id+'): Destroying sourcePopcorn');
+			sourcePopcorn.destroy();
+		}
+		if(DEBUG) console.log('initSourcePopcorn('+id+'): Creating sourcePopcorn');
+		sourcePopcorn = Popcorn(id);
 		$("#transcript-content span").each(function(i) {  
-			p.transcript({
+			sourcePopcorn.transcript({
 				time: $(this).attr("m") / 1000, // seconds
 				futureClass: "transcript-grey",
 				target: this,
