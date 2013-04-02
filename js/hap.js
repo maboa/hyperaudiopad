@@ -17,19 +17,19 @@ $(document).ready(function(){
 		title: "Internet Amazonians",
 		url: "transcripts/internetindians.htm",
 		media: {
-/*			m4v: 'http://happyworm.com/video/internetindians.mp4',
-			webmv: 'http://happyworm.com/video/internetindians.webm' */
-			m4v: '../video/internetindians.mp4',
-			webmv: '../video/internetindians.webm'
+			m4v: 'http://happyworm.com/video/internetindians.mp4',
+			webmv: 'http://happyworm.com/video/internetindians.webm'
+			/* m4v: '../video/internetindians.mp4',
+			webmv: '../video/internetindians.webm' */
 		}
 	}, {
 		title: "Rainforest Raids",
 		url: "transcripts/raidsinrainforest.htm",
 		media: {
-/*			m4v: 'http://happyworm.com/video/raidsinrainforest.mp4',
-			webmv: 'http://happyworm.com/video/raidsinrainforest.webm' */
-			m4v: '../video/raidsinrainforest.mp4',
-			webmv: '../video/raidsinrainforest.webm'
+			m4v: 'http://happyworm.com/video/raidsinrainforest.mp4',
+			webmv: 'http://happyworm.com/video/raidsinrainforest.webm'
+			/* m4v: '../video/raidsinrainforest.mp4',
+			webmv: '../video/raidsinrainforest.webm' */
 		}
 	}/*, {
 		title: "SOTU 2013",
@@ -118,15 +118,18 @@ $(document).ready(function(){
 			$('#pause-btn-target').show();
 
 			// Prepare a player for this media
+			if(DEBUG) console.log('play(): prepare current media');
 			this.load(this.currentMediaId, this.scriptIndex);
 
 			var currentVideoId = "";
 
 			if(this.playerMediaId[0] === this.currentMediaId) {
+				if(DEBUG) console.log('play(): already prepared for in player[0]');
 				this.player[1].hide().jPlayer("pause");
 				this.player[0].show().jPlayer("play", config.jumpTo);
 				currentVideoId = "jp_video_1";
 			} else if(this.playerMediaId[1] === this.currentMediaId) {
+				if(DEBUG) console.log('play(): already prepared for in player[1]');
 				this.player[0].hide().jPlayer("pause");
 				this.player[1].show().jPlayer("play", config.jumpTo);
 				currentVideoId = "jp_video_2";
@@ -135,6 +138,7 @@ $(document).ready(function(){
 			}
 
 			// Prepare the other player for the next media
+			if(DEBUG) console.log('play(): prepare next media');
 			this.load(this.nextMediaId, this.scriptIndex+1);
 
 
@@ -187,12 +191,15 @@ $(document).ready(function(){
 
 			if(this.paused) {
 				if(this.playerMediaId[0] === this.currentMediaId) {
+					if(DEBUG) console.log('cue(): already prepared for in player[0]');
 					this.player[1].hide();
 					this.player[0].show().jPlayer("pause", currentJumpTo); 
 				} else if(this.playerMediaId[1] === this.currentMediaId) {
+					if(DEBUG) console.log('cue(): already prepared for in player[1]');
 					this.player[0].hide();
 					this.player[1].show().jPlayer("pause", currentJumpTo);
 				} else {
+					if(DEBUG) console.log('cue(): prepare the current video');
 					this.load(this.currentMediaId, this.scriptIndex);
 					this.player[(this.lastPlayerPrimed+1)%2].hide();
 					this.player[this.lastPlayerPrimed].show().jPlayer("pause", currentJumpTo);
@@ -201,6 +208,7 @@ $(document).ready(function(){
 
 			if(this.currentMediaId !== this.nextMediaId) {
 				// Prepare the other player for the next media
+				if(DEBUG) console.log('cue(): prepare next video');
 				if(this.load(this.nextMediaId, this.scriptIndex+1)) {
 					this.player[this.lastPlayerPrimed].jPlayer("pause", nextJumpTo);
 				}
@@ -243,8 +251,8 @@ $(document).ready(function(){
 
 				this.player[nextPlayerUsed].jPlayer("setMedia", transcripts[id].media);
 				this.playerMediaId[nextPlayerUsed] = id;
-				this.player[this.lastPlayerPrimed].hide();
-				this.player[nextPlayerUsed].show();
+				// this.player[this.lastPlayerPrimed].hide();
+				// this.player[nextPlayerUsed].show();
 				fitVideo(this.player[nextPlayerUsed]);
 
 				this.lastPlayerPrimed = nextPlayerUsed;
