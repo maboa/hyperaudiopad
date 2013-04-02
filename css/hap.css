@@ -170,3 +170,9 @@ div.drag-bar {
 div.drag-bar:hover {
 	cursor: ew-resize;
 }
+
+#target-canvas {
+	position: absolute;
+	left: 480px;
+	top: 78px;
+}

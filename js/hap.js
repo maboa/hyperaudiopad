@@ -85,14 +85,6 @@ $(document).ready(function(){
 
 		play: function(config) {
 
-			// Set play configuration
-			if(config) {
-				this.scriptIndex = config.scriptIndex;
-				this.start = config.start; 
-				this.end = config.end;  
-			} else {
-				config = {}; // So the config.jumpTo is happily undefined.
-			}
 
 			this.currentMediaId = theScript[this.scriptIndex].mediaId;
 			this.nextMediaId = this.scriptIndex+1 < theScript.length ? theScript[this.scriptIndex+1].mediaId : null;
@@ -116,18 +108,51 @@ $(document).ready(function(){
 			// Prepare a player for this media
 			this.load(this.currentMediaId, this.scriptIndex);
 
+			var currentVideoId = "";
+
 			if(this.playerMediaId[0] === this.currentMediaId) {
 				this.player[1].hide().jPlayer("pause");
-				this.player[0].show().jPlayer("play", config.jumpTo); 
+				this.player[0].show().jPlayer("play", config.jumpTo);
+				currentVideoId = "#jp_video_1";
 			} else if(this.playerMediaId[1] === this.currentMediaId) {
 				this.player[0].hide().jPlayer("pause");
 				this.player[1].show().jPlayer("play", config.jumpTo);
+				currentVideoId = "#jp_video_2";
 			} else {
 				// we have a problem
 			}
 
 			// Prepare the other player for the next media
 			this.load(this.nextMediaId, this.scriptIndex+1);
+
+
+			// Experimenting with Canvas Effects and Seriously.js
+			// not the best place to put it
+
+			if(DEBUG) console.log("seriously ...");
+
+			var seriously = new Seriously();
+			//var sourceVid = seriously.source('#colorbars');
+			var sourceVid = seriously.source(currentVideoId);
+			var target = seriously.target('#target-canvas');
+
+			// just testing ...
+			var effect = seriously.effect('nightvision');
+
+			// connect all our nodes in the right order
+			effect.source = sourceVid;
+			target.source = effect;
+
+			seriously.go();
+
+			// Set play configuration
+			if(config) {
+				this.scriptIndex = config.scriptIndex;
+				this.start = config.start; 
+				this.end = config.end;  
+			} else {
+				config = {}; // So the config.jumpTo is happily undefined.
+			}
 		},
 		pause: function() {
 			this.paused = true;
