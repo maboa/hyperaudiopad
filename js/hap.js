@@ -4,7 +4,7 @@ $(document).ready(function(){
 
 	$.jPlayer.timeFormat.padMin = false;
 
-	var DEBUG = false;
+	var DEBUG_MP = true;
 
 	// These JSON object would be loaded in.
 
@@ -111,7 +111,7 @@ $(document).ready(function(){
 
 			this.paused = false;
 
-			if(DEBUG) {
+			if(DEBUG_MP) {
 				console.log("------Play Target Transcript------");
 				console.log("targetPlayer.currentMediaId="+this.currentMediaId);
 				console.log("targetPlayer.playerMediaId[0]="+this.playerMediaId[0]);
@@ -126,18 +126,18 @@ $(document).ready(function(){
 			$('#pause-btn-target').show();
 
 			// Prepare a player for this media
-			if(DEBUG) console.log('play(): prepare current media');
+			if(DEBUG_MP) console.log('play(): prepare current media');
 			this.load(this.currentMediaId, this.scriptIndex);
 
 			var currentVideoId = "";
 
 			if(this.playerMediaId[0] === this.currentMediaId) {
-				if(DEBUG) console.log('play(): already prepared for in player[0]');
+				if(DEBUG_MP) console.log('play(): already prepared for in player[0]');
 				this.player[1].hide().jPlayer("pause");
 				this.player[0].show().jPlayer("play", config.jumpTo);
 				currentVideoId = "jp_video_1";
 			} else if(this.playerMediaId[1] === this.currentMediaId) {
-				if(DEBUG) console.log('play(): already prepared for in player[1]');
+				if(DEBUG_MP) console.log('play(): already prepared for in player[1]');
 				this.player[0].hide().jPlayer("pause");
 				this.player[1].show().jPlayer("play", config.jumpTo);
 				currentVideoId = "jp_video_2";
@@ -146,14 +146,14 @@ $(document).ready(function(){
 			}
 
 			// Prepare the other player for the next media
-			if(DEBUG) console.log('play(): prepare next media');
+			if(DEBUG_MP) console.log('play(): prepare next media');
 			this.load(this.nextMediaId, this.scriptIndex+1);
 
 
 			// Experimenting with Canvas Effects and Seriously.js
 			// not the best place to put it
 
-			if(DEBUG) console.log("seriously ...");
+			if(DEBUG_MP) console.log("seriously ...");
 
 
 			var sourceVid = seriously.source('#'+currentVideoId);
@@ -169,15 +169,15 @@ $(document).ready(function(){
 			$('#play-btn-target').show();
 			$('#pause-btn-target').hide();
 
-			if(DEBUG) console.log("pause(): Attempting to pause");
+			if(DEBUG_MP) console.log("pause(): Attempting to pause");
 			if (!this.player[0].data('jPlayer').status.paused) {
 				this.player[0].jPlayer("pause");
-				if(DEBUG) console.log("pause(): paused player 1");
+				if(DEBUG_MP) console.log("pause(): paused player 1");
 			}
 			
 			if (!this.player[1].data('jPlayer').status.paused) {
 				this.player[1].jPlayer("pause");
-				if(DEBUG) console.log("pause(): paused player 2");
+				if(DEBUG_MP) console.log("pause(): paused player 2");
 			}
 		},
 		cue: function() {
@@ -199,15 +199,15 @@ $(document).ready(function(){
 
 			if(this.paused) {
 				if(this.playerMediaId[0] === this.currentMediaId) {
-					if(DEBUG) console.log('cue(): already prepared for in player[0]');
+					if(DEBUG_MP) console.log('cue(): already prepared for in player[0]');
 					this.player[1].hide();
 					this.player[0].show().jPlayer("pause", currentJumpTo); 
 				} else if(this.playerMediaId[1] === this.currentMediaId) {
-					if(DEBUG) console.log('cue(): already prepared for in player[1]');
+					if(DEBUG_MP) console.log('cue(): already prepared for in player[1]');
 					this.player[0].hide();
 					this.player[1].show().jPlayer("pause", currentJumpTo);
 				} else {
-					if(DEBUG) console.log('cue(): prepare the current video');
+					if(DEBUG_MP) console.log('cue(): prepare the current video');
 					this.load(this.currentMediaId, this.scriptIndex);
 					this.player[(this.lastPlayerPrimed+1)%2].hide();
 					this.player[this.lastPlayerPrimed].show().jPlayer("pause", currentJumpTo);
@@ -216,7 +216,7 @@ $(document).ready(function(){
 
 			if(this.currentMediaId !== this.nextMediaId) {
 				// Prepare the other player for the next media
-				if(DEBUG) console.log('cue(): prepare next video');
+				if(DEBUG_MP) console.log('cue(): prepare next video');
 				if(this.load(this.nextMediaId, this.scriptIndex+1)) {
 					this.player[this.lastPlayerPrimed].jPlayer("pause", nextJumpTo);
 				}
@@ -226,10 +226,10 @@ $(document).ready(function(){
 
 			// The id is the index reference to the transcripts array.
 
-			if(DEBUG) console.log('loadTranscriptTarget('+id+', '+index+')');
+			if(DEBUG_MP) console.log('loadTranscriptTarget('+id+', '+index+')');
 
 			if(typeof id !== 'number') {
-				if(DEBUG) console.log('Ignoring: id='+id);
+				if(DEBUG_MP) console.log('Ignoring: id='+id);
 				return false;
 			}
 
@@ -255,7 +255,7 @@ $(document).ready(function(){
 			} else {
 
 				var nextPlayerUsed = (this.lastPlayerPrimed + 1) % 2;
-				if(DEBUG) console.log('[before] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
+				if(DEBUG_MP) console.log('[before] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
 
 				this.player[nextPlayerUsed].jPlayer("setMedia", transcripts[id].media);
 				this.playerMediaId[nextPlayerUsed] = id;
@@ -265,7 +265,7 @@ $(document).ready(function(){
 
 				this.lastPlayerPrimed = nextPlayerUsed;
 
-				if(DEBUG) console.log('[after] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
+				if(DEBUG_MP) console.log('[after] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
 			}
 
 			initTargetPopcorn('#' + this.player[this.lastPlayerPrimed].data("jPlayer").internal.video.id, index);
@@ -290,8 +290,8 @@ $(document).ready(function(){
 
 				//console.log("now="+now+" this.end="+this.end+"theScript.length="+theScript.length+" this.scriptIndex="+this.scriptIndex);
 
-				if(DEBUG) console.log("targetPlayer.manager(): this.end="+this.end);
-				if(DEBUG) console.log("targetPlayer.manager(): now="+now);
+				if(DEBUG_MP) console.log("targetPlayer.manager(): this.end="+this.end);
+				if(DEBUG_MP) console.log("targetPlayer.manager(): now="+now);
 
 				// If the chunk playing has ended...
 				if (now > this.end) {
@@ -300,35 +300,35 @@ $(document).ready(function(){
 
 					// check for the this.end
 
-					if(DEBUG) console.log("theScript.length = "+theScript.length);
-					if(DEBUG) console.log("targetPlayer.scriptIndex = "+this.scriptIndex);
+					if(DEBUG_MP) console.log("theScript.length = "+theScript.length);
+					if(DEBUG_MP) console.log("targetPlayer.scriptIndex = "+this.scriptIndex);
 
 					// Pause the player playing
 
-					if(DEBUG) console.log("Attempting to pause");
+					if(DEBUG_MP) console.log("Attempting to pause");
 					if (this.playerMediaId[0] === this.currentMediaId) {
-						if(DEBUG) console.log("pausing player 1");
+						if(DEBUG_MP) console.log("pausing player 1");
 						this.player[0].jPlayer("pause");
-						if(DEBUG) console.log("paused player 1");
+						if(DEBUG_MP) console.log("paused player 1");
 					} else if (this.playerMediaId[1] === this.currentMediaId) {
-						if(DEBUG) console.log("pausing player 2");
+						if(DEBUG_MP) console.log("pausing player 2");
 						this.player[1].jPlayer("pause");
-						if(DEBUG) console.log("paused player 2");
+						if(DEBUG_MP) console.log("paused player 2");
 					} else {
 						// We have a problem - something should have been setup and playing.
 					}
 
 /*
 					if (theScript.length <= this.scriptIndex+1) {
-						if(DEBUG) console.log("Attempting to pause");
+						if(DEBUG_MP) console.log("Attempting to pause");
 						if (!this.player[0].data('jPlayer').status.paused) {
 							this.player[0].jPlayer("pause");
-							if(DEBUG) console.log("paused player 1");
+							if(DEBUG_MP) console.log("paused player 1");
 						}
 						
 						if (!this.player[1].data('jPlayer').status.paused) {
 							this.player[1].jPlayer("pause");
-							if(DEBUG) console.log("paused player 2");
+							if(DEBUG_MP) console.log("paused player 2");
 						}
 					}
 */
@@ -344,7 +344,7 @@ $(document).ready(function(){
 						//console.log(this.scriptIndex);
 
 						if (theScript[this.scriptIndex].action == 'fade') {
-							if(DEBUG) console.log('action fade detected');
+							if(DEBUG_MP) console.log('action fade detected');
 
 							if (theScript[this.scriptIndex].color) {
 								fadeColor = theScript[this.scriptIndex].color;
@@ -356,18 +356,18 @@ $(document).ready(function(){
 						}
 
 						if (theScript[this.scriptIndex].action == 'apply') {
-							if(DEBUG) console.log('action apply detected');
+							if(DEBUG_MP) console.log('action apply detected');
 
 							effectArray = theScript[this.scriptIndex].effect;
 						}
 
-						if(DEBUG) console.log("fadeColor="+fadeColor);
-						if(DEBUG) console.log("fadeSpeed="+fadeSpeed);
-						if(DEBUG) console.log("effect="+effect);
+						if(DEBUG_MP) console.log("fadeColor="+fadeColor);
+						if(DEBUG_MP) console.log("fadeSpeed="+fadeSpeed);
+						if(DEBUG_MP) console.log("effect="+effect);
 
 						// moving to the next block in the target
 						this.scriptIndex++;
-						if (DEBUG) console.dir(theScript);
+						if (DEBUG_MP) console.dir(theScript);
 
 						// This bit to...
 /*
@@ -388,8 +388,8 @@ $(document).ready(function(){
 
 						$('#fader-content').css('background-color',fadeColor);
 
-						if(DEBUG) console.log("targetPlayer.playerMediaId[0] = "+this.playerMediaId[0]);
-						if(DEBUG) console.log("targetPlayer.playerMediaId[1] = "+this.playerMediaId[1]);
+						if(DEBUG_MP) console.log("targetPlayer.playerMediaId[0] = "+this.playerMediaId[0]);
+						if(DEBUG_MP) console.log("targetPlayer.playerMediaId[1] = "+this.playerMediaId[1]);
 
 						var nextVideoId = "";
 
@@ -401,7 +401,7 @@ $(document).ready(function(){
 								self.player[0].show();
 								$('#fader-content').fadeTo(fadeSpeed, 0);
 							});
-							if(DEBUG) console.log("switch to 1");
+							if(DEBUG_MP) console.log("switch to 1");
 							this.player[1].jPlayer("pause");
 							this.player[0].jPlayer("play",this.start/1000);
 						} else if (this.playerMediaId[1] === this.currentMediaId) {
@@ -412,8 +412,8 @@ $(document).ready(function(){
 								self.player[1].show();
 								$('#fader-content').fadeTo(fadeSpeed, 0);
 							});
-							if(DEBUG) console.log("switch to 2");
-							if(DEBUG) console.log(this.start);
+							if(DEBUG_MP) console.log("switch to 2");
+							if(DEBUG_MP) console.log(this.start);
 							this.player[0].jPlayer("pause");
 							this.player[1].jPlayer("play",this.start/1000); 
 						} else {
@@ -453,7 +453,7 @@ $(document).ready(function(){
 
 					} else {
 						// Ended Target Transcript.
-						if (DEBUG) console.log("Ended Target Transcript.");
+						if (DEBUG_MP) console.log("Ended Target Transcript.");
 
 						this.paused = true; // FYI - If you do not set this flag, the player loops and auto-plays from the start again.
 
@@ -554,7 +554,7 @@ $(document).ready(function(){
 
 					// moving to the next block in the target
 					targetPlayer.scriptIndex++;
-					if (DEBUG) console.dir(theScript);
+					if (DEBUG_MP) console.dir(theScript);
 					targetPlayer.start = theScript[targetPlayer.scriptIndex].start;
 					targetPlayer.end = theScript[targetPlayer.scriptIndex].end;
 					targetPlayer.currentMediaId = theScript[targetPlayer.scriptIndex].mediaId;
@@ -818,10 +818,10 @@ $(document).ready(function(){
 
 	function initSourcePopcorn(id) {
 		if(sourcePopcorn) {
-			if(DEBUG) console.log('initSourcePopcorn('+id+'): Destroying sourcePopcorn');
+			if(DEBUG_MP) console.log('initSourcePopcorn('+id+'): Destroying sourcePopcorn');
 			sourcePopcorn.destroy();
 		}
-		if(DEBUG) console.log('initSourcePopcorn('+id+'): Creating sourcePopcorn');
+		if(DEBUG_MP) console.log('initSourcePopcorn('+id+'): Creating sourcePopcorn');
 		sourcePopcorn = Popcorn(id);
 		$("#transcript-content span").each(function(i) {  
 			sourcePopcorn.transcript({
@@ -833,7 +833,7 @@ $(document).ready(function(){
 				}
 			});
 		});
-	};
+	}
 
 	function initTargetPopcorn(id, index) {
 		var p = Popcorn(id);
@@ -847,7 +847,7 @@ $(document).ready(function(){
 				}
 			});
 		});
-	};
+	}
 
 	var $transFiles = $('#transcript-files').empty();
 	$.each(transcripts, function(i) {
