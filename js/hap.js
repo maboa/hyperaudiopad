@@ -17,19 +17,19 @@ $(document).ready(function(){
 		title: "Internet Amazonians",
 		url: "transcripts/internetindians.htm",
 		media: {
-			m4v: 'http://happyworm.com/video/internetindians.mp4',
-			webmv: 'http://happyworm.com/video/internetindians.webm'
-			/*m4v: '../video/internetindians.mp4',
-			webmv: '../video/internetindians.webm'*/
+/*			m4v: 'http://happyworm.com/video/internetindians.mp4',
+			webmv: 'http://happyworm.com/video/internetindians.webm' */
+			m4v: '../video/internetindians.mp4',
+			webmv: '../video/internetindians.webm'
 		}
 	}, {
 		title: "Rainforest Raids",
 		url: "transcripts/raidsinrainforest.htm",
 		media: {
-			m4v: 'http://happyworm.com/video/raidsinrainforest.mp4',
-			webmv: 'http://happyworm.com/video/raidsinrainforest.webm'
-			/*m4v: '../video/raidsinrainforest.mp4',
-			webmv: '../video/raidsinrainforest.webm'*/
+/*			m4v: 'http://happyworm.com/video/raidsinrainforest.mp4',
+			webmv: 'http://happyworm.com/video/raidsinrainforest.webm' */
+			m4v: '../video/raidsinrainforest.mp4',
+			webmv: '../video/raidsinrainforest.webm'
 		}
 	}/*, {
 		title: "SOTU 2013",
