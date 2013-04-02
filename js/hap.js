@@ -19,6 +19,8 @@ $(document).ready(function(){
 		media: {
 			m4v: 'http://happyworm.com/video/internetindians.mp4',
 			webmv: 'http://happyworm.com/video/internetindians.webm'
+			/*m4v: '../video/internetindians.mp4',
+			webmv: '../video/internetindians.webm'*/
 		}
 	}, {
 		title: "Rainforest Raids",
@@ -26,6 +28,8 @@ $(document).ready(function(){
 		media: {
 			m4v: 'http://happyworm.com/video/raidsinrainforest.mp4',
 			webmv: 'http://happyworm.com/video/raidsinrainforest.webm'
+			/*m4v: '../video/raidsinrainforest.mp4',
+			webmv: '../video/raidsinrainforest.webm'*/
 		}
 	}/*, {
 		title: "SOTU 2013",
@@ -113,11 +117,11 @@ $(document).ready(function(){
 			if(this.playerMediaId[0] === this.currentMediaId) {
 				this.player[1].hide().jPlayer("pause");
 				this.player[0].show().jPlayer("play", config.jumpTo);
-				currentVideoId = "#jp_video_1";
+				currentVideoId = "jp_video_1";
 			} else if(this.playerMediaId[1] === this.currentMediaId) {
 				this.player[0].hide().jPlayer("pause");
 				this.player[1].show().jPlayer("play", config.jumpTo);
-				currentVideoId = "#jp_video_2";
+				currentVideoId = "jp_video_2";
 			} else {
 				// we have a problem
 			}
@@ -132,16 +136,10 @@ $(document).ready(function(){
 			if(DEBUG) console.log("seriously ...");
 
 			var seriously = new Seriously();
-			//var sourceVid = seriously.source('#colorbars');
-			var sourceVid = seriously.source(currentVideoId);
+			var sourceVid = seriously.source('#'+currentVideoId);
 			var target = seriously.target('#target-canvas');
 
-			// just testing ...
-			var effect = seriously.effect('nightvision');
-
-			// connect all our nodes in the right order
-			effect.source = sourceVid;
-			target.source = effect;
+			target.source = sourceVid;
 
 			seriously.go();
 
@@ -324,6 +322,7 @@ $(document).ready(function(){
 
 						var fadeSpeed = 100; //ms
 						var fadeColor = "black";
+						var effect = "";
 
 						//console.log(this.scriptIndex);
 
@@ -339,8 +338,17 @@ $(document).ready(function(){
 							}
 						}
 
+						if (theScript[this.scriptIndex].action == 'apply') {
+							if(DEBUG) console.log('action apply detected');
+
+							if (theScript[this.scriptIndex].effect) {
+								effect = theScript[this.scriptIndex].effect;
+							}
+						}
+
 						if(DEBUG) console.log("fadeColor="+fadeColor);
 						if(DEBUG) console.log("fadeSpeed="+fadeSpeed);
+						if(DEBUG) console.log("effect="+effect);
 
 						// moving to the next block in the target
 						this.scriptIndex++;
@@ -368,7 +376,10 @@ $(document).ready(function(){
 						if(DEBUG) console.log("targetPlayer.playerMediaId[0] = "+this.playerMediaId[0]);
 						if(DEBUG) console.log("targetPlayer.playerMediaId[1] = "+this.playerMediaId[1]);
 
+						var nextVideoId = "";
+
 						if (this.playerMediaId[0] === this.currentMediaId) {
+							nextVideoId = "jp_video_1";
 							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 								//console.log('ping');
 								self.player[1].hide();
@@ -379,6 +390,7 @@ $(document).ready(function(){
 							this.player[1].jPlayer("pause");
 							this.player[0].jPlayer("play",this.start/1000);
 						} else if (this.playerMediaId[1] === this.currentMediaId) {
+							nextVideoId = "jp_video_2";
 							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 								//console.log('pong');
 								self.player[0].hide();
@@ -392,6 +404,23 @@ $(document).ready(function(){
 						} else {
 							// Would need to change the media... But it should already be ready.
 						}
+
+						if (effect.length > 0) {
+							console.log("APPLYING EFFECT TO "+nextVideoId)
+							var seriously = new Seriously();
+							var sourceVid = seriously.source("#"+nextVideoId);
+							var target = seriously.target('#target-canvas');
+
+							var effect = seriously.effect(effect);
+
+							// connect all our nodes in the right order
+							effect.source = sourceVid;
+							target.source = effect;
+
+							seriously.go();
+						}
+
+
 					} else {
 						// Ended Target Transcript.
 						if (DEBUG) console.log("Ended Target Transcript.");
@@ -667,9 +696,14 @@ $(document).ready(function(){
 		console.dir(commandList);
 
 
-		var action,time,color;
+		var action,time,color,effect;
 
 		console.log("cm length = "+commandList.length);
+
+		var applyFlag = false;
+
+		// We could use this list to load the appropriate JS files (also conceivably we could load on demand) -MB
+		var effects = ['ascii','bleach-bypass','hex','invert','nightvision','noise','ripple','scanlines','sepia','sketch','tvglitch','vignette'];
 
 		for (var i=0; i < commandList.length; i++) {
 
@@ -678,6 +712,15 @@ $(document).ready(function(){
 			// detecting fade
 			if (commandList[i] == 'fade') {
 				action = commandList[i];
+			}
+
+			if (applyFlag == true && $.inArray(commandList[i], effects) >= 0) {
+				action = 'apply';
+				effect = commandList[i];
+			}
+
+			if (commandList[i] == 'apply') {
+				applyFlag = true;
 			}
 
 			console.log(commandList[i]+ 'a number? = '+isNumber(commandList[i]) );
@@ -699,6 +742,7 @@ $(document).ready(function(){
 			theScript[index].action = action;
 			theScript[index].time = time;
 			theScript[index].color = color;
+			theScript[index].effect = effect;
 		}
 
 		//console.dir(commandList);
