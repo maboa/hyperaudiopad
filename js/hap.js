@@ -84,6 +84,7 @@ $(document).ready(function(){
 		scriptIndex: 0, // ref to theScript[]
 		start: 0,
 		end: 0,
+		now: 0, // Only used to pass from manager to play (after a pause) atm. Same as the manager var now.
 		player: [$("#jquery_jplayer_1"),$("#jquery_jplayer_2")],
 		playerMediaId: [],
 		currentMediaId: null,
@@ -130,20 +131,29 @@ $(document).ready(function(){
 			if(DEBUG_MP) console.log('play(): prepare current media');
 			this.load(this.currentMediaId);
 
-			killTargetPopcorn();
-			setTargetHighlighting(this.scriptIndex);
+			if(DEBUG_MP) console.log('play(): this.popcorn='+this.popcorn);
+
+			// The jumpTo does this for clicks, and the popcron instance check for play button.
+			if(config.jumpTo || !this.popcorn) {
+				killTargetPopcorn();
+				setTargetHighlighting(this.scriptIndex);
+			}
 
 			var currentVideoId = "";
 
 			if(this.playerMediaId[0] === this.currentMediaId) {
 				if(DEBUG_MP) console.log('play(): already prepared for in player[0]');
-				initTargetPopcorn('#' + this.player[0].data("jPlayer").internal.video.id, this.scriptIndex);
+				if(config.jumpTo || !this.popcorn) {
+					initTargetPopcorn('#' + this.player[0].data("jPlayer").internal.video.id, this.scriptIndex, config.jumpTo);
+				}
 				this.player[1].hide().jPlayer("pause");
 				this.player[0].show().jPlayer("play", config.jumpTo);
 				currentVideoId = "jp_video_1";
 			} else if(this.playerMediaId[1] === this.currentMediaId) {
 				if(DEBUG_MP) console.log('play(): already prepared for in player[1]');
-				initTargetPopcorn('#' + this.player[1].data("jPlayer").internal.video.id, this.scriptIndex);
+				if(config.jumpTo || !this.popcorn) {
+					initTargetPopcorn('#' + this.player[1].data("jPlayer").internal.video.id, this.scriptIndex, config.jumpTo);
+				}
 				this.player[0].hide().jPlayer("pause");
 				this.player[1].show().jPlayer("play", config.jumpTo);
 				currentVideoId = "jp_video_2";
@@ -292,6 +302,9 @@ $(document).ready(function(){
 				} else {
 					// We have a problem
 				}
+
+				// Hack so we can pass this to play after a pause.
+				this.now = now;
 
 				//console.log("now="+now+" this.end="+this.end+"theScript.length="+theScript.length+" this.scriptIndex="+this.scriptIndex);
 
@@ -713,16 +726,15 @@ $(document).ready(function(){
 	}
 
 	// Applied to the current chunk in the target that is playing
-	function initTargetPopcorn(id, index) {
-		if(targetPlayer.popcorn) {
-			if(DEBUG_MP) console.log('initTargetPopcorn('+id+', '+index+'): Destroying targetPlayer.popcorn');
-			targetPlayer.popcorn.destroy();
-		}
-		if(DEBUG_MP) console.log('initTargetPopcorn('+id+', '+index+'): Creating targetPlayer.popcorn');
+	function initTargetPopcorn(id, index, jumpTo) {
+		if(DEBUG_MP) console.log('initTargetPopcorn('+id+', '+index+', '+jumpTo+')');
+		killTargetPopcorn();
+		if(DEBUG_MP) console.log('initTargetPopcorn('+id+', '+index+', '+jumpTo+'): Creating targetPlayer.popcorn');
 		targetPlayer.popcorn = Popcorn(id);
 		$("#target-content p[i='" + index + "'] span").each(function(i) {
+			var myTime = $(this).attr("m") / 1000; // seconds
 			targetPlayer.popcorn.transcript({
-				time: $(this).attr("m") / 1000, // seconds
+				time: myTime, // seconds
 				futureClass: "transcript-grey",
 				target: this,
 				onNewPara: function(parent) {
@@ -731,7 +743,8 @@ $(document).ready(function(){
 			});
 			// Since the first word is usually highlighted incorrectly, due to event never firing.
 			// ie., The currentTime jumped past the trigger time for the word.
-			if(i === 0) {
+			// if(i === 0) {
+			if(i === 0 || jumpTo && myTime <= jumpTo) {
 				$(this).removeClass("transcript-grey");
 			}
 		});
@@ -741,6 +754,7 @@ $(document).ready(function(){
 		if(targetPlayer.popcorn) {
 			if(DEBUG_MP) console.log('killTargetPopcorn(): Destroying targetPlayer.popcorn');
 			targetPlayer.popcorn.destroy();
+			delete targetPlayer.popcorn;
 		}
 	}
 
