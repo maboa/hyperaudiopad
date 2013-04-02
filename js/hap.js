@@ -1,5 +1,7 @@
 $(document).ready(function(){
 
+	var seriously = new Seriously(); // instance seriously lib for global use
+
 	$.jPlayer.timeFormat.padMin = false;
 
 	var DEBUG = true;
@@ -17,19 +19,19 @@ $(document).ready(function(){
 		title: "Internet Amazonians",
 		url: "transcripts/internetindians.htm",
 		media: {
-/*			m4v: 'http://happyworm.com/video/internetindians.mp4',
-			webmv: 'http://happyworm.com/video/internetindians.webm' */
-			m4v: '../video/internetindians.mp4',
-			webmv: '../video/internetindians.webm'
+			m4v: 'http://happyworm.com/video/internetindians.mp4',
+			webmv: 'http://happyworm.com/video/internetindians.webm'
+			/* m4v: '../video/internetindians.mp4',
+			webmv: '../video/internetindians.webm' */
 		}
 	}, {
 		title: "Rainforest Raids",
 		url: "transcripts/raidsinrainforest.htm",
 		media: {
-/*			m4v: 'http://happyworm.com/video/raidsinrainforest.mp4',
-			webmv: 'http://happyworm.com/video/raidsinrainforest.webm' */
-			m4v: '../video/raidsinrainforest.mp4',
-			webmv: '../video/raidsinrainforest.webm'
+			m4v: 'http://happyworm.com/video/raidsinrainforest.mp4',
+			webmv: 'http://happyworm.com/video/raidsinrainforest.webm'
+			/* m4v: '../video/raidsinrainforest.mp4',
+			webmv: '../video/raidsinrainforest.webm' */
 		}
 	}/*, {
 		title: "SOTU 2013",
@@ -89,6 +91,11 @@ $(document).ready(function(){
 
 		play: function(config) {
 
+
+			console.log("==============");
+			console.dir(theScript);
+			console.log("==============");
+
 			// Set play configuration
 			if(config) {
 				this.scriptIndex = config.scriptIndex;
@@ -143,7 +150,7 @@ $(document).ready(function(){
 
 			if(DEBUG) console.log("seriously ...");
 
-			var seriously = new Seriously();
+
 			var sourceVid = seriously.source('#'+currentVideoId);
 			var target = seriously.target('#target-canvas');
 
@@ -405,8 +412,10 @@ $(document).ready(function(){
 						}
 
 						if (effect.length > 0) {
-							console.log("APPLYING EFFECT TO "+nextVideoId)
-							var seriously = new Seriously();
+
+							//seriously = null;
+							seriously = new Seriously();
+
 							var sourceVid = seriously.source("#"+nextVideoId);
 							var target = seriously.target('#target-canvas');
 
@@ -702,7 +711,7 @@ $(document).ready(function(){
 		var applyFlag = false;
 
 		// We could use this list to load the appropriate JS files (also conceivably we could load on demand) -MB
-		var effects = ['ascii','bleach-bypass','hex','invert','nightvision','noise','ripple','scanlines','sepia','sketch','tvglitch','vignette'];
+		var effects = ['ascii','bleach-bypass','invert','nightvision','noise','ripple','scanlines','sepia','sketch','tvglitch','vignette'];
 
 		for (var i=0; i < commandList.length; i++) {
 
@@ -738,6 +747,16 @@ $(document).ready(function(){
 		console.log(color);
 
 		if ( newText.indexOf(']') > 0 ) {
+			if (theScript.length == 0) { // direction has been given at the start
+				console.log('theScript length is zero');
+				// create empty timespan to hold the effect
+				var timespan = {};
+				timespan.start = 0;
+				timespan.end = 0;
+				timespan.mediaId = 0;
+				theScript.push(timespan);
+				index = 0;
+			}
 			theScript[index].action = action;
 			theScript[index].time = time;
 			theScript[index].color = color;
