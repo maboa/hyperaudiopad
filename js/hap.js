@@ -5,6 +5,7 @@ $(document).ready(function(){
 	$.jPlayer.timeFormat.padMin = false;
 
 	var DEBUG_MP = true;
+	var DEBUG_MB = true;
 
 	// These JSON object would be loaded in.
 
@@ -438,7 +439,7 @@ $(document).ready(function(){
 								seriouslyEffect[i] = seriously.effect(effectArray[i]);
 								if (i > 0) {
 									seriouslyEffect[i].source = seriouslyEffect[i-1];
-									console.log("connecting up");
+									if (DEBUG_MB) console.log("connecting up");
 								} else {
 									seriouslyEffect[0].source = sourceVid;
 								}
@@ -717,14 +718,14 @@ $(document).ready(function(){
 	// Listen to contenteditable
 
 	document.addEventListener("DOMCharacterDataModified", function(event) {
-		console.log($(event.target).parent()[0].tagName);
-		console.dir(event);
-		console.log($(event.target).parent().attr("m"));
+		if (DEBUG_MB) console.log($(event.target).parent()[0].tagName);
+		if (DEBUG_MB) console.dir(event);
+		if (DEBUG_MB) console.log($(event.target).parent().attr("m"));
 		var index = $(event.target).parents('p').attr("i");
 		var newText = event.newValue;
-		console.log(event.newValue);
+		if (DEBUG_MB) console.log(event.newValue);
 		var commands = newText.substring(newText.indexOf('[')+1,newText.indexOf(']'));
-		console.log(commands);
+		if (DEBUG_MB) console.log(commands);
 		var commandList = commands.split(" ");
 		console.dir(commandList);
 
@@ -743,7 +744,7 @@ $(document).ready(function(){
 
 		for (var i=0; i < commandList.length; i++) {
 
-			console.log("word "+i);
+			if (DEBUG_MB) console.log("word "+i);
 
 			// detecting fade
 			if (commandList[i] == 'fade') {
@@ -760,7 +761,7 @@ $(document).ready(function(){
 				applyFlag = true;
 			}
 
-			console.log(commandList[i]+ 'a number? = '+isNumber(commandList[i]) );
+			if (DEBUG_MB) console.log(commandList[i]+ 'a number? = '+isNumber(commandList[i]) );
 
 			if (isNumber(commandList[i])) {
 				time = commandList[i];
@@ -771,13 +772,13 @@ $(document).ready(function(){
 			}
 		}
 
-		console.log(action);
-		console.log(time);
-		console.log(color);
+		if (DEBUG_MB) console.log(action);
+		if (DEBUG_MB) console.log(time);
+		if (DEBUG_MB) console.log(color);
 
 		if ( newText.indexOf(']') > 0 ) {
 			if (theScript.length == 0) { // direction has been given at the start
-				console.log('theScript length is zero');
+				if (DEBUG_MB) console.log('theScript length is zero');
 				// create empty timespan to hold the effect
 				var timespan = {};
 				timespan.start = 0;
@@ -793,7 +794,7 @@ $(document).ready(function(){
 		}
 
 		//console.dir(commandList);
-		console.dir(theScript);
+		if (DEBUG_MB) console.dir(theScript);
 	});
 
 	function isNumber(n) {
@@ -1308,14 +1309,14 @@ $(document).ready(function(){
 		var middleLeft = parseFloat($('.middle.col').css('left'),10);
 		var middleWidth = dd.offsetX - middleLeft-4;
 
-		console.log(middleWidth);
-		console.log(middleLeft);
+		if (DEBUG_MB) console.log(middleWidth);
+		if (DEBUG_MB) console.log(middleLeft);
 
 		
 		$('.middle.col').css('width', middleWidth);
 
 
-		console.log("dd.offsetX:"+dd.offsetX);
+		if (DEBUG_MB) console.log("dd.offsetX:"+dd.offsetX);
 	});
 
 });
