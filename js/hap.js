@@ -126,11 +126,12 @@ $(document).ready(function(){
 			$('#play-btn-target').hide();
 			$('#pause-btn-target').show();
 
-			setTargetHighlighting(this.scriptIndex);
-
 			// Prepare a player for this media
 			if(DEBUG_MP) console.log('play(): prepare current media');
 			this.load(this.currentMediaId);
+
+			killTargetPopcorn();
+			setTargetHighlighting(this.scriptIndex);
 
 			var currentVideoId = "";
 
@@ -159,7 +160,6 @@ $(document).ready(function(){
 			// not the best place to put it
 
 			if(DEBUG_MP) console.log("seriously ...");
-
 
 			var sourceVid = seriously.source('#'+currentVideoId);
 			var target = seriously.target('#target-canvas');
@@ -217,6 +217,7 @@ $(document).ready(function(){
 					this.player[(this.lastPlayerPrimed+1)%2].hide();
 					this.player[this.lastPlayerPrimed].show().jPlayer("pause", currentJumpTo);
 				}
+				killTargetPopcorn();
 				setTargetHighlighting(this.scriptIndex);
 			}
 
@@ -719,7 +720,7 @@ $(document).ready(function(){
 		}
 		if(DEBUG_MP) console.log('initTargetPopcorn('+id+', '+index+'): Creating targetPlayer.popcorn');
 		targetPlayer.popcorn = Popcorn(id);
-		$("#target-content p[i='" + index + "'] span").each(function(i) {  
+		$("#target-content p[i='" + index + "'] span").each(function(i) {
 			targetPlayer.popcorn.transcript({
 				time: $(this).attr("m") / 1000, // seconds
 				futureClass: "transcript-grey",
@@ -728,7 +729,19 @@ $(document).ready(function(){
 					$("#target-content").stop().scrollTo($(parent), 800, {axis:'y',margin:true,offset:{top:0}});
 				}
 			});
+			// Since the first word is usually highlighted incorrectly, due to event never firing.
+			// ie., The currentTime jumped past the trigger time for the word.
+			if(i === 0) {
+				$(this).removeClass("transcript-grey");
+			}
 		});
+	}
+
+	function killTargetPopcorn() {
+		if(targetPlayer.popcorn) {
+			if(DEBUG_MP) console.log('killTargetPopcorn(): Destroying targetPlayer.popcorn');
+			targetPlayer.popcorn.destroy();
+		}
 	}
 
 	function setTargetHighlighting(index) {
@@ -739,7 +752,8 @@ $(document).ready(function(){
 
 			if(DEBUG_MP) console.log('setTargetHighlighting('+index+'): i='+i);
 
-			if (i > index || index === 0) { // Transcript after index will be read in the future. index=0 for a reset all.
+			// if (i > index || (i !== 0 && index === 0)) { // Transcript after index will be read in the future. index=0 for a reset all.
+			if (i > index || (index === 0)) { // Transcript after index will be read in the future.
 				$this.find("span").addClass("transcript-grey");
 			} else if (i < index) { // Transcript before index has been read.
 				$this.find("span").removeClass("transcript-grey");
