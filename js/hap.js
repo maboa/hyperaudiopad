@@ -97,6 +97,12 @@ $(document).ready(function(){
 
 						copyOver(startSpan, endSpan, startTime, endTime, function() {
 							if (DEBUG_MB) console.log("calling loadTranscriptsFromFile");
+							var commandText = theScript[i].commandText;
+							if (commandText != undefined && commandText.length > 0) {
+								var direction = $('<p>['+commandText+']</p>'); 
+								$('#target-content').append( direction );
+							}
+
 							loadTranscriptsFromFile(++i);
 						});
 					});
@@ -110,21 +116,25 @@ $(document).ready(function(){
 		}
 	}
 
+	var theScript = [];
+	var latency = 1000;
+
 	var hash = window.location.hash.replace("#","");
 	if (hash.length > 0) {
 		// load theScript
 		$.get('remixes/'+hash+'.json', function(data) {
-			if (DEBUG_MB) console.log('theScript loaded in');
+			if (DEBUG_MB) console.log(' ==================== theScript loaded in');
 			if (DEBUG_MB) console.dir(data);
-			theScript = data;
+			if (DEBUG_MB) console.dir(eval(data));
+			theScript = eval(data);
 
 			loadTranscriptsFromFile();
-
+			targetPlayer.cue();
+			$('#target-content').css('top','350px');
 		});
 	}
 
-	var theScript = [];  
-	var latency = 1000;
+
 
 	// Grab the script from the URL
 	var theScriptState = [];
@@ -318,6 +328,11 @@ $(document).ready(function(){
 			} else {
 				config = {}; // So the config.jumpTo is happily undefined.
 			}
+
+			if (DEBUG_MB) console.log("INDEX = "+this.scriptIndex); 
+
+			// sorry MP - quick frig to check
+			if (this.scriptIndex >= theScript.length) this.scriptIndex = 0;
 
 			this.currentMediaId = theScript[this.scriptIndex].mediaId;
 			this.nextMediaId = this.scriptIndex+1 < theScript.length ? theScript[this.scriptIndex+1].mediaId : null;
