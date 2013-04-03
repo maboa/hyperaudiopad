@@ -180,7 +180,7 @@ $(document).ready(function(){
 
 		initVideoMap: function() {
 			this.videoMap.fader = this.seriously.effect('fader');
-			this.videoMap.fader.amount = 0;
+			this.videoMap.fader.amount = 0; // Otherwise it defaults to complete fade of 1.
 			// this.videoMap.fader.color = [255,0,0,1];
 
 			this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
@@ -192,14 +192,6 @@ $(document).ready(function(){
 
 			this.seriously.stop();
 
-			// Destroy the old node map
-			// this.seriously.destroy();
-			// Create a new node map
-			// this.seriously = new Seriously();
-
-			// this.videoMap.videoSource = this.seriously.source("#"+nextVideoId);
-			// this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
-
 			for (i=0, iLen=this.videoMap.effect.length; i < iLen; i++) {
 				this.videoMap.effect[i].destroy();
 				this.videoMap.effect[i] = null;
@@ -207,15 +199,16 @@ $(document).ready(function(){
 
 			this.videoMap.effect = [];
 
-			// add all the effects
+			if(effects[0] !== 'none') {
 
-			for (i=0, iLen=effects.length; i < iLen; i++) {
-				this.videoMap.effect[i] = this.seriously.effect(effects[i]);
-				if (i > 0) {
-					this.videoMap.effect[i].source = this.videoMap.effect[i-1];
-					if (DEBUG_MP) console.log("createVideoMap(): connecting up effect chain");
-				} else {
-					// this.videoMap.effect[0].source = this.videoMap.videoSource;
+				// add all the effects
+
+				for (i=0, iLen=effects.length; i < iLen; i++) {
+					this.videoMap.effect[i] = this.seriously.effect(effects[i]);
+					if (i > 0) {
+						this.videoMap.effect[i].source = this.videoMap.effect[i-1];
+						if (DEBUG_MP) console.log("createVideoMap(): connecting up effect chain");
+					}
 				}
 			}
 
@@ -884,51 +877,58 @@ $(document).ready(function(){
 		var commandList = commands.split(" ");
 		console.dir(commandList);
 
-		// NBL action is now obsolete.
-		var action,time,color,fade;
+		// read in any existing settings
+
+		var time = theScript[index].time,
+			color = theScript[index].color,
+			fade = theScript[index].fade,
+			effect = theScript[index].effect;
 
 		console.log("cm length = "+commandList.length);
 
 		var applyFlag = false;
 
 		// We could use this list to load the appropriate JS files (also conceivably we could load on demand) -MB
-		var effects = ['ascii','bleach-bypass','colorcube','emboss','invert','nightvision','noise','ripple','scanlines','sepia','sketch','tvglitch','vignette'];
+		var effects = ['none','ascii','bleach-bypass','colorcube','emboss','invert','nightvision','noise','ripple','scanlines','sepia','sketch','tvglitch','vignette'];
 
 		var effectIndex = 0;
-		var effect = [];
 
 		for (var i=0; i < commandList.length; i++) {
 
 			if (DEBUG_MB) console.log("word "+i);
 
-			// detecting fade
-			if (commandList[i] == 'fade') {
-				action = commandList[i];
-				fade = true;
-			}
-
 			if (applyFlag == true && $.inArray(commandList[i], effects) >= 0) {
-				action = 'apply';
-				effect[effectIndex] = commandList[i];
-				effectIndex++;
+				// action = 'apply';
+				if(commandList[i] === 'none') {
+					effect = [commandList[i]]; // none
+				} else {
+					effect[effectIndex] = commandList[i];
+					effectIndex++;
+				}
 			}
 
 			if (commandList[i] == 'apply') {
 				applyFlag = true;
+				effect = [];
 			}
 
 			if (DEBUG_MB) console.log(commandList[i]+ 'a number? = '+isNumber(commandList[i]) );
 
-			if (isNumber(commandList[i])) {
+			// detecting fade
+			if (commandList[i] == 'fade') {
+				fade = true;
+			}
+
+			if (fade && isNumber(commandList[i])) {
 				time = commandList[i];
 			}
 
-			if (isColor(commandList[i])) {
+			if (fade && isColor(commandList[i])) {
 				color = commandList[i];
 			}
 		}
 
-		if (DEBUG_MB) console.log(action);
+		// if (DEBUG_MB) console.log(action);
 		if (DEBUG_MB) console.log(time);
 		if (DEBUG_MB) console.log(color);
 
