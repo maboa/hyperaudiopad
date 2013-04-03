@@ -256,9 +256,13 @@ $(document).ready(function(){
 /*
 			options: {
 				amount: number,
-				duration: number
+				duration: number,
+				callback: function()
 			}
 */
+
+			if (DEBUG_MP) console.log("fadeTo(): from=%f | videoMap.effect=%o", from, this.videoMap.effect);
+
 			$({fade:from}).animate({fade:options.amount}, {
 				duration: options.duration,
 				step: function() {
@@ -266,6 +270,11 @@ $(document).ready(function(){
 				},
 				complete: function() {
 					self.videoMap.fader.amount = options.amount;
+					if(options.callback) {
+						setTimeout(function() {
+							options.callback();
+						},0);
+					}
 				}
 			});
 		},
@@ -375,7 +384,7 @@ $(document).ready(function(){
 
 				for(search = this.scriptIndex - 1; search >= 0; search--) {
 					// Search back to the last effect applied
-					if (theScript[search].effect.length) {
+					if (theScript[search].effect) {
 						if(DEBUG_MP) console.log('play(): action apply detected');
 						effectArray = theScript[search].effect;
 						break; // exit for loop
@@ -457,7 +466,7 @@ $(document).ready(function(){
 
 				for(search = this.scriptIndex - 1; search >= 0; search--) {
 					// Search back to the last effect applied
-					if (theScript[search].effect.length) {
+					if (theScript[search].effect) {
 						if(DEBUG_MP) console.log('cue(): action apply detected');
 						effectArray = theScript[search].effect;
 						break; // exit for loop
@@ -551,15 +560,21 @@ $(document).ready(function(){
 						// this.fadeStart = true;
 						this.fadeColor(theScript[this.scriptIndex].color);
 						this.fadeTo({
-							amount:1, 
+							amount:1,
 							duration:duration,
 							callback: function() {
-								// erm...
+								self.fadeTo({
+									amount:0,
+									duration:duration,
+									callback: function() {
+										console.log('End of: Fade in then out')
+									}
+								});
 							}
 						});
 					}
 				}
-
+/*
 				if(this.fadeStart) {
 					if(DEBUG_MP) console.log('manager(): fade START detected');
 
@@ -569,7 +584,7 @@ $(document).ready(function(){
 					// this.fadeColor(theScript[this.scriptIndex-1].color);
 					this.fadeTo({amount:0, duration:duration});
 				}
-
+*/
 				// If the chunk playing has ended...
 				if (now > this.end) {
 
@@ -618,13 +633,14 @@ $(document).ready(function(){
 						var fadeColor = "black";
 
 						//console.log(this.scriptIndex);
-
+/*
 						if (theScript[this.scriptIndex].fade) {
 							if(DEBUG_MP) console.log('manager(): fade START set');
 							this.fadeStart = true;
 						}
+*/
 
-
+/*
 						if (theScript[this.scriptIndex].fade) {
 							// if(DEBUG_MP) console.log('manager(): fade detected');
 
@@ -636,7 +652,6 @@ $(document).ready(function(){
 								fadeSpeed = theScript[this.scriptIndex].time*1000;
 							}
 
-/*
 							this.fadeColor(fadeColor);
 							this.fadeTo({amount:1, duration:fadeSpeed});
 
@@ -649,11 +664,11 @@ $(document).ready(function(){
 									self.videoMap.fader.amount = 1;
 								}
 							});
-*/
 						}
+*/
 
 						// Think we can just always make it equal to... The if really just for the console.
-						if (theScript[this.scriptIndex].effect.length) {
+						if (theScript[this.scriptIndex].effect) {
 							if(DEBUG_MP) console.log('action apply detected');
 
 							effectArray = theScript[this.scriptIndex].effect;
@@ -686,24 +701,35 @@ $(document).ready(function(){
 
 						if (this.playerMediaId[0] === this.currentMediaId) {
 							nextVideoId = this.player[0].data("jPlayer").internal.video.id;
+/*
 							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 								//console.log('ping');
 								self.player[1].hide();
 								self.player[0].show();
 								$('#fader-content').fadeTo(fadeSpeed, 0);
 							});
+*/
+
+							this.player[1].hide();
+							this.player[0].show();
+
 							if(DEBUG_MP) console.log("switch to 1");
 							initTargetPopcorn('#' + this.player[0].data("jPlayer").internal.video.id, this.scriptIndex);
 							this.player[1].jPlayer("pause");
 							this.player[0].jPlayer("play",this.start/1000);
 						} else if (this.playerMediaId[1] === this.currentMediaId) {
 							nextVideoId = this.player[1].data("jPlayer").internal.video.id;
+/*
 							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 								//console.log('pong');
 								self.player[0].hide();
 								self.player[1].show();
 								$('#fader-content').fadeTo(fadeSpeed, 0);
 							});
+*/
+							this.player[0].hide();
+							this.player[1].show();
+
 							if(DEBUG_MP) console.log("switch to 2");
 							initTargetPopcorn('#' + this.player[1].data("jPlayer").internal.video.id, this.scriptIndex);
 							this.player[0].jPlayer("pause");
