@@ -120,13 +120,20 @@ $(document).ready(function(){
 		videoMap: {
 			videoSource: null,
 			canvasTarget: null,
+			fader: null,
 			effect: []
 		},
 		currentVideoId: "",
+		fadeEnd: false, // Used to capture the fade at the end of a chunk. ie., True until the animation starts.
+		fadeStart: false, // Used to fade at the start of a chunk.
 
 		initVideoMap: function() {
-			// Might be able to clean up the map code a little...
+			this.videoMap.fader = this.seriously.effect('fader');
+			this.videoMap.fader.amount = 0;
+			// this.videoMap.fader.color = [255,0,0,1];
+
 			this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
+			this.videoMap.canvasTarget.source = this.videoMap.fader;
 		},
 		createVideoMap: function(effects) {
 
@@ -182,13 +189,48 @@ $(document).ready(function(){
 				// Connect the video to the first effect
 				this.videoMap.effect[0].source = this.videoMap.videoSource;
 				// Connect the last effect to the canvas
-				this.videoMap.canvasTarget.source = this.videoMap.effect[this.videoMap.effect.length-1];
+				// this.videoMap.canvasTarget.source = this.videoMap.effect[this.videoMap.effect.length-1];
+				this.videoMap.fader.source = this.videoMap.effect[this.videoMap.effect.length-1];
 			} else {
 				// Connect the video to the canvas
-				this.videoMap.canvasTarget.source = this.videoMap.videoSource;
+				// this.videoMap.canvasTarget.source = this.videoMap.videoSource;
+				this.videoMap.fader.source = this.videoMap.videoSource;
 			}
 
 			this.seriously.go();
+		},
+		fadeTo: function(options) {
+			var self = this,
+				from = this.videoMap.fader.amount;
+/*
+			options: {
+				amount: number,
+				duration: number
+			}
+*/
+			$({fade:from}).animate({fade:options.amount}, {
+				duration: options.duration,
+				step: function() {
+					self.videoMap.fader.amount = this.fade;
+				},
+				complete: function() {
+					self.videoMap.fader.amount = options.amount;
+				}
+			});
+		},
+		fadeColor: function(color) {
+			var rgba = [0,0,0,1]; // Default is black
+			if(typeof color === 'string') {
+				switch(color) {
+					case 'red': rgba = [255,0,0,1]; break;
+					case 'green': rgba = [0,255,0,1]; break;
+					case 'blue': rgba = [0,0,255,1]; break;
+					case 'yellow': rgba = [255,255,0,1]; break;
+				}
+			} else if(color && color.length === 4) {
+				rgba = color;
+			}
+			this.videoMap.fader.color = rgba;
 		},
 
 		play: function(config) {
@@ -282,7 +324,7 @@ $(document).ready(function(){
 
 				for(search = this.scriptIndex - 1; search >= 0; search--) {
 					// Search back to the last effect applied
-					if (theScript[search].action === 'apply') {
+					if (theScript[search].effect.length) {
 						if(DEBUG_MP) console.log('play(): action apply detected');
 						effectArray = theScript[search].effect;
 						break; // exit for loop
@@ -296,6 +338,9 @@ $(document).ready(function(){
 			} else if (this.currentVideoId !== nextVideoId) {
 				this.connectVideo(nextVideoId);
 			}
+
+			this.fadeEnd = theScript[this.scriptIndex].fade;
+			this.fadeStart = false;
 		},
 		pause: function() {
 			this.paused = true;
@@ -360,7 +405,7 @@ $(document).ready(function(){
 
 				for(search = this.scriptIndex - 1; search >= 0; search--) {
 					// Search back to the last effect applied
-					if (theScript[search].action === 'apply') {
+					if (theScript[search].effect.length) {
 						if(DEBUG_MP) console.log('cue(): action apply detected');
 						effectArray = theScript[search].effect;
 						break; // exit for loop
@@ -440,6 +485,35 @@ $(document).ready(function(){
 				if(DEBUG_MP) console.log("targetPlayer.manager(): this.end="+this.end);
 				if(DEBUG_MP) console.log("targetPlayer.manager(): now="+now);
 
+				if(this.fadeEnd) {
+					if(DEBUG_MP) console.log('manager(): fade END detected');
+
+					var duration = theScript[this.scriptIndex].time*1000;
+
+					if (now > this.end - duration) {
+						this.fadeEnd = false;
+						// this.fadeStart = true;
+						this.fadeColor(theScript[this.scriptIndex].color);
+						this.fadeTo({
+							amount:1, 
+							duration:duration,
+							callback: function() {
+								// erm...
+							}
+						});
+					}
+				}
+
+				if(this.fadeStart) {
+					if(DEBUG_MP) console.log('manager(): fade START detected');
+
+					var duration = theScript[this.scriptIndex-1].time*1000;
+
+					this.fadeStart = false;
+					// this.fadeColor(theScript[this.scriptIndex-1].color);
+					this.fadeTo({amount:0, duration:duration});
+				}
+
 				// If the chunk playing has ended...
 				if (now > this.end) {
 
@@ -489,8 +563,14 @@ $(document).ready(function(){
 
 						//console.log(this.scriptIndex);
 
-						if (theScript[this.scriptIndex].action == 'fade') {
-							if(DEBUG_MP) console.log('action fade detected');
+						if (theScript[this.scriptIndex].fade) {
+							if(DEBUG_MP) console.log('manager(): fade START set');
+							this.fadeStart = true;
+						}
+
+
+						if (theScript[this.scriptIndex].fade) {
+							// if(DEBUG_MP) console.log('manager(): fade detected');
 
 							if (theScript[this.scriptIndex].color) {
 								fadeColor = theScript[this.scriptIndex].color;
@@ -499,9 +579,25 @@ $(document).ready(function(){
 							if (theScript[this.scriptIndex].time) {
 								fadeSpeed = theScript[this.scriptIndex].time*1000;
 							}
+
+/*
+							this.fadeColor(fadeColor);
+							this.fadeTo({amount:1, duration:fadeSpeed});
+
+							$({fade:0}).animate({fade:1}, {
+								duration: fadeSpeed,
+								step: function() {
+									self.videoMap.fader.amount = this.fade;
+								},
+								complete: function() {
+									self.videoMap.fader.amount = 1;
+								}
+							});
+*/
 						}
 
-						if (theScript[this.scriptIndex].action == 'apply') {
+						// Think we can just always make it equal to... The if really just for the console.
+						if (theScript[this.scriptIndex].effect.length) {
 							if(DEBUG_MP) console.log('action apply detected');
 
 							effectArray = theScript[this.scriptIndex].effect;
@@ -514,6 +610,11 @@ $(document).ready(function(){
 						// moving to the next block in the target
 						this.scriptIndex++;
 						if (DEBUG_MP) console.dir(theScript);
+
+						if (theScript[this.scriptIndex].fade) {
+							if(DEBUG_MP) console.log('manager(): fade END set');
+							this.fadeEnd = true;
+						}
 
 						// Prepare the other player for the next media
 						// Also updates this.start, this.end, this.currentMediaId and this.nextMediaId
@@ -701,8 +802,8 @@ $(document).ready(function(){
 		var commandList = commands.split(" ");
 		console.dir(commandList);
 
-
-		var action,time,color,effect;
+		// NBL action is now obsolete.
+		var action,time,color,fade;
 
 		console.log("cm length = "+commandList.length);
 
@@ -721,6 +822,7 @@ $(document).ready(function(){
 			// detecting fade
 			if (commandList[i] == 'fade') {
 				action = commandList[i];
+				fade = true;
 			}
 
 			if (applyFlag == true && $.inArray(commandList[i], effects) >= 0) {
@@ -759,7 +861,8 @@ $(document).ready(function(){
 				theScript.push(timespan);
 				index = 0;
 			}
-			theScript[index].action = action;
+			// theScript[index].action = action;
+			theScript[index].fade = fade;
 			theScript[index].time = time;
 			theScript[index].color = color;
 			theScript[index].effect = effect;
