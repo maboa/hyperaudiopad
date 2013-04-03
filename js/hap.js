@@ -69,19 +69,44 @@ $(document).ready(function(){
 			i = 0;
 		}
 
+		if (DEBUG_MB) console.log("index = "+i);
+
 		if (i < theScript.length) {
+			if (DEBUG_MB) console.log("copying over...");
 			var transcript = transcripts[theScript[i].mediaId].url;
 
 			$('#transcript-content').load(transcript, function() {
+				
+				var startSpan, endSpan, startTime, endTime;
 
-				/*$('span[m="'+startTime+'"]').each(function() {
+				startTime = theScript[i].start;
+				endTime = theScript[i].end;
 
+				if (DEBUG_MB) console.log("grabbing the spans");
+
+				$('span[m="'+startTime+'"]').each(function() {
+					startSpan = $(this)[0];
+					$('span[m="'+endTime+'"]').each(function() {
+						endSpan = $(this)[0].previousElementSibling;
+
+						if (DEBUG_MB) console.log("start/end");
+						if (DEBUG_MB) console.dir(startSpan);
+						if (DEBUG_MB) console.dir(endSpan);
+						if (DEBUG_MB) console.log("startTime = "+startTime);
+						if (DEBUG_MB) console.log("endTime = "+endTime);
+
+						copyOver(startSpan, endSpan, startTime, endTime, function() {
+							if (DEBUG_MB) console.log("calling loadTranscriptsFromFile");
+							loadTranscriptsFromFile(++i);
+						});
+					});
 				});
-
-				copyOver(theScript[i].start, theScript[i].end);*/
-				loadTranscriptsFromFile(++i);
+				
 				if (DEBUG_MB) console.log('transcript = '+transcript);
 			});
+		} else {
+			if (DEBUG_MB) console.log('dropping out');
+			//return false;
 		}
 	}
 
@@ -388,6 +413,7 @@ $(document).ready(function(){
 		cue: function() {
 
 			var currentJumpTo, nextJumpTo, nextVideoId;
+
 
 			this.start = theScript[this.scriptIndex].start;
 			this.end = theScript[this.scriptIndex].end;
@@ -1084,7 +1110,7 @@ $(document).ready(function(){
 
 	// Sets the excerpt  
 
-	function copyOver(startSpan,endSpan,startTime,endTime) {
+	function copyOver(startSpan, endSpan, startTime, endTime, callback) {
 
 		var nextSpan = startSpan; 
 		// $('#target-content').append('<p s="'+startTime+'" e="'+endTime+'" f="'+targetPlayer.player[0].data('jPlayer').status.src+'">');
@@ -1148,7 +1174,7 @@ $(document).ready(function(){
 		//console.log(targetPlayer.player[0].data('jPlayer').status.src);
 		//timespan.src = targetPlayer.player[0].data('jPlayer').status.src;
 
-		return (timespan);
+		callback(timespan);
 	}
 
 
@@ -1262,7 +1288,11 @@ $(document).ready(function(){
 
 				/* --- start snip --- */
 				
-				var timespan = copyOver(startSpan,endSpan,startTime,endTime);
+				var timespan;
+				copyOver(startSpan,endSpan,startTime,endTime, function(ts){
+					timespan = ts;
+				});
+
 				theScript.push(timespan);
 
 				/*--- end snip ----*/
