@@ -70,6 +70,7 @@ ul {
 
 #target-content {
 	top: 78px;
+	outline: 0px solid transparent;
 }
 
 

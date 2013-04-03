@@ -60,6 +60,18 @@ $(document).ready(function(){
 		}
 	}*/];
 
+
+	if (DEBUG_MB) console.log('hash = '+window.location.hash);
+
+	var hash = window.location.hash.replace("#","");
+	if (hash.length > 0) {
+		// load theScript
+		$.get('remixes/'+hash+'.json', function(data) {
+			if (DEBUG_MB) console.log('theScript loaded in');
+			if (DEBUG_MB) console.dir(data);
+		});
+	}
+
 	var theScript = [];  
 	var latency = 1000;
 
@@ -1303,19 +1315,10 @@ $(document).ready(function(){
 			dataType: "json",
 			success: function(json) {
 				window.location.hash = code;
-				if($.isFunction(callback)) {
-					callback(json);
-				}
 			},
 			error: function(xhr, status, error) {
-				if($.isFunction(callback)) {
-					callback({
-						error: true,
-						errorMsg: status + " : " + error
-					});
-					console.log('status = '+status);
-					console.log('error = '+error);
-				}
+				console.log('status = '+status);
+				console.log('error = '+error);
 			}
 		});
 		
