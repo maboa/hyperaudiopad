@@ -63,6 +63,9 @@ $(document).ready(function(){
 
 	if (DEBUG_MB) console.log('hash = '+window.location.hash);
 
+	var theScript = [];
+	var latency = 1000;
+
 	function loadTranscriptsFromFile(i) {
 		
 		if(!i) {
@@ -116,17 +119,14 @@ $(document).ready(function(){
 		}
 	}
 
-	var theScript = [];
-	var latency = 1000;
-
 	var hash = window.location.hash.replace("#","");
 	if (hash.length > 0) {
 		// load theScript
 		$.get('remixes/'+hash+'.json', function(data) {
 			if (DEBUG_MB) console.log(' ==================== theScript loaded in');
 			if (DEBUG_MB) console.dir(data);
-			if (DEBUG_MB) console.dir(eval(data));
-			theScript = eval(data);
+			if (DEBUG_MB) console.dir(data);
+			theScript = data;
 
 			loadTranscriptsFromFile();
 			targetPlayer.cue();
@@ -332,7 +332,7 @@ $(document).ready(function(){
 			if (DEBUG_MB) console.log("INDEX = "+this.scriptIndex); 
 
 			// sorry MP - quick frig to check
-			if (this.scriptIndex >= theScript.length) this.scriptIndex = 0;
+			// if (this.scriptIndex >= theScript.length) this.scriptIndex = 0;
 
 			this.currentMediaId = theScript[this.scriptIndex].mediaId;
 			this.nextMediaId = this.scriptIndex+1 < theScript.length ? theScript[this.scriptIndex+1].mediaId : null;
