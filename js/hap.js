@@ -98,7 +98,7 @@ $(document).ready(function(){
 						if (DEBUG_MB) console.log("startTime = "+startTime);
 						if (DEBUG_MB) console.log("endTime = "+endTime);
 
-						copyOver(startSpan, endSpan, startTime, endTime, function() {
+						copyOver(startSpan, endSpan, startTime, endTime, i, function() {
 							if (DEBUG_MB) console.log("calling loadTranscriptsFromFile");
 							var commandText = theScript[i].commandText;
 							if (commandText != undefined && commandText.length > 0) {
@@ -1168,11 +1168,11 @@ $(document).ready(function(){
 
 	// Sets the excerpt  
 
-	function copyOver(startSpan, endSpan, startTime, endTime, callback) {
+	function copyOver(startSpan, endSpan, startTime, endTime, sIndex, callback) {
 
 		var nextSpan = startSpan; 
 		// $('#target-content').append('<p s="'+startTime+'" e="'+endTime+'" f="'+targetPlayer.player[0].data('jPlayer').status.src+'">');
-		var selectedStuff = $('<p i="'+theScript.length+'" start="'+startTime+'" end="'+endTime+'">'); 
+		var selectedStuff = $('<p i="'+sIndex+'" start="'+startTime+'" end="'+endTime+'">'); 
 		$('#target-content').append( selectedStuff ); 
 		
 		//console.log('selected....');
@@ -1347,7 +1347,7 @@ $(document).ready(function(){
 				/* --- start snip --- */
 				
 				var timespan;
-				copyOver(startSpan,endSpan,startTime,endTime, function(ts){
+				copyOver(startSpan,endSpan,startTime,endTime, theScript.length, function(ts){
 					timespan = ts;
 				});
 
