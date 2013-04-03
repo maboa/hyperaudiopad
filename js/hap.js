@@ -97,7 +97,6 @@ $(document).ready(function(){
 		scriptIndex: 0, // ref to theScript[]
 		start: 0,
 		end: 0,
-		now: 0, // Only used to pass from manager to play (after a pause) atm. Same as the manager var now.
 		player: [$("#jquery_jplayer_1"),$("#jquery_jplayer_2")],
 		playerMediaId: [],
 		currentMediaId: null,
@@ -258,21 +257,27 @@ $(document).ready(function(){
 
 
 			// Experimenting with Canvas Effects and Seriously.js
-			// not the best place to put it
 
 			if(DEBUG_MP) console.log("seriously ...");
 
-			// This bit need review after refactoring the code in the manager
-/*
-			this.videoMap.videoSource = this.seriously.source('#'+currentVideoId);
-			this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
+			// If someone clicked on a word, changing the usual flow.
+			if(config.jumpTo) {
 
-			this.videoMap.canvasTarget.source = this.videoMap.videoSource;
+				var effectArray = [],
+					search;
 
-			this.seriously.go();
-*/
+				for(search = this.scriptIndex - 1; search >= 0; search--) {
+					// Search back to the last effect applied
+					if (theScript[search].action === 'apply') {
+						if(DEBUG_MP) console.log('play(): action apply detected');
+						effectArray = theScript[search].effect;
+						break; // exit for loop
+					}
+				}
 
-			if (this.currentVideoId !== nextVideoId) {
+				this.createVideoMap(effectArray);
+				this.connectVideo(nextVideoId);
+			} else if (this.currentVideoId !== nextVideoId) {
 				this.connectVideo(nextVideoId);
 			}
 		},
@@ -355,20 +360,6 @@ $(document).ready(function(){
 				return false;
 			}
 
-			// Reset the play/pause button
-			// $('#play-btn-target').show();
-			// $('#pause-btn-target').hide();
-
-			// Stop the players
-			// this.player[0].jPlayer("pause");
-			// this.player[1].jPlayer("pause");
-
-			// $('#load-status-target').html('loading ...');
-
-			// load in the audio
-			// check which player to load media into
-
-
 			// Check whether a player already setup to play this media.
 			if(this.playerMediaId[0] === id) {
 				this.lastPlayerPrimed = 0;
@@ -381,8 +372,6 @@ $(document).ready(function(){
 
 				this.player[nextPlayerUsed].jPlayer("setMedia", transcripts[id].media);
 				this.playerMediaId[nextPlayerUsed] = id;
-				// this.player[this.lastPlayerPrimed].hide();
-				// this.player[nextPlayerUsed].show();
 				fitVideo(this.player[nextPlayerUsed]);
 
 				this.lastPlayerPrimed = nextPlayerUsed;
@@ -408,9 +397,6 @@ $(document).ready(function(){
 				} else {
 					// We have a problem
 				}
-
-				// Hack so we can pass this to play after a pause.
-				this.now = now;
 
 				//console.log("now="+now+" this.end="+this.end+"theScript.length="+theScript.length+" this.scriptIndex="+this.scriptIndex);
 
@@ -505,7 +491,7 @@ $(document).ready(function(){
 						var nextVideoId = "";
 
 						if (this.playerMediaId[0] === this.currentMediaId) {
-							nextVideoId = "jp_video_1";
+							nextVideoId = this.player[0].data("jPlayer").internal.video.id;
 							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 								//console.log('ping');
 								self.player[1].hide();
@@ -517,7 +503,7 @@ $(document).ready(function(){
 							this.player[1].jPlayer("pause");
 							this.player[0].jPlayer("play",this.start/1000);
 						} else if (this.playerMediaId[1] === this.currentMediaId) {
-							nextVideoId = "jp_video_2";
+							nextVideoId = this.player[1].data("jPlayer").internal.video.id;
 							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 								//console.log('pong');
 								self.player[0].hide();
@@ -538,40 +524,6 @@ $(document).ready(function(){
 						} else if (this.currentVideoId !== nextVideoId) {
 							this.connectVideo(nextVideoId);
 						}
-/*
-						if (effectArray.length > 0) {
-
-							// Destroy the old node map
-							this.seriously.destroy();
-							// Create a new node map
-							this.seriously = new Seriously();
-
-							this.videoMap.videoSource = this.seriously.source("#"+nextVideoId);
-							this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
-							this.videoMap.effect = [];
-
-							// var sourceVid = seriously.source("#"+nextVideoId);
-							// var target = seriously.target('#target-canvas');
-							// var seriouslyEffect = [];
-
-							// add all the effects
-
-							for (var i=0; i < effectArray.length; i++) {
-								this.videoMap.effect[i] = this.seriously.effect(effectArray[i]);
-								if (i > 0) {
-									this.videoMap.effect[i].source = this.videoMap.effect[i-1];
-									if (DEBUG_MB) console.log("connecting up");
-								} else {
-									this.videoMap.effect[0].source = this.videoMap.videoSource;
-								}
-							}
-
-							// Connect the last effect to the canvas
-							this.videoMap.canvasTarget.source = this.videoMap.effect[this.videoMap.effect.length-1];
-
-							this.seriously.go();
-						}
-*/
 
 					} else {
 						// Ended Target Transcript.
@@ -588,7 +540,7 @@ $(document).ready(function(){
 						this.player[1].hide();
 
 						// Reset the video map to the first one, or just remove it if no initial effect.
-						this.createVideoMap(theScript[0].effect || []);
+						this.createVideoMap((theScript[0].mediaId && theScript[0].effect) || []);
 
 						// Cue up the players ready for if the play button is pressed.
 						this.cue();
@@ -596,11 +548,6 @@ $(document).ready(function(){
 						// Show the correct control button
 						$('#play-btn-target').show();
 						$('#pause-btn-target').hide();
-
-						// Should not need the others set since we play though .play() method
-
-						// this.currentMediaId = theScript[this.scriptIndex].mediaId;
-						// this.nextMediaId = this.scriptIndex+1 < theScript.length ? theScript[this.scriptIndex+1].mediaId : null;
 					}
 				}
 			}
@@ -698,24 +645,6 @@ $(document).ready(function(){
 			end: parseInt($(this).parent().attr('end'),  10)
 		}
 
-/*
-		playConfig
-		var jumpTo = $(this).attr('m')/1000;
-		targetPlayer.scriptIndex = parseInt($(this).parent().attr('i'), 10);
-		targetPlayer.start = parseInt($(this).parent().attr('start'), 10); 
-		targetPlayer.end = parseInt($(this).parent().attr('end'),  10);  
-
-		targetPlayer.currentMediaId = theScript[targetPlayer.scriptIndex].mediaId;
-
-		console.log("------Clicked On A Target Word------");
-		console.log("targetPlayer.currentMediaId="+targetPlayer.currentMediaId);
-		console.log("targetPlayer.playerMediaId[0]="+targetPlayer.playerMediaId[0]);
-		console.log("targetPlayer.playerMediaId[1]="+targetPlayer.playerMediaId[1]);
-		console.log("targetPlayer.scriptIndex="+targetPlayer.scriptIndex);
-		console.log("targetPlayer.start="+targetPlayer.start);
-		console.log("targetPlayer.end="+targetPlayer.end);
-		console.log("jumpTo="+jumpTo);
-*/
 		targetPlayer.play(playConfig);
 
 		return false;
@@ -897,6 +826,8 @@ $(document).ready(function(){
 		});
 	}
 
+	// Generate the Transcript list.
+
 	var $transFiles = $('#transcript-files').empty();
 	$.each(transcripts, function(i) {
 		var $transBtn = $('<a class="transcript-file">' + this.title + '</a>').click(function(e) {
@@ -905,24 +836,6 @@ $(document).ready(function(){
 		});
 		$transFiles.append($('<li></li>').append($transBtn));
 	});
-/*
-	$('#transcript-files').empty();
-	for (var j = 0; j < exposedTranscripts.length; j++) {
-		$('#transcript-files').append('<li><a class="transcript-file" href="'+exposedTranscripts[j].id+'" >'+exposedTranscripts[j].title+'</a></li>');
-	}
-
-	$('.transcript-file').on('click',function(){ 
-		var id = $(this).attr('href');
-
-		//console.log(id);
-		
-		$('#script-title').text($(this).text());
-
-		loadTranscriptSource(id);
-
-		return false;
-	}); 
-*/
 
 	// For loading Transcripts into the source area.
 
