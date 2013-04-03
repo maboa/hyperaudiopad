@@ -396,7 +396,7 @@ $(document).ready(function(){
 			}
 
 			$('#target-header-ctrl').fadeIn();
-			$('#clear-target').fadeIn();
+			$('#target-action-ctrl').fadeIn();
 			return true;
 		},
 		manager: function(event) {
@@ -1118,7 +1118,7 @@ $(document).ready(function(){
 				//$('#target-content span').addClass('transcript-grey');
 
 				$('#target-header-ctrl').fadeIn();
-				$('#clear-target').fadeIn();
+				$('#target-action-ctrl').fadeIn();
 
 				$('#transcript-content-hint').fadeOut();
 
@@ -1276,8 +1276,39 @@ $(document).ready(function(){
 		// need to make two classes here with heights in - too much repeated code with fixed numeric values
 		$('#target-content').css('top','78px');
 		$('#target-header-ctrl').fadeOut();
-		$(this).fadeOut();
+		$('#target-action-ctrl').fadeOut();
 
+		return false;
+	});
+
+	$('#save-target').click(function(){
+
+		var code = Math.random().toString(36).substring(7);
+
+		$.ajax({
+			url: "server/save.php" + "?save=1&code=" + code,
+			data: {settings: JSON.stringify(theScript)},
+			type: "POST",
+			// contentType:"application/json;charset=UTF-8",
+			dataType: "json",
+			success: function(json) {
+				window.location.hash = code;
+				if($.isFunction(callback)) {
+					callback(json);
+				}
+			},
+			error: function(xhr, status, error) {
+				if($.isFunction(callback)) {
+					callback({
+						error: true,
+						errorMsg: status + " : " + error
+					});
+					console.log('status = '+status);
+					console.log('error = '+error);
+				}
+			}
+		});
+		
 		return false;
 	});
 

@@ -4,12 +4,12 @@
 	header('Pragma: no-cache');
 	header('Expires: 0');
 
-	$file_path = 'remixes/';
+	$file_path = '../remixes/';
 	$file_ext = '.json';
 
-	if(isset($_GET['file'])) :
+	if(isset($_GET['code'])) :
 
-		$filename = $file_path . $_GET['file'] . $file_ext;
+		$filename = $file_path . $_GET['code'] . $file_ext;
 
 		if(isset($_GET['save']) && $_GET['save'] == '1') :
 			// Save JSON to file
