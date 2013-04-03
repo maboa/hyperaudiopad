@@ -280,21 +280,21 @@ $(document).ready(function(){
 
 			if(typeof color === 'string') {
 				switch(color) {
-					case 'silver': rgba = [192,192,192,1]; break;
-					case 'gray': rgba = [105,105,105,1]; break;
-					case 'white': rgba = [255,255,255,1]; break;
-					case 'maroon': rgba = [255,52,179,1]; break;
-					case 'red': rgba = [255,0,0,1]; break;
-					case 'purple': rgba = [128,0,128,1]; break;
-					case 'fuchsia': rgba = [255,0,255,1]; break;
-					case 'green': rgba = [0,128,0,1]; break;
-					case 'lime': rgba = [0,255,0,1]; break;
-					case 'olive': rgba = [128,128,0,1]; break;
-					case 'yellow': rgba = [255,255,0,1]; break;
-					case 'navy': rgba = [0,0,128,1]; break;
-					case 'blue': rgba = [0,0,255,1]; break;
-					case 'teal': rgba = [0,128,128,1]; break;
-					case 'aqua': rgba = [0,255,255,1]; break;
+					case 'silver': rgba = [0.75,0.75,0.75,1]; break;
+					case 'gray': rgba = [0.25,0.25,0.25,1]; break;
+					case 'white': rgba = [1,1,1,1]; break;
+					case 'maroon': rgba = [0.5,0,0,1]; break;
+					case 'red': rgba = [1,0,0,1]; break;
+					case 'purple': rgba = [0.5,0,0.5,1]; break;
+					case 'fuchsia': rgba = [1,0,1,1]; break;
+					case 'green': rgba = [0,0.5,0,1]; break;
+					case 'lime': rgba = [0,1,0,1]; break;
+					case 'olive': rgba = [0.5,0.5,0,1]; break;
+					case 'yellow': rgba = [1,1,0,1]; break;
+					case 'navy': rgba = [0,0,0.5,1]; break;
+					case 'blue': rgba = [0,0,1,1]; break;
+					case 'teal': rgba = [0,0.5,0.5,1]; break;
+					case 'aqua': rgba = [0,1,1,1]; break;
 					// case 'XXX': rgba = [RRR,GGG,BBB,1]; break;
 				}
 			} else if(color && color.length === 4) {
