@@ -263,8 +263,11 @@ $(document).ready(function(){
 			// If someone clicked on a word, changing the usual flow.
 			if(config.jumpTo) {
 
-				var effectArray = (!theScript[0].mediaId && theScript[0].effect) || [],
+				var effectArray = (typeof theScript[0].mediaId === 'undefined' && theScript[0].effect) || [],
 					search;
+
+				if(DEBUG_MP) console.log('play(): theScript[]=%o',theScript);
+				if(DEBUG_MP) console.log('play(): (Default) effectArray[]=%o',effectArray);
 
 				for(search = this.scriptIndex - 1; search >= 0; search--) {
 					// Search back to the last effect applied
@@ -274,6 +277,8 @@ $(document).ready(function(){
 						break; // exit for loop
 					}
 				}
+
+				if(DEBUG_MP) console.log('play(): (Searched) effectArray[]=%o',effectArray);
 
 				this.createVideoMap(effectArray);
 				this.connectVideo(nextVideoId);
@@ -336,17 +341,22 @@ $(document).ready(function(){
 				killTargetPopcorn();
 				setTargetHighlighting(this.scriptIndex);
 
-				var effectArray = (!theScript[0].mediaId && theScript[0].effect) || [],
+				var effectArray = (typeof theScript[0].mediaId === 'undefined' && theScript[0].effect) || [],
 					search;
+
+				if(DEBUG_MP) console.log('cue(): theScript[]=%o',theScript);
+				if(DEBUG_MP) console.log('cue(): (Default) effectArray[]=%o',effectArray);
 
 				for(search = this.scriptIndex - 1; search >= 0; search--) {
 					// Search back to the last effect applied
 					if (theScript[search].action === 'apply') {
-						if(DEBUG_MP) console.log('play(): action apply detected');
+						if(DEBUG_MP) console.log('cue(): action apply detected');
 						effectArray = theScript[search].effect;
 						break; // exit for loop
 					}
 				}
+
+				if(DEBUG_MP) console.log('cue(): (Searched) effectArray[]=%o',effectArray);
 
 				this.createVideoMap(effectArray);
 				this.connectVideo(nextVideoId);
