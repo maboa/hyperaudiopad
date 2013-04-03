@@ -212,6 +212,8 @@ $(document).ready(function(){
 				console.log("config.jumpTo="+config.jumpTo);
 			}
 
+			//if(DEBUG_MB) console.log(Math.random().toString(36).substring(6).toUpperCase());
+
 			$('#play-btn-target').hide();
 			$('#pause-btn-target').show();
 
