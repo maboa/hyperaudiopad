@@ -254,12 +254,14 @@ $(document).ready(function(){
 			}
 */
 
-			if (DEBUG_MP) console.log("fadeTo(): from=%f | videoMap.effect=%o", from, this.videoMap.effect);
+			if (DEBUG_MP) console.log("fadeTo(): from=%f | options=%o", from, options);
 
 			$({fade:from}).animate({fade:options.amount}, {
 				duration: options.duration,
+				easing: 'linear',
 				step: function() {
 					self.videoMap.fader.amount = this.fade;
+					// if (DEBUG_MP) console.log("fadeTo(): from=%f | options=%o | this.fade=%f", from, options, this.fade);
 				},
 				complete: function() {
 					self.videoMap.fader.amount = options.amount;
@@ -273,12 +275,27 @@ $(document).ready(function(){
 		},
 		fadeColor: function(color) {
 			var rgba = [0,0,0,1]; // Default is black
+
+			// search for the legalColors var to see the whitelist.
+
 			if(typeof color === 'string') {
 				switch(color) {
+					case 'silver': rgba = [192,192,192,1]; break;
+					case 'gray': rgba = [105,105,105,1]; break;
+					case 'white': rgba = [255,255,255,1]; break;
+					case 'maroon': rgba = [255,52,179,1]; break;
 					case 'red': rgba = [255,0,0,1]; break;
-					case 'green': rgba = [0,255,0,1]; break;
-					case 'blue': rgba = [0,0,255,1]; break;
+					case 'purple': rgba = [128,0,128,1]; break;
+					case 'fuchsia': rgba = [255,0,255,1]; break;
+					case 'green': rgba = [0,128,0,1]; break;
+					case 'lime': rgba = [0,255,0,1]; break;
+					case 'olive': rgba = [128,128,0,1]; break;
 					case 'yellow': rgba = [255,255,0,1]; break;
+					case 'navy': rgba = [0,0,128,1]; break;
+					case 'blue': rgba = [0,0,255,1]; break;
+					case 'teal': rgba = [0,128,128,1]; break;
+					case 'aqua': rgba = [0,255,255,1]; break;
+					// case 'XXX': rgba = [RRR,GGG,BBB,1]; break;
 				}
 			} else if(color && color.length === 4) {
 				rgba = color;
