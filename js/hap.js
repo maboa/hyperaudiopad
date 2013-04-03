@@ -63,12 +63,38 @@ $(document).ready(function(){
 
 	if (DEBUG_MB) console.log('hash = '+window.location.hash);
 
+	function loadTranscriptsFromFile(i) {
+		
+		if(!i) {
+			i = 0;
+		}
+
+		if (i < theScript.length) {
+			var transcript = transcripts[theScript[i].mediaId].url;
+
+			$('#transcript-content').load(transcript, function() {
+
+				/*$('span[m="'+startTime+'"]').each(function() {
+
+				});
+
+				copyOver(theScript[i].start, theScript[i].end);*/
+				loadTranscriptsFromFile(++i);
+				if (DEBUG_MB) console.log('transcript = '+transcript);
+			});
+		}
+	}
+
 	var hash = window.location.hash.replace("#","");
 	if (hash.length > 0) {
 		// load theScript
 		$.get('remixes/'+hash+'.json', function(data) {
 			if (DEBUG_MB) console.log('theScript loaded in');
 			if (DEBUG_MB) console.dir(data);
+			theScript = data;
+
+			loadTranscriptsFromFile();
+
 		});
 	}
 
@@ -392,6 +418,7 @@ $(document).ready(function(){
 			// The id is the index reference to the transcripts array.
 
 			if(DEBUG_MP) console.log('loadTranscriptTarget('+id+')');
+			if(DEBUG_MB) console.log('sourceMediaId = '+sourceMediaId);
 
 			if(typeof id !== 'number') {
 				if(DEBUG_MP) console.log('Ignoring: id='+id);
@@ -407,6 +434,9 @@ $(document).ready(function(){
 
 				var nextPlayerUsed = (this.lastPlayerPrimed + 1) % 2;
 				if(DEBUG_MP) console.log('[before] targetPlayer.lastPlayerPrimed='+this.lastPlayerPrimed+' | nextPlayerUsed='+nextPlayerUsed);
+
+				if(DEBUG_MB) console.dir("media object ...");
+				if(DEBUG_MB) console.dir(transcripts[id].media);
 
 				this.player[nextPlayerUsed].jPlayer("setMedia", transcripts[id].media);
 				this.playerMediaId[nextPlayerUsed] = id;
@@ -952,6 +982,73 @@ $(document).ready(function(){
 
 	// Sets the excerpt  
 
+	function copyOver(startSpan,endSpan,startTime,endTime) {
+
+		var nextSpan = startSpan; 
+		// $('#target-content').append('<p s="'+startTime+'" e="'+endTime+'" f="'+targetPlayer.player[0].data('jPlayer').status.src+'">');
+		var selectedStuff = $('<p i="'+theScript.length+'" start="'+startTime+'" end="'+endTime+'">'); 
+		$('#target-content').append( selectedStuff ); 
+		
+		//console.log('selected....');
+		
+		
+		while(nextSpan != endSpan) { 
+			//console.log('nextspan');   
+			//console.log(nextSpan);         
+			// $(nextSpan).clone().appendTo('#target-content');
+			if (nextSpan instanceof HTMLSpanElement) {
+				$(nextSpan).clone().appendTo(selectedStuff); 
+				selectedStuff.append(' ');
+			}
+
+			// as nextNode of a paragraph is a parapgraph we want to drop down here
+			if (nextSpan instanceof HTMLParagraphElement) {
+				selectedStuff.append('<p>');
+				nextSpan = nextSpan.firstChild;
+			} else {
+				nextSpan = getNextNode(nextSpan,true,endSpan);	
+			}
+		}
+
+		$(endSpan).clone().appendTo(selectedStuff); 
+
+		// grab the span after the endSpan to get proper end time
+
+		var nextSpanStart = getNextNode(nextSpan,true,endSpan);
+
+		if (nextSpanStart instanceof HTMLParagraphElement) {
+			nextSpanStart = nextSpanStart.firstChild;
+		}
+
+		var nextSpanStartTime = parseInt(nextSpanStart.getAttribute('m'));
+
+		if (isNaN(nextSpanStartTime)) { // checking for end of text select
+			nextSpanStartTime = Math.floor(myPlayerSource.data('jPlayer').status.duration * 1000);
+		}
+
+
+		//console.log(selectedStuff);
+
+
+		$('#target-content').append('</p>');
+
+		var timespan = {};
+		timespan.start = startTime;
+		timespan.end = nextSpanStartTime;  
+
+		timespan.mediaId = sourceMediaId;
+
+
+		//console.log("s="+startTime);
+		//console.log("e="+endTime);
+		//console.log("n="+nextSpanStartTime);
+
+		//console.log(targetPlayer.player[0].data('jPlayer').status.src);
+		//timespan.src = targetPlayer.player[0].data('jPlayer').status.src;
+
+		return (timespan);
+	}
+
 
 
 	$('#transcript-content').mouseup(function(e){ 
@@ -1061,71 +1158,13 @@ $(document).ready(function(){
 				console.log('--------'); */
 
 
-
-				var nextSpan = startSpan; 
-				// $('#target-content').append('<p s="'+startTime+'" e="'+endTime+'" f="'+targetPlayer.player[0].data('jPlayer').status.src+'">');
-				var selectedStuff = $('<p i="'+theScript.length+'" start="'+startTime+'" end="'+endTime+'">'); 
-				$('#target-content').append( selectedStuff ); 
+				/* --- start snip --- */
 				
-				//console.log('selected....');
-				
-				
-				while(nextSpan != endSpan) { 
-					//console.log('nextspan');   
-					//console.log(nextSpan);         
-					// $(nextSpan).clone().appendTo('#target-content');
-					if (nextSpan instanceof HTMLSpanElement) {
-						$(nextSpan).clone().appendTo(selectedStuff); 
-						selectedStuff.append(' ');
-					}
-
-					// as nextNode of a paragraph is a parapgraph we want to drop down here
-					if (nextSpan instanceof HTMLParagraphElement) {
-						selectedStuff.append('<p>');
-						nextSpan = nextSpan.firstChild;
-					} else {
-						nextSpan = getNextNode(nextSpan,true,endSpan);	
-					}
-				}
-
-				$(endSpan).clone().appendTo(selectedStuff); 
-
-				// grab the span after the endSpan to get proper end time
-
-				var nextSpanStart = getNextNode(nextSpan,true,endSpan);
-
-				if (nextSpanStart instanceof HTMLParagraphElement) {
-					nextSpanStart = nextSpanStart.firstChild;
-				}
-
-				var nextSpanStartTime = parseInt(nextSpanStart.getAttribute('m'));
-
-				if (isNaN(nextSpanStartTime)) { // checking for end of text select
-					nextSpanStartTime = Math.floor(myPlayerSource.data('jPlayer').status.duration * 1000);
-				}
-
-
-				//console.log(selectedStuff);
-
-
-				$('#target-content').append('</p>');   
-
-
-				
-				var timespan = {};
-				timespan.start = startTime;
-				timespan.end = nextSpanStartTime;  
-
-				timespan.mediaId = sourceMediaId;
-
-
-				//console.log("s="+startTime);
-				//console.log("e="+endTime);
-				//console.log("n="+nextSpanStartTime);
-
-				//console.log(targetPlayer.player[0].data('jPlayer').status.src);
-				//timespan.src = targetPlayer.player[0].data('jPlayer').status.src;
+				var timespan = copyOver(startSpan,endSpan,startTime,endTime);
 				theScript.push(timespan);
+
+				/*--- end snip ----*/
+
 
 				if(theScript.length === 1) {
 					// Setup the target player for the start.
