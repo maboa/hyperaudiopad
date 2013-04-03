@@ -724,6 +724,7 @@ $(document).ready(function(){
 			theScript[index].time = time;
 			theScript[index].color = color;
 			theScript[index].effect = effect;
+			theScript[index].commandText = commands;
 		}
 
 		//console.dir(commandList);
