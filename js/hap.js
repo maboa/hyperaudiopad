@@ -143,14 +143,13 @@ $(document).ready(function(){
 				this.videoMap.effect[i] = this.seriously.effect(effects[i]);
 				if (i > 0) {
 					this.videoMap.effect[i].source = this.videoMap.effect[i-1];
-					if (DEBUG_MB) console.log("createVideoMap(): connecting up effect chain");
+					if (DEBUG_MP) console.log("createVideoMap(): connecting up effect chain");
 				} else {
 					// this.videoMap.effect[0].source = this.videoMap.videoSource;
 				}
 			}
 
-			// Connect the last effect to the canvas
-			// this.videoMap.canvasTarget.source = this.videoMap.effect[this.videoMap.effect.length-1];
+			if (DEBUG_MP) console.log("createVideoMap(): videoMap.effect=%o",this.videoMap.effect);
 		},
 		connectVideo: function(videoId) {
 
