@@ -34,6 +34,16 @@ $(document).ready(function(){
 			m4v: '../video/raidsinrainforest.mp4',
 			webmv: '../video/raidsinrainforest.webm'
 		}
+	}
+	, {
+		title: "The Justice Boat",
+		url: "transcripts/justiceboat.htm",
+		media: {
+			/* m4v: 'http://happyworm.com/video/justiceboat.mp4',
+			webmv: 'http://happyworm.com/video/justiceboat.webm' */
+			m4v: '../video/justiceboat.mp4',
+			webmv: '../video/justiceboat.webm'
+		}
 	}/*, {
 		title: "SOTU 2013",
 		url: "transcripts/sotu2013.htm",
