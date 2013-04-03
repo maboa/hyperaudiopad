@@ -586,7 +586,7 @@ $(document).ready(function(){
 						this.player[1].hide();
 
 						// Reset the video map to the first one, or just remove it if no initial effect.
-						this.createVideoMap(theScript[0].effect || []);
+						this.createVideoMap((theScript[0].mediaId && theScript[0].effect) || []);
 
 						// Cue up the players ready for if the play button is pressed.
 						this.cue();
