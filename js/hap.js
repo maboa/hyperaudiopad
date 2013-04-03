@@ -88,6 +88,9 @@ $(document).ready(function(){
 	var sourceMediaId = null;
 	var sourcePopcorn = null;
 
+	// making it clear that we have an editable content pane
+	$('#target-content').focus();
+
 	// Want to migrate all the target player Flags and controls into this object
 	var targetPlayer = {
 		paused: true,
@@ -386,6 +389,7 @@ $(document).ready(function(){
 			}
 
 			$('#target-header-ctrl').fadeIn();
+			$('#clear-target').fadeIn();
 			return true;
 		},
 		manager: function(event) {
@@ -947,6 +951,7 @@ $(document).ready(function(){
 			// Setup popcorn and load in the media
 			initSourcePopcorn('#' + myPlayerSource.data("jPlayer").internal.video.id);
 			myPlayerSource.jPlayer("setMedia", transcripts[id].media);
+			$('.fb-title').text(transcripts[id].title);
 
 			// Store reference to the transcript
 			sourceMediaId = id;
@@ -1181,8 +1186,19 @@ $(document).ready(function(){
 				//$('#target-content span').addClass('transcript-grey');
 
 				$('#target-header-ctrl').fadeIn();
+				$('#clear-target').fadeIn();
 
 				$('#transcript-content-hint').fadeOut();
+
+				// this reveals the target video on first paste
+				
+				if (!$('#show-video-target').is(":visible")) {
+					$('#target-content').css('top','350px');
+				}
+
+				// making it clear that we have an editable content pane
+				$('#target-content').focus();
+				
 				hints = false;
 
 				//e.preventDefault(); 
@@ -1310,6 +1326,17 @@ $(document).ready(function(){
 		$(this).hide();
 		$('#show-video-target').show();
 
+		return false;
+	});
+
+	$('#clear-target').click(function(){
+		theScript = [];
+		$('#target-content').empty();
+		// need to make two classes here with heights in - too much repeated code with fixed numeric values
+		$('#target-content').css('top','78px');
+		$('#target-header-ctrl').fadeOut();
+		$(this).fadeOut();
+		// should clear the video too here
 		return false;
 	});
 

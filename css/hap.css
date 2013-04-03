@@ -26,7 +26,7 @@ body {
 a {
 	text-decoration: none;
 	color: #f07d00;
-	cursor: pointer; /* For the moissing href */
+	cursor: pointer; /* For the missing href */
 }
 
 a:hover {
@@ -64,16 +64,20 @@ ul {
 	float: right;
 }
 
-#transcript-content, #target-content {
+#transcript-content {
 	top: 350px;
 }
 
+#target-content {
+	top: 78px;
+}
 
-#transcript-content span, #target-content span  {
+
+#transcript-content span, #target-content span {
 	cursor: pointer;
 }
 
-#transcript-content span.transcript-grey:hover, #target-content span.transcript-grey:hover {  
+#transcript-content span.transcript-grey:hover, #target-content span.transcript-grey:hover {
 	color: #f07d00; 
 }
 
@@ -175,4 +179,10 @@ div.drag-bar:hover {
 	position: absolute;
 	left: 480px;
 	top: 78px;
+}
+
+span.state {
+	position:absolute;
+	top: 8px
+	right: 8px;
 }
