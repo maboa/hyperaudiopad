@@ -261,7 +261,7 @@ $(document).ready(function(){
 			// If someone clicked on a word, changing the usual flow.
 			if(config.jumpTo) {
 
-				var effectArray = [],
+				var effectArray = (!theScript[0].mediaId && theScript[0].effect) || [],
 					search;
 
 				for(search = this.scriptIndex - 1; search >= 0; search--) {
@@ -334,9 +334,25 @@ $(document).ready(function(){
 				killTargetPopcorn();
 				setTargetHighlighting(this.scriptIndex);
 
+				var effectArray = (!theScript[0].mediaId && theScript[0].effect) || [],
+					search;
+
+				for(search = this.scriptIndex - 1; search >= 0; search--) {
+					// Search back to the last effect applied
+					if (theScript[search].action === 'apply') {
+						if(DEBUG_MP) console.log('play(): action apply detected');
+						effectArray = theScript[search].effect;
+						break; // exit for loop
+					}
+				}
+
+				this.createVideoMap(effectArray);
+				this.connectVideo(nextVideoId);
+/*
 				if (this.currentVideoId !== nextVideoId) {
 					this.connectVideo(nextVideoId);
 				}
+*/
 			}
 
 			if(this.currentMediaId !== this.nextMediaId) {
@@ -538,7 +554,7 @@ $(document).ready(function(){
 						this.player[1].hide();
 
 						// Reset the video map to the first one, or just remove it if no initial effect.
-						this.createVideoMap((theScript[0].mediaId && theScript[0].effect) || []);
+						// this.createVideoMap((theScript[0].mediaId && theScript[0].effect) || []);
 
 						// Cue up the players ready for if the play button is pressed.
 						this.cue();
@@ -1182,6 +1198,7 @@ $(document).ready(function(){
 		return false;
 	});
 
+/*
 	$('#clear-btn').click(function(){
 
 		//$.bbq.removeState();
@@ -1193,7 +1210,7 @@ $(document).ready(function(){
 
 		return false;
 	});
-
+*/
 
 	$('#instructions-btn').click(function(){
 
@@ -1245,15 +1262,22 @@ $(document).ready(function(){
 
 	$('#clear-target').click(function(){
 		theScript = [];
+
+		targetPlayer.pause();
+		killTargetPopcorn();
+
+		// Remove any effects.
+		targetPlayer.createVideoMap([]);
+
+		// Remove the old transcript
 		$('#target-content').empty();
 		// need to make two classes here with heights in - too much repeated code with fixed numeric values
 		$('#target-content').css('top','78px');
 		$('#target-header-ctrl').fadeOut();
 		$(this).fadeOut();
-		// should clear the video too here
+
 		return false;
 	});
-
 
 	$('#jquery_jplayer_source').on("mouseenter",function(){
 		$('#jp_container_source').trigger("mouseenter");
