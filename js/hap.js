@@ -84,9 +84,9 @@ $(document).ready(function(){
 
 				if (DEBUG_MB) console.log("grabbing the spans");
 
-				$('span[m="'+startTime+'"]').each(function() {
+				$('#transcript-content span[m="'+startTime+'"]').each(function() {
 					startSpan = $(this)[0];
-					$('span[m="'+endTime+'"]').each(function() {
+					$('#transcript-content span[m="'+endTime+'"]').each(function() {
 						endSpan = $(this)[0].previousElementSibling;
 
 						if (DEBUG_MB) console.log("start/end");
