@@ -256,23 +256,35 @@ $(document).ready(function(){
 
 
 			// Experimenting with Canvas Effects and Seriously.js
-			// not the best place to put it
 
 			if(DEBUG_MP) console.log("seriously ...");
 
-			// This bit need review after refactoring the code in the manager
+			// If someone clicked on a word, changing the usual flow.
+			if(config.jumpTo) {
+
+				var effectArray = [],
+					search;
+
+				for(search = this.scriptIndex - 1; search >= 0; search--) {
+					// Search back to the last effect applied
+					if (theScript[search].action === 'apply') {
+						if(DEBUG_MP) console.log('play(): action apply detected');
+						effectArray = theScript[search].effect;
+						break; // exit for loop
+					}
+				}
+
+				this.createVideoMap(effectArray);
+				this.connectVideo(nextVideoId);
+			} else if (this.currentVideoId !== nextVideoId) {
+				this.connectVideo(nextVideoId);
+			}
+
 /*
-			this.videoMap.videoSource = this.seriously.source('#'+currentVideoId);
-			this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
-
-			this.videoMap.canvasTarget.source = this.videoMap.videoSource;
-
-			this.seriously.go();
-*/
-
 			if (this.currentVideoId !== nextVideoId) {
 				this.connectVideo(nextVideoId);
 			}
+*/
 		},
 		pause: function() {
 			this.paused = true;
@@ -503,7 +515,7 @@ $(document).ready(function(){
 						var nextVideoId = "";
 
 						if (this.playerMediaId[0] === this.currentMediaId) {
-							nextVideoId = "jp_video_1";
+							nextVideoId = this.player[0].data("jPlayer").internal.video.id;
 							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 								//console.log('ping');
 								self.player[1].hide();
@@ -515,7 +527,7 @@ $(document).ready(function(){
 							this.player[1].jPlayer("pause");
 							this.player[0].jPlayer("play",this.start/1000);
 						} else if (this.playerMediaId[1] === this.currentMediaId) {
-							nextVideoId = "jp_video_2";
+							nextVideoId = this.player[1].data("jPlayer").internal.video.id;
 							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
 								//console.log('pong');
 								self.player[0].hide();
