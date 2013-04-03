@@ -698,7 +698,7 @@ $(document).ready(function(){
 		var applyFlag = false;
 
 		// We could use this list to load the appropriate JS files (also conceivably we could load on demand) -MB
-		var effects = ['ascii','bleach-bypass','invert','nightvision','noise','ripple','scanlines','sepia','sketch','tvglitch','vignette'];
+		var effects = ['ascii','bleach-bypass','colorcube','invert','nightvision','noise','ripple','scanlines','sepia','sketch','tvglitch','vignette'];
 
 		var effectIndex = 0;
 		var effect = [];
