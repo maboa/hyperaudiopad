@@ -134,6 +134,7 @@ $(document).ready(function(){
 
 			loadTranscriptsFromFile();
 			targetPlayer.cue();
+			loadTranscriptSource(theScript[theScript.length-1].mediaId);
 			$('#target-content').css('top','350px');
 		});
 	}
