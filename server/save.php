@@ -32,10 +32,12 @@
 					mkdir($path_dir, 0777, true);
 				endif;
 
-				// Create the file and save it.
-				$fp = fopen($filename,'w');
-				fwrite($fp,$json);
-				fclose($fp);
+				if(!file_exists($filename)) :
+					// Create the file and save it.
+					$fp = fopen($filename,'w');
+					fwrite($fp,$json);
+					fclose($fp);
+				endif;
 				echo $json;
 			else :
 				// Error: No JSON
