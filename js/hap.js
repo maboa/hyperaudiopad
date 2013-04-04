@@ -902,13 +902,21 @@ $(document).ready(function(){
 	// Listen to contenteditable
 
 	document.addEventListener("DOMCharacterDataModified", function(event) {
+		
+		// This whole thing needs 'evolving'
+
 		if (DEBUG_MB) console.log($(event.target).parent()[0].tagName);
 		if (DEBUG_MB) console.dir(event);
 		if (DEBUG_MB) console.log($(event.target).parent().attr("m"));
 		var index = $(event.target).parents('p').attr("i");
 		var newText = event.newValue;
 		if (DEBUG_MB) console.log(event.newValue);
-		var commands = newText.substring(newText.indexOf('[')+1,newText.indexOf(']'));
+		if (DEBUG_MB) console.log("the whole event");
+		if (DEBUG_MB) console.dir(event);
+
+		var startBracketIndex = newText.indexOf('[');
+
+		var commands = newText.substring(startBracketIndex+1,newText.indexOf(']'));
 		if (DEBUG_MB) console.log(commands);
 		var commandList = commands.split(" ");
 		console.dir(commandList);
@@ -984,7 +992,43 @@ $(document).ready(function(){
 			theScript[index].time = time;
 			theScript[index].color = color;
 			theScript[index].effect = effect;
+
 			theScript[index].commandText = commands;
+
+			/*if (theScript[index].commandText == undefined) {
+				if (DEBUG_MB) console.log('creating commandText');
+				theScript[index].commandText = [];
+			}
+
+
+			// check that the start bracket position does not already exist as this indicates we are editing an existing command
+			// of course if you change the position of the start bracket it will break
+			// this is all temporary - we should probably parse the whole document on save to create the commandText data (at least)
+
+			var commandTextNotFound = true;
+			var commandTextIndex = 0;
+
+			if (theScript[index].commandStart != undefined) {
+				for (var i=0; i < theScript[index].commandStart.length; i++) {
+					if (theScript[index].commandStart[i] == startBracketIndex) {
+						commandTextIndex = i;
+						commandTextNotFound = false;
+					}
+				}
+			}
+
+			if (theScript[index].commandStart == undefined) {
+				if (DEBUG_MB) console.log('creating commandStart');
+				theScript[index].commandStart = [];
+			}
+
+			if (commandTextNotFound == true) {
+				theScript[index].commandStart.push(startBracketIndex);
+				theScript[index].commandText.push(commands);
+			} else {
+				theScript[index].commandText[commandTextIndex] = commands;
+			}*/
+
 		}
 
 		//console.dir(commandList);
