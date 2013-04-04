@@ -70,8 +70,10 @@ $(document).ready(function(){
 	var theScript = [];
 	var latency = 1000;
 
-	function loadTranscriptsFromFile(i) {
+	function loadTranscriptsFromFile(options) {
 		
+		var i = options.i;
+
 		if(!i) {
 			i = 0;
 		}
@@ -111,7 +113,8 @@ $(document).ready(function(){
 								$('#target-content').append( direction );
 							}
 
-							loadTranscriptsFromFile(++i);
+							// loadTranscriptsFromFile(++i);
+							loadTranscriptsFromFile({i:++i,callback:options.callback});
 						});
 					});
 				});
@@ -120,6 +123,9 @@ $(document).ready(function(){
 			});
 		} else {
 			if (DEBUG_MB) console.log('dropping out');
+			if(options.callback) {
+				options.callback();
+			}
 			//return false;
 		}
 	}
@@ -133,10 +139,13 @@ $(document).ready(function(){
 			if (DEBUG_MB) console.dir(data);
 			theScript = data;
 
-			loadTranscriptsFromFile();
-			targetPlayer.cue();
-			loadTranscriptSource(theScript[theScript.length-1].mediaId);
-			$('#target-content').css('top','350px');
+			$('#transcript-content').hide();
+			loadTranscriptsFromFile({callback:function() {
+				targetPlayer.cue();
+				loadTranscriptSource(theScript[theScript.length-1].mediaId);
+				$('#transcript-content').show();
+				$('#target-content').css('top','350px');
+			}});
 		});
 	}
 
