@@ -94,7 +94,8 @@ $(document).ready(function(){
 				$('#transcript-content span[m="'+startTime+'"]').each(function() {
 					startSpan = $(this)[0];
 					$('#transcript-content span[m="'+endTime+'"]').each(function() {
-						endSpan = $(this)[0].previousElementSibling;
+						//endSpan = $(this)[0].previousElementSibling;
+						endSpan = $(this)[0];
 
 						if (DEBUG_MB) console.log("start/end");
 						if (DEBUG_MB) console.dir(startSpan);
@@ -1309,7 +1310,8 @@ $(document).ready(function(){
 		// Check node sibling is a span (otherwise must be a para)
 		// NB: Node is always text which is why we need to grab the sibling
 
-		var endNode = select.focusNode.nextSibling;
+		//var endNode = select.focusNode.nextSibling;
+		var endNode = select.focusNode;
 
 		if (endNode instanceof HTMLSpanElement) {
 			endSpan = endNode; 
@@ -1362,7 +1364,8 @@ $(document).ready(function(){
 			// Flip if end time is less than start time (ie the text was selected backwards)
 
 			var startTime = parseInt(startSpan.getAttribute('m'));
-			var endTime = parseInt(endSpan.getAttribute('m'));   
+			//var endTime = parseInt(endSpan.getAttribute('m'));
+			var endTime = parseInt(endSpan.getAttribute('m')) + 1000; 
 
 			/*console.log('startTime');
 			console.log(startTime);
