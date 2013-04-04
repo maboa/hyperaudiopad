@@ -1,11 +1,15 @@
 $(document).ready(function(){
 
-	// var seriously = new Seriously(); // instance seriously lib for global use
-
 	$.jPlayer.timeFormat.padMin = false;
 
 	var DEBUG_MP = true;
 	var DEBUG_MB = true;
+
+	var DEBUG_VIDEO = false;
+
+	if (DEBUG_VIDEO) {
+		$('#media-target').show();
+	};
 
 	// These JSON object would be loaded in.
 

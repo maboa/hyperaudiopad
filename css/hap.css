@@ -150,6 +150,10 @@ body { margin: 0; -webkit-text-size-adjust: 100%; }
 	top: 78px;
 }
 
+#media-target {
+	left: 480px;
+}
+
 .jp-jplayer {
 	position: absolute;
 	top: 0px;
@@ -178,7 +182,7 @@ div.drag-bar:hover {
 
 #target-canvas {
 	position: absolute;
-	left: 480px;
+	left: 0px;
 	top: 78px;
 }
 
