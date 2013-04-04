@@ -6,6 +6,8 @@ $(document).ready(function(){
 	var DEBUG_MB = true;
 
 	var DEBUG_VIDEO = false;
+	//var BASE = "http://happyworm.com/";
+	var BASE = "../";
 
 	if (DEBUG_VIDEO) {
 		$('#media-target').show();
@@ -24,45 +26,25 @@ $(document).ready(function(){
 		title: "Internet Amazonians",
 		url: "transcripts/internetindians.htm",
 		media: {
-			/* m4v: 'http://happyworm.com/video/internetindians.mp4',
-			webmv: 'http://happyworm.com/video/internetindians.webm' */
-			m4v: '../video/internetindians.mp4',
-			webmv: '../video/internetindians.webm'
+			m4v: BASE+'video/internetindians.mp4',
+			webmv: BASE+'video/internetindians.webm'
 		}
 	}, {
 		title: "Rainforest Raids",
 		url: "transcripts/raidsinrainforest.htm",
 		media: {
-			/* m4v: 'http://happyworm.com/video/raidsinrainforest.mp4',
-			webmv: 'http://happyworm.com/video/raidsinrainforest.webm' */
-			m4v: '../video/raidsinrainforest.mp4',
-			webmv: '../video/raidsinrainforest.webm'
+			m4v: BASE+'video/raidsinrainforest.mp4',
+			webmv: BASE+'video/raidsinrainforest.webm'
 		}
 	}
 	, {
 		title: "The Justice Boat",
 		url: "transcripts/justiceboat.htm",
 		media: {
-			/* m4v: 'http://happyworm.com/video/justiceboat.mp4',
-			webmv: 'http://happyworm.com/video/justiceboat.webm' */
-			m4v: '../video/justiceboat.mp4',
-			webmv: '../video/justiceboat.webm'
+			m4v: BASE+'video/justiceboat.mp4',
+			webmv: BASE+'video/justiceboat.webm'
 		}
-	}/*, {
-		title: "SOTU 2013",
-		url: "transcripts/sotu2013.htm",
-		media: {
-			m4v: 'http://bc05.ajnm.me/665003303001/665003303001_2161312826001_The-2013-State-of-the-Union-Address.mp4',
-			webmv: 'Noo fecking WebM pal'
-		}
-	}, {
-		title: "SOTU 2012",
-		url: "transcripts/sotu2012.htm",
-		media: {
-			m4v: 'http://bc05.ajnm.me/665003303001/665003303001_2154491034001_012412-StateoftheUnion-EN-HD.mp4',
-			webmv: 'Noo fecking WebM pal'
-		}
-	}*/];
+	}];
 
 
 	if (DEBUG_MB) console.log('hash = '+window.location.hash);
@@ -105,17 +87,17 @@ $(document).ready(function(){
 						if (DEBUG_MB) console.log("startTime = "+startTime);
 						if (DEBUG_MB) console.log("endTime = "+endTime);
 
-						copyOver(startSpan, endSpan, startTime, endTime, i, function() {
-							if (DEBUG_MB) console.log("calling loadTranscriptsFromFile");
-							var commandText = theScript[i].commandText;
-							if (commandText != undefined && commandText.length > 0) {
-								var direction = $('<p>['+commandText+']</p>'); 
-								$('#target-content').append( direction );
-							}
+						copyOver(startSpan, endSpan, startTime, endTime, i);
 
-							// loadTranscriptsFromFile(++i);
-							loadTranscriptsFromFile({i:++i,callback:options.callback});
-						});
+						if (DEBUG_MB) console.log("calling loadTranscriptsFromFile");
+						var commandText = theScript[i].commandText;
+						if (commandText != undefined && commandText.length > 0) {
+							var direction = $('<p>['+commandText+']</p>'); 
+							$('#target-content').append( direction );
+						}
+
+						// loadTranscriptsFromFile(++i);
+						loadTranscriptsFromFile({i:++i,callback:options.callback});
 					});
 				});
 				
@@ -1167,7 +1149,7 @@ $(document).ready(function(){
 
 		// The id is the index reference to the transcripts array.
 
-		console.log('loadTranscriptSource('+id+')');
+		if (DEBUG_MB) console.log('loadTranscriptSource('+id+')');
 
 		// Set the title
 		$('#script-title').text(transcripts[id].title); // Move to loadTranscriptSource()
@@ -1238,7 +1220,7 @@ $(document).ready(function(){
 
 	// Sets the excerpt  
 
-	function copyOver(startSpan, endSpan, startTime, endTime, sIndex, callback) {
+	function copyOver(startSpan, endSpan, startTime, endTime, sIndex) {
 
 		var nextSpan = startSpan; 
 		// $('#target-content').append('<p s="'+startTime+'" e="'+endTime+'" f="'+targetPlayer.player[0].data('jPlayer').status.src+'">');
@@ -1302,7 +1284,7 @@ $(document).ready(function(){
 		//console.log(targetPlayer.player[0].data('jPlayer').status.src);
 		//timespan.src = targetPlayer.player[0].data('jPlayer').status.src;
 
-		callback(timespan);
+		return timespan;
 	}
 
 
@@ -1418,11 +1400,7 @@ $(document).ready(function(){
 
 				/* --- start snip --- */
 				
-				var timespan;
-				copyOver(startSpan,endSpan,startTime,endTime, theScript.length, function(ts){
-					timespan = ts;
-				});
-
+				var timespan = copyOver(startSpan,endSpan,startTime,endTime, theScript.length);
 				theScript.push(timespan);
 
 				/*--- end snip ----*/

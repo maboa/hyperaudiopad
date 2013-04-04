@@ -1,0 +1,1 @@
+[{"start":38410,"end":42696,"mediaId":0,"fade":true,"time":"1","color":"black","commandText":"fade to black over 1 second"},{"start":110260,"end":122210,"mediaId":0},{"start":1432230,"end":1439000,"mediaId":1,"effect":["tvglitch","nightvision","scanlines"],"commandText":"apply tvglitch nightvision scanlines effect"},{"start":1443660,"end":1452160,"mediaId":1}]
