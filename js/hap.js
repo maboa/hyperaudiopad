@@ -1070,10 +1070,8 @@ $(document).ready(function(){
 
 
 	function initSourcePopcorn(id) {
-		if(sourcePopcorn) {
-			if(DEBUG_MP) console.log('initSourcePopcorn('+id+'): Destroying sourcePopcorn');
-			sourcePopcorn.destroy();
-		}
+		if(DEBUG_MP) console.log('initSourcePopcorn('+id+')');
+		killSourcePopcorn();
 		if(DEBUG_MP) console.log('initSourcePopcorn('+id+'): Creating sourcePopcorn');
 		sourcePopcorn = Popcorn(id);
 		$("#transcript-content span").each(function(i) {  
@@ -1086,6 +1084,17 @@ $(document).ready(function(){
 				}
 			});
 		});
+	}
+
+
+	// Destroying the popcorn instance in Firefox cause lock-up for up to 10 seconds.
+	function killSourcePopcorn() {
+		if(sourcePopcorn) {
+			// if(DEBUG_MP) console.log('killSourcePopcorn(): Destroying sourcePopcorn');
+			// sourcePopcorn.destroy();
+			// Popcorn.destroy(sourcePopcorn);
+			delete sourcePopcorn;
+		}
 	}
 
 	// Applied to the current chunk in the target that is playing
@@ -1170,8 +1179,10 @@ $(document).ready(function(){
 		 // Stop the player
 		myPlayerSource.jPlayer("pause");
 
+		killSourcePopcorn();
+
 		$('#load-status-source').html('loading ...');
-		$('#transcript-content').load(transcripts[id].url, function() {
+		$('#transcript-content').empty().load(transcripts[id].url, function() {
 			//load success!!!
 
 			// Scroll the transcript to the top
