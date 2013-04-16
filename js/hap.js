@@ -2,8 +2,8 @@ $(document).ready(function(){
 
 	$.jPlayer.timeFormat.padMin = false;
 
-	var DEBUG_MP = true;
-	var DEBUG_MB = true;
+	var DEBUG_MP = false;
+	var DEBUG_MB = false;
 
 	var DEBUG_VIDEO = false;
 	//var BASE = "http://happyworm.com/";
