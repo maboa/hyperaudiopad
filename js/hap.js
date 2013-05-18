@@ -1,3 +1,17 @@
+/*
+ * The Hyperaudio Pad
+ * http://hyperaud.io
+ *
+ * Copyright (c) 2013 Hyperaudio Incorporated
+ * Dual licensed under the MIT and GPL licenses.
+ *  - http://www.opensource.org/licenses/mit-license.php
+ *  - http://www.gnu.org/copyleft/gpl.html
+ *
+ * Authors: 
+ * Mark Boas
+ * Mark J Panaghiston
+ */
+
 $(document).ready(function(){
 
 	$.jPlayer.timeFormat.padMin = false;
@@ -6,8 +20,8 @@ $(document).ready(function(){
 	var DEBUG_MB = false;
 
 	var DEBUG_VIDEO = false;
-	//var BASE = "http://happyworm.com/";
-	var BASE = "../";
+	var BASE = "http://happyworm.com/";
+	//var BASE = "../";
 
 	if (DEBUG_VIDEO) {
 		$('#media-target').show();
