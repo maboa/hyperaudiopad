@@ -20,8 +20,8 @@ $(document).ready(function(){
 	var DEBUG_MB = false;
 
 	var DEBUG_VIDEO = false;
-	var BASE = "http://happyworm.com/";
-	//var BASE = "../";
+	// var BASE = "http://happyworm.com/";
+	var BASE = "/";
 
 	if (DEBUG_VIDEO) {
 		$('#media-target').show();
