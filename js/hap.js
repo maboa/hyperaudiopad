@@ -553,7 +553,13 @@ $(document).ready(function(){
 				if(DEBUG_MB) console.dir("media object ...");
 				if(DEBUG_MB) console.dir(transcripts[id].media);
 
-				this.player[nextPlayerUsed].jPlayer("setMedia", transcripts[id].media);
+				// fix since Chrome and cache does not like duplicate videos.
+				var chromeFix = $.extend({},transcripts[id].media);
+				chromeFix.m4v += "?a";
+				chromeFix.webmv += "?a";
+
+				// this.player[nextPlayerUsed].jPlayer("setMedia", transcripts[id].media);
+				this.player[nextPlayerUsed].jPlayer("setMedia", chromeFix);
 				this.playerMediaId[nextPlayerUsed] = id;
 				fitVideo(this.player[nextPlayerUsed]);
 
