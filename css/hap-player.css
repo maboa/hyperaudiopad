@@ -1,18 +1,68 @@
+
+.jp-jplayer {
+	position: absolute;
+	top: 0px;
+}
+
+.jp-video {
+	position: absolute;
+	height:270px;
+	color:black;
+	font: 16px 'SourceSansProSemibold', Arial, sans-serif;
+	color: #fff;
+	line-height: 48px;
+}
+
+.jp-fullscreen {
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+}
+
+#target-canvas {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 480px;
+	height: 270px;
+}
+.jp-fullscreen #target-canvas {
+	/* position:fixed;
+	top:0;
+	left:0; */
+	width:100%;
+	height:100%;
+}
+
+.jp-gui {
+	position:absolute;
+	top: 0;
+	width:480px;
+	height:270px;
+}
+
+.jp-fullscreen .jp-gui {
+	width:100%;
+	height:100%;
+}
+
 	.jp-pause:before { content: '\e801'; } /* '⎉' */
 	.jp-play:before { content: '\e800'; } /* '▶' */
 	.jp-viewsource:before { content: '\e802'; } /* '▶' */
 
 
 	a.jp-viewsource {
-		position:absolute;
-		right:10px;
-		top: 10px;
+		position:relative;
+		left:7px;
+		top: 5px;
 		text-decoration: none;
-		line-height:32px;
+		line-height:48px;
 		font-size: 32px;
 		/* define your pause/play buton color here */
 		color: #ffffff;
-		z-index: 999;
+		/* z-index: 999; */
 	}
 
 	a.jp-play,
@@ -25,44 +75,34 @@
 		color: #ffffff;
 	}
 
-	.jp-video {
-		position: absolute;
-		/* height:48px; */
-		height:270px;
-		color:black;
-		/* text-align:center; */
-		font: 16px 'SourceSansProSemibold', Arial, sans-serif;
-		color: #fff;
-		line-height: 48px;
-		/* top: 222px; */
-	}
-
-	.jp-gui {
+	.jp-controls {
 		position:absolute;
 		bottom: 0;
-		width:480px;
+		width:48px;
 		height:48px;
-		cursor: pointer;
-	}
-
-	.jp-controls {
-		position:relative;
-		top: 0;
-		width:100%;
-		height:100%;
 		background-color: #f07d00;
 	}
 
 	.jp-controls a{
 		padding-left: 48px;
+		cursor: pointer;
+	}
+
+	.jp-controls-2 {
+		position:absolute;
+		top: 0;
+		right:0;
+		width:48px;
+		height:48px;
+		background-color: #f07d00;
 	}
 
 	.jp-bar {
-		position:relative;
-		top: -48px;
+		position:absolute;
+		bottom: 0;
 		left: 48px;
 		width: 432px;
-		height:100%;
+		height:48px;
 		background-color: #444;
 	}
 
@@ -71,6 +111,7 @@
 		top: 0;
 		height: 100%;
 		width: 100%;
+		cursor: pointer;
 	}
 
 	.jp-play-bar {
@@ -114,7 +155,8 @@
 		-ms-user-select: none;
 		user-select: none;
 	}
-
+/*
 	div.jp-video-flex {
 		width: 100%;
 	}
+*/

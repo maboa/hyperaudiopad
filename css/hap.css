@@ -154,11 +154,6 @@ body { margin: 0; -webkit-text-size-adjust: 100%; }
 	left: 480px;
 }
 
-.jp-jplayer {
-	position: absolute;
-	top: 0px;
-}
-
 #fader-content {
 	position: absolute;
 	top: 0px;
@@ -178,22 +173,6 @@ div.drag-bar {
 
 div.drag-bar:hover {
 	cursor: ew-resize;
-}
-
-#target-canvas {
-	position: absolute;
-	left: 0px;
-	/* top: 78px; */
-	top: 0;
-	width: 480px;
-	height: 270px;
-}
-#target-canvas.fullscreen {
-	position:fixed;
-	top:0;
-	left:0;
-	width:100%;
-	height:100%;
 }
 
 span.state {

@@ -1231,7 +1231,7 @@ $(document).ready(function(){
 			}
 
 			$('#source-header-ctrl').fadeIn();
-			$('#jp_container_source').delay(800).fadeTo("slow", 0.9);
+			$('#jp_container_source').show().find('.jp-gui').hide().delay(800).fadeTo("slow", 0.5);
 			sourceLoaded = true;
 		});
 	}
@@ -1650,47 +1650,65 @@ $(document).ready(function(){
 		
 		return false;
 	});
-/*
-	$('#jquery_jplayer_source').on("mouseenter",function(){
-		$('#jp_container_source').trigger("mouseenter");
-	}).on("mouseleave",function(){
-		$('#jp_container_source').trigger("mouseleave");
-	});
-*/
+
 	$('#jp_container_source').on("mouseenter",function(){
-		if (sourceLoaded == true) {
+		if (sourceLoaded) {
 			$(this).find('.jp-gui').stop(true).fadeTo("slow", 0.9);
 		}
 	}).on("mouseleave",function(){
-		if (sourceLoaded == true) {
+		if (sourceLoaded) {
 			$(this).find('.jp-gui').stop(true).delay(800).fadeTo("slow", 0.5);
 		}
 	});
 
+	$('#jp_container_target').on("mouseenter",function(){
+		$(this).find('.jp-gui').stop(true).fadeTo("slow", 0.9);
+	}).on("mouseleave",function(){
+		$(this).find('.jp-gui').stop(true).delay(800).fadeTo("slow", 0.5);
+	}).on("mousemove",function(){
+		var $gui = $(this).find('.jp-gui');
+		if(fullscreen.active) {
+			if(targetPlayer.paused) {
+				$gui.fadeTo("fast", 0.9);
+			} else {
+				$gui.stop(true).fadeTo("fast", 0.9).delay(800).fadeTo("slow", 0);
+			}
+		}
+	}).find('.jp-gui').fadeTo("fast", 0.5);
+
 
 	var fullscreen = {
-		target: '#target-canvas',
+		target: '#jp_container_target', // '#target-canvas',
 		$target: null,
-		button: '#full-screen-target',
-		$button: null,
+		btnFullscreen: '#full-screen-target',
+		$btnFullscreen: null,
+		btnRestorescreen: '.jp-viewsource', // inside the target
+		$btnRestorescreen: null,
 		fullscreenchangeHandler: null,
+		active:false,
 		init: function() {
 			var self = this;
 
 			this.$target = $(this.target);
-			this.$button = $(this.button);
+			this.$btnFullscreen = $(this.btnFullscreen);
+			this.$btnRestorescreen = this.$target.find(this.btnRestorescreen);
 
 			// Create event handlers if native fullscreen is supported
 			if($.jPlayer.nativeFeatures.fullscreen.api.fullscreenEnabled) {
 				this._fullscreenAddEventListeners();
 			} else {
-				this.$button.hide();
+				this.$btnFullscreen.hide();
 			}
 
-			this.$button.click(function(e) {
+			this.$btnFullscreen.click(function(e) {
 				e.preventDefault();
 				self._requestFullscreen();
 			});
+
+			this.$btnRestorescreen.click(function(e) {
+				e.preventDefault();
+				self._exitFullscreen();
+			}).parent().hide();
 		},
 		_fullscreenAddEventListeners: function() {
 			var self = this,
@@ -1717,47 +1735,33 @@ $(document).ready(function(){
 			}
 		},
 		_fullscreenchange: function() {
-/*
-			// If nothing is fullscreen, then we cannot be in fullscreen mode.
-			if(this.options.fullScreen && !$.jPlayer.nativeFeatures.fullscreen.api.fullscreenElement()) {
-				this._setOption("fullScreen", false);
-			}
-*/
-			if(!$.jPlayer.nativeFeatures.fullscreen.api.fullscreenElement()) {
+			// If nothing is fullscreen, then we cannot be in fullscreen mode. ie., Detect escape pressed.
+			if(this.active && !$.jPlayer.nativeFeatures.fullscreen.api.fullscreenElement()) {
 				this._exitFullscreen();
 			}
 		},
 		_requestFullscreen: function() {
-			// Either the container or the jPlayer div
-			// var e = this.ancestorJq.length ? this.ancestorJq[0] : this.element[0],
 			var e = this.$target[0],
 				fs = $.jPlayer.nativeFeatures.fullscreen;
 
-/* It is a canvas - not a video element
-			// This method needs the video element. For iOS and Android.
-			if(fs.used.webkitVideo) {
-				e = this.htmlElement.video;
-			}
-*/
 			if(fs.api.fullscreenEnabled) {
+				this.active = true;
 				fs.api.requestFullscreen(e);
 				// this.$target.css({'position':'fixed','width':'100%','height':'100%'});
-				this.$target.addClass('fullscreen');
+				this.$target.addClass('jp-fullscreen');
+				this.$btnRestorescreen.parent().show();
 			}
 		},
 		_exitFullscreen: function() {
 
 			var fs = $.jPlayer.nativeFeatures.fullscreen,
 				e;
-/*
-			// This method needs the video element. For iOS and Android.
-			if(fs.used.webkitVideo) {
-				e = this.htmlElement.video;
-			}
-*/
+
 			if(fs.api.fullscreenEnabled) {
+				this.active = false;
 				fs.api.exitFullscreen(e);
-				this.$target.removeClass('fullscreen');
+				this.$target.removeClass('jp-fullscreen');
+				this.$btnRestorescreen.parent().hide();
 			}
 		}
 	};
