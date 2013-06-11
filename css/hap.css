@@ -183,7 +183,8 @@ div.drag-bar:hover {
 #target-canvas {
 	position: absolute;
 	left: 0px;
-	top: 78px;
+	/* top: 78px; */
+	top: 0;
 }
 #target-canvas.fullscreen {
 	position:fixed;

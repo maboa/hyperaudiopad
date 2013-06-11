@@ -377,6 +377,9 @@ $(document).ready(function(){
 			$('#play-btn-target').hide();
 			$('#pause-btn-target').show();
 
+			$('#jp_container_target .jp-play').hide();
+			$('#jp_container_target .jp-pause').show();
+
 			// Prepare a player for this media
 			if(DEBUG_MP) console.log('play(): prepare current media');
 			this.load(this.currentMediaId);
@@ -451,9 +454,14 @@ $(document).ready(function(){
 		},
 		pause: function() {
 			this.paused = true;
-			// Then pause the player playing... or just pause both?
+
 			$('#play-btn-target').show();
 			$('#pause-btn-target').hide();
+
+			$('#jp_container_target .jp-play').show();
+			$('#jp_container_target .jp-pause').hide();
+
+			// Then pause the player playing... or just pause both?
 
 			if(DEBUG_MP) console.log("pause(): Attempting to pause");
 			if (!this.player[0].data('jPlayer').status.paused) {
@@ -821,6 +829,9 @@ $(document).ready(function(){
 						// Show the correct control button
 						$('#play-btn-target').show();
 						$('#pause-btn-target').hide();
+
+						$('#jp_container_target .jp-play').show();
+						$('#jp_container_target .jp-pause').hide();
 					}
 				}
 			}
@@ -1204,7 +1215,7 @@ $(document).ready(function(){
 			// Setup popcorn and load in the media
 			initSourcePopcorn('#' + myPlayerSource.data("jPlayer").internal.video.id);
 			myPlayerSource.jPlayer("setMedia", transcripts[id].media);
-			$('.fb-title').text(transcripts[id].title);
+			$('#jp_container_source .fb-title').text(transcripts[id].title);
 
 			// Store reference to the transcript
 			sourceMediaId = id;
@@ -1518,19 +1529,24 @@ $(document).ready(function(){
 
 	// play and pause for the target area.
 
-	$('#play-btn-target').click(function(){
+	$('#play-btn-target').click(function(e) {
+		e.preventDefault();
 		targetPlayer.play();
-		$(this).hide();
-		$('#pause-btn-target').show();
-		return false;
 	});
 
-	$('#pause-btn-target').click(function(){
+	$('#pause-btn-target').click(function(e) {
+		e.preventDefault();
 		targetPlayer.pause();
-		$(this).hide();
-		$('#play-btn-target').show();
-		return false;
 	});
+
+	$('#jp_container_target .jp-play').click(function(e) {
+		e.preventDefault();
+		targetPlayer.play();
+	});
+	$('#jp_container_target .jp-pause').click(function(e) {
+		e.preventDefault();
+		targetPlayer.pause();
+	}).hide();
 
 /*
 	$('#clear-btn').click(function(){
@@ -1643,11 +1659,11 @@ $(document).ready(function(){
 
 	$('#jp_container_source').on("mouseenter",function(){
 		if (sourceLoaded == true) {
-			$(this).stop(true,true).fadeTo("slow", 0.9);
+			$(this).stop(true).fadeTo("slow", 0.9);
 		}
 	}).on("mouseleave",function(){
 		if (sourceLoaded == true) {
-			$(this).stop(true,true).delay(800).fadeTo("slow", 0.5);
+			$(this).stop(true).delay(800).fadeTo("slow", 0.5);
 		}
 	});
 

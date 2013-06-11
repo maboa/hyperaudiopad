@@ -116,7 +116,27 @@
 				<div id="fader-content"></div>
 			</div>
 
-			<canvas id="target-canvas" width="480" height="270"></canvas>
+			<div class="media-hldr">
+
+				<canvas id="target-canvas" width="480" height="270"></canvas>
+
+				<!-- Player controls -->
+				<div id="jp_container_target" class="jp-video jp-video-flex">
+					<div id="jp-source-controls" class="jp-controls unselectable">
+						<a href="#" class="jp-play"></a>
+						<a href="#" class="jp-pause"></a>
+					</div>
+					<div class="jp-bar">
+						<div class="jp-seek-bar">
+							<div class="fb-title unselectable"></div>
+							<div class="jp-current-time unselectable"></div>
+							<div class="jp-duration unselectable"></div>
+							<div class="jp-play-bar"></div>
+						</div>
+					</div>
+				</div>
+
+			</div>
 
 			<div id="target-content" class="body row scroll-y" contenteditable="true" spellcheck="false">
 			</div>
