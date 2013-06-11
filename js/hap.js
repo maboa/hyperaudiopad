@@ -1640,6 +1640,110 @@ $(document).ready(function(){
 		}
 	});
 
+
+	var fullscreen = {
+		target: '#target-canvas',
+		$target: null,
+		button: '#full-screen-target',
+		$button: null,
+		fullscreenchangeHandler: null,
+		init: function() {
+			var self = this;
+
+			this.$target = $(this.target);
+			this.$button = $(this.button);
+
+			// Create event handlers if native fullscreen is supported
+			if($.jPlayer.nativeFeatures.fullscreen.api.fullscreenEnabled) {
+				this._fullscreenAddEventListeners();
+			} else {
+				this.$button.hide();
+			}
+
+			this.$button.click(function(e) {
+				e.preventDefault();
+				self._requestFullscreen();
+			});
+		},
+		_fullscreenAddEventListeners: function() {
+			var self = this,
+				fs = $.jPlayer.nativeFeatures.fullscreen;
+
+			if(fs.api.fullscreenEnabled) {
+				if(fs.event.fullscreenchange) {
+					// Create the event handler function and store it for removal.
+					if(typeof this.fullscreenchangeHandler !== 'function') {
+						this.fullscreenchangeHandler = function() {
+							self._fullscreenchange();
+						};
+					}
+					document.addEventListener(fs.event.fullscreenchange, this.fullscreenchangeHandler, false);
+				}
+				// No point creating handler for fullscreenerror.
+				// Either logic avoids fullscreen occurring (w3c/moz), or their is no event on the browser (webkit).
+			}
+		},
+		_fullscreenRemoveEventListeners: function() {
+			var fs = $.jPlayer.nativeFeatures.fullscreen;
+			if(this.fullscreenchangeHandler) {
+				document.addEventListener(fs.event.fullscreenchange, this.fullscreenchangeHandler, false);
+			}
+		},
+		_fullscreenchange: function() {
+/*
+			// If nothing is fullscreen, then we cannot be in fullscreen mode.
+			if(this.options.fullScreen && !$.jPlayer.nativeFeatures.fullscreen.api.fullscreenElement()) {
+				this._setOption("fullScreen", false);
+			}
+*/
+			if(!$.jPlayer.nativeFeatures.fullscreen.api.fullscreenElement()) {
+				this._exitFullscreen();
+			}
+		},
+		_requestFullscreen: function() {
+			// Either the container or the jPlayer div
+			// var e = this.ancestorJq.length ? this.ancestorJq[0] : this.element[0],
+			var e = this.$target[0],
+				fs = $.jPlayer.nativeFeatures.fullscreen;
+
+/* It is a canvas - not a video element
+			// This method needs the video element. For iOS and Android.
+			if(fs.used.webkitVideo) {
+				e = this.htmlElement.video;
+			}
+*/
+			if(fs.api.fullscreenEnabled) {
+				fs.api.requestFullscreen(e);
+				// this.$target.css({'position':'fixed','width':'100%','height':'100%'});
+				this.$target.addClass('fullscreen');
+			}
+		},
+		_exitFullscreen: function() {
+
+			var fs = $.jPlayer.nativeFeatures.fullscreen,
+				e;
+/*
+			// This method needs the video element. For iOS and Android.
+			if(fs.used.webkitVideo) {
+				e = this.htmlElement.video;
+			}
+*/
+			if(fs.api.fullscreenEnabled) {
+				fs.api.exitFullscreen(e);
+				this.$target.removeClass('fullscreen');
+			}
+		}
+	};
+	fullscreen.init();
+
+
+
+
+
+
+
+
+
 	// testing drag stuff
 
 	$('.drag-bar').drag(function( ev, dd ){
