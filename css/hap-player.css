@@ -1,5 +1,20 @@
-	.jp-pause:before { content: '\2389'; } /* '⎉' */
-	.jp-play:before { content: '\25b6'; } /* '▶' */
+	.jp-pause:before { content: '\e801'; } /* '⎉' */
+	.jp-play:before { content: '\e800'; } /* '▶' */
+	.jp-viewsource:before { content: '\e802'; } /* '▶' */
+
+
+	a.jp-viewsource {
+		position:absolute;
+		right:10px;
+		top: 10px;
+		text-decoration: none;
+		line-height:32px;
+		font-size: 32px;
+		/* define your pause/play buton color here */
+		color: #ffffff;
+		z-index: 999;
+	}
+
 
 	a.jp-play,
 	a.jp-pause {
