@@ -78,7 +78,14 @@ $(document).ready(function(){
 
 		if (i < theScript.length) {
 			if (DEBUG_MB) console.log("copying over...");
+
+			if (DEBUG_MB) console.log("i ="+i);
+			if (DEBUG_MB) console.log("theScript[i].mediaId ="+theScript[i].mediaId);
+			if (DEBUG_MB) console.dir(transcripts);
+
 			var transcript = transcripts[theScript[i].mediaId].url;
+
+
 
 			$('#transcript-content').load(transcript, function() {
 				
@@ -126,25 +133,29 @@ $(document).ready(function(){
 		}
 	}
 
-	var hash = window.location.hash.replace("#","");
-	if (hash.length > 0) {
-		// load theScript
-		$.get('remixes/'+hash+'.json', function(data) {
-			if (DEBUG_MB) console.log(' ==================== theScript loaded in');
-			if (DEBUG_MB) console.dir(data);
-			if (DEBUG_MB) console.dir(data);
-			theScript = data;
+	function loadTheScript(data) {
 
-			$('#transcript-content').hide();
-			loadTranscriptsFromFile({callback:function() {
+		if (DEBUG_MB) console.log(' ==================== theScript loaded in');
+		if (DEBUG_MB) console.dir(data);
+		theScript = data;
+
+		$('#transcript-content').hide();
+		loadTranscriptsFromFile({
+			callback:function() {
 				targetPlayer.cue();
 				loadTranscriptSource(theScript[theScript.length-1].mediaId);
 				$('#transcript-content').show();
 				$('#target-content').css('top','350px');
-			}});
+			}
 		});
+
 	}
 
+	var hash = window.location.hash.replace("#","");
+	if (hash.length > 0) {
+		// load theScript
+		$.get('remixes/'+hash+'.json', loadTheScript, 'json');
+	}
 
 
 	// Grab the script from the URL
