@@ -97,14 +97,20 @@
 		background-color: #f07d00;
 	}
 
-	.jp-bar {
-		position:absolute;
-		bottom: 0;
-		left: 48px;
-		width: 432px;
-		height:48px;
-		background-color: #444;
-	}
+.jp-bar {
+	position:absolute;
+	bottom: 0;
+	left: 48px;
+	width: 432px;
+	height:48px;
+	background-color: #444;
+}
+
+.jp-fullscreen .jp-bar {
+	width: -moz-calc(100% - 48px);
+	width: -webkit-calc(100% - 48px);
+	width: calc(100% - 48px);
+}
 
 	.jp-seek-bar {
 		position:absolute;
