@@ -185,6 +185,8 @@ div.drag-bar:hover {
 	left: 0px;
 	/* top: 78px; */
 	top: 0;
+	width: 480px;
+	height: 270px;
 }
 #target-canvas.fullscreen {
 	position:fixed;

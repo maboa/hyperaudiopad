@@ -1650,20 +1650,20 @@ $(document).ready(function(){
 		
 		return false;
 	});
-
+/*
 	$('#jquery_jplayer_source').on("mouseenter",function(){
 		$('#jp_container_source').trigger("mouseenter");
 	}).on("mouseleave",function(){
 		$('#jp_container_source').trigger("mouseleave");
 	});
-
+*/
 	$('#jp_container_source').on("mouseenter",function(){
 		if (sourceLoaded == true) {
-			$(this).stop(true).fadeTo("slow", 0.9);
+			$(this).find('.jp-gui').stop(true).fadeTo("slow", 0.9);
 		}
 	}).on("mouseleave",function(){
 		if (sourceLoaded == true) {
-			$(this).stop(true).delay(800).fadeTo("slow", 0.5);
+			$(this).find('.jp-gui').stop(true).delay(800).fadeTo("slow", 0.5);
 		}
 	});
 

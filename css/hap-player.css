@@ -15,7 +15,6 @@
 		z-index: 999;
 	}
 
-
 	a.jp-play,
 	a.jp-pause {
 		text-decoration: none;
@@ -28,20 +27,28 @@
 
 	.jp-video {
 		position: absolute;
-		height:48px;
+		/* height:48px; */
+		height:270px;
 		color:black;
-		text-align:center;
-		cursor: pointer;
+		/* text-align:center; */
 		font: 16px 'SourceSansProSemibold', Arial, sans-serif;
 		color: #fff;
 		line-height: 48px;
-		top: 222px;
+		/* top: 222px; */
+	}
+
+	.jp-gui {
+		position:absolute;
+		bottom: 0;
+		width:480px;
+		height:48px;
+		cursor: pointer;
 	}
 
 	.jp-controls {
-		position:absolute;
+		position:relative;
 		top: 0;
-		width:48px;
+		width:100%;
 		height:100%;
 		background-color: #f07d00;
 	}
@@ -51,16 +58,15 @@
 	}
 
 	.jp-bar {
-		position:absolute;
-		top: 0;
+		position:relative;
+		top: -48px;
 		left: 48px;
 		width: 432px;
-		height: 100%;
+		height:100%;
 		background-color: #444;
 	}
 
 	.jp-seek-bar {
-		z-index: 9;
 		position:absolute;
 		top: 0;
 		height: 100%;
@@ -68,7 +74,6 @@
 	}
 
 	.jp-play-bar {
-		z-index: 9;
 		position:absolute;
 		top: 0;
 		height:100%;
@@ -76,7 +81,6 @@
 	}
 
 	.jp-duration {
-		z-index: 10;
 		position:absolute;
 		top:0;
 		right:0;
@@ -85,7 +89,6 @@
 	}
 
 	.jp-current-time {
-		z-index: 10;
 		position:absolute;
 		top:0;
 		right:3em;
@@ -100,7 +103,6 @@
 		left:0;
 		width:240px;
 		padding-left:12px;
-		z-index: 10;
 		height: 100%;
 	}
 
