@@ -835,6 +835,16 @@ $(document).ready(function(){
 					}
 				}
 			}
+		},
+		setDuration: function() {
+			var duration = 0;
+			$.each(theScript, function() {
+				duration += this.end - this.start;
+			});
+
+			duration /= 1000; // convert to seconds.
+
+			$('#jp_container_target .jp-duration').text($.jPlayer.convertTime(duration));
 		}
 	};
 
@@ -1453,6 +1463,9 @@ $(document).ready(function(){
 					targetPlayer.cue();
 				}
 				
+				// update the duration
+				targetPlayer.setDuration();
+
 				//$.bbq.pushState(theScript);
 				//console.dir(theScript);
 
