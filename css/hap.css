@@ -165,7 +165,7 @@ body { margin: 0; -webkit-text-size-adjust: 100%; }
 }
 
 div.drag-bar {
-	z-index: 1000;
+	z-index: 101;
 	width: 5px;
 	height: 100%;
 	left: 654px;

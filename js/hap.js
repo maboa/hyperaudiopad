@@ -149,11 +149,7 @@ $(document).ready(function(){
 				$('#target-content').css('top','350px');
 				// saved pieces should default view in fullscreen
 				
-				//Create a new jQuery.Event object without the "new" operator.
-				var e = $.Event( "click" );
-				// trigger an artificial click event
-				$("#full-screen-target").trigger( e );
-				//fullscreen._requestFullscreen();
+				fullscreen.request();
 			}
 		});
 	}
@@ -328,6 +324,10 @@ $(document).ready(function(){
 
 		play: function(config) {
 
+			// Handle the case where saved trans given but fullscreen denied at page load.
+			if(fullscreen.isRestricted()) {
+				fullscreen.request();
+			}
 
 			console.log("==============");
 			console.dir(theScript);
@@ -1686,7 +1686,7 @@ $(document).ready(function(){
 		$(this).find('.jp-gui').stop(true).delay(800).fadeTo("slow", 0.5);
 	}).on("mousemove",function(){
 		var $gui = $(this).find('.jp-gui');
-		if(fullscreen.active) {
+		if(fullscreen.requested) {
 			if(targetPlayer.paused) {
 				$gui.fadeTo("fast", 0.9);
 			} else {
@@ -1703,8 +1703,9 @@ $(document).ready(function(){
 		$btnFullscreen: null,
 		btnRestorescreen: '.jp-viewsource', // inside the target
 		$btnRestorescreen: null,
-		fullscreenchangeHandler: null,
+		enabled: false,
 		active:false,
+		requested:false,
 		init: function() {
 			var self = this;
 
@@ -1714,71 +1715,74 @@ $(document).ready(function(){
 
 			// Create event handlers if native fullscreen is supported
 			if($.jPlayer.nativeFeatures.fullscreen.api.fullscreenEnabled) {
-				this._fullscreenAddEventListeners();
+				this._addEventListeners();
+				this.enabled = true;
 			} else {
 				this.$btnFullscreen.hide();
 			}
 
 			this.$btnFullscreen.click(function(e) {
 				e.preventDefault();
-				self._requestFullscreen();
+				self.request();
 			});
 
 			this.$btnRestorescreen.click(function(e) {
 				e.preventDefault();
-				self._exitFullscreen();
+				self.exit();
 			}).parent().hide();
 		},
-		_fullscreenAddEventListeners: function() {
+		_addEventListeners: function() {
 			var self = this,
 				fs = $.jPlayer.nativeFeatures.fullscreen;
 
 			if(fs.api.fullscreenEnabled) {
 				if(fs.event.fullscreenchange) {
-					// Create the event handler function and store it for removal.
-					if(typeof this.fullscreenchangeHandler !== 'function') {
-						this.fullscreenchangeHandler = function() {
-							self._fullscreenchange();
-						};
-					}
-					document.addEventListener(fs.event.fullscreenchange, this.fullscreenchangeHandler, false);
+					document.addEventListener(fs.event.fullscreenchange, function() {
+						self._change();
+					}, false);
 				}
-				// No point creating handler for fullscreenerror.
-				// Either logic avoids fullscreen occurring (w3c/moz), or their is no event on the browser (webkit).
+				if(fs.event.fullscreenerror) {
+					// Little point creating handler for fullscreenerror. There is no event on the webkit browser.
+					document.addEventListener(fs.event.fullscreenerror, function() {
+						self._error();
+					}, false);
+				}
 			}
 		},
-		_fullscreenRemoveEventListeners: function() {
-			var fs = $.jPlayer.nativeFeatures.fullscreen;
-			if(this.fullscreenchangeHandler) {
-				document.addEventListener(fs.event.fullscreenchange, this.fullscreenchangeHandler, false);
-			}
-		},
-		_fullscreenchange: function() {
+		_change: function() {
+			var fsElem = $.jPlayer.nativeFeatures.fullscreen.api.fullscreenElement();
+			// console.log('change: elem: ' + fsElem);
+
 			// If nothing is fullscreen, then we cannot be in fullscreen mode. ie., Detect escape pressed.
-			if(this.active && !$.jPlayer.nativeFeatures.fullscreen.api.fullscreenElement()) {
-				this._exitFullscreen();
+			if(this.requested && !fsElem) {
+				this.exit();
 			}
+
+			this.active = !!fsElem;
 		},
-		_requestFullscreen: function() {
+		_error: function() {
+			// console.log('error: elem: ' + $.jPlayer.nativeFeatures.fullscreen.api.fullscreenElement());
+		},
+		isRestricted: function() {
+			return this.enabled && (this.active !== this.requested);
+		},
+		request: function() {
 			var e = this.$target[0],
 				fs = $.jPlayer.nativeFeatures.fullscreen;
 
 			if(fs.api.fullscreenEnabled) {
-				this.active = true;
+				this.requested = true;
 				fs.api.requestFullscreen(e);
-				// this.$target.css({'position':'fixed','width':'100%','height':'100%'});
 				this.$target.addClass('jp-fullscreen');
 				this.$btnRestorescreen.parent().show();
 			}
 		},
-		_exitFullscreen: function() {
-
-			var fs = $.jPlayer.nativeFeatures.fullscreen,
-				e;
+		exit: function() {
+			var fs = $.jPlayer.nativeFeatures.fullscreen;
 
 			if(fs.api.fullscreenEnabled) {
-				this.active = false;
-				fs.api.exitFullscreen(e);
+				this.requested = false;
+				fs.api.exitFullscreen();
 				this.$target.removeClass('jp-fullscreen');
 				this.$btnRestorescreen.parent().hide();
 			}

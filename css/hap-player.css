@@ -19,6 +19,7 @@
 	left:0;
 	width:100%;
 	height:100%;
+	z-index: 200; /* Some items on the page are around the layer 100. */
 }
 
 #target-canvas {
@@ -60,9 +61,8 @@
 		text-decoration: none;
 		line-height:48px;
 		font-size: 32px;
-		/* define your pause/play buton color here */
+		/* define your button color here */
 		color: #ffffff;
-		/* z-index: 999; */
 	}
 
 	a.jp-play,
