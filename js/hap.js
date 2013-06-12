@@ -743,8 +743,6 @@ $(document).ready(function(){
 						// Also updates this.start, this.end, this.currentMediaId and this.nextMediaId
 						this.cue();
 
-						$('#fader-content').css('background-color',fadeColor);
-
 						if(DEBUG_MP) console.log("targetPlayer.playerMediaId[0] = "+this.playerMediaId[0]);
 						if(DEBUG_MP) console.log("targetPlayer.playerMediaId[1] = "+this.playerMediaId[1]);
 
@@ -753,14 +751,6 @@ $(document).ready(function(){
 
 						if (this.playerMediaId[0] === this.currentMediaId) {
 							nextVideoId = this.player[0].data("jPlayer").internal.video.id;
-/*
-							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
-								//console.log('ping');
-								self.player[1].hide();
-								self.player[0].show();
-								$('#fader-content').fadeTo(fadeSpeed, 0);
-							});
-*/
 
 							this.player[1].hide();
 							this.player[0].show();
@@ -771,14 +761,7 @@ $(document).ready(function(){
 							this.player[0].jPlayer("play",this.start/1000);
 						} else if (this.playerMediaId[1] === this.currentMediaId) {
 							nextVideoId = this.player[1].data("jPlayer").internal.video.id;
-/*
-							$('#fader-content').fadeTo(fadeSpeed, 1, function() {
-								//console.log('pong');
-								self.player[0].hide();
-								self.player[1].show();
-								$('#fader-content').fadeTo(fadeSpeed, 0);
-							});
-*/
+
 							this.player[0].hide();
 							this.player[1].show();
 
