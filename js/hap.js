@@ -147,10 +147,18 @@ $(document).ready(function(){
 				$('#transcript-content').show();
 				// TODO make top 350 a separate class and apply when needed
 				$('#target-content').css('top','350px');
+				// saved pieces should default view in fullscreen
+				
+				//Create a new jQuery.Event object without the "new" operator.
+				var e = $.Event( "click" );
+				// trigger an artificial click event
+				$("#full-screen-target").trigger( e );
+				//fullscreen._requestFullscreen();
 			}
 		});
 	}
 
+	// Check for the hash on the URL - which means this is a saved piece
 	var hash = window.location.hash.replace("#","");
 	if (hash.length > 0) {
 		// load theScript
