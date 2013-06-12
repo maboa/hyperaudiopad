@@ -145,10 +145,10 @@ $(document).ready(function(){
 				targetPlayer.cue();
 				loadTranscriptSource(theScript[theScript.length-1].mediaId);
 				$('#transcript-content').show();
+				// TODO make top 350 a separate class and apply when needed
 				$('#target-content').css('top','350px');
 			}
 		});
-
 	}
 
 	var hash = window.location.hash.replace("#","");
@@ -157,25 +157,8 @@ $(document).ready(function(){
 		$.get('remixes/'+hash+'.json', loadTheScript, 'json');
 	}
 
-
-	// Grab the script from the URL
 	var theScriptState = [];
-	//var theScriptState = $.bbq.getState();
-	//console.dir(theScript);  
-	var theScriptLength = theScript.length; 
-
-	//console.log(theScript[0].m);
-	//console.log(theScriptLength);
-	//console.log(theScript.length);
-
-	/*if (theScriptLength > 0) {
-
-		for (var i=0; i < theScriptLength; i++) {
-			loadFile(theScript[i].m);
-		}
-	} else {
-		theScript = [];
-	} */
+	var theScriptLength = theScript.length;
 
 	var hints = true;
 
@@ -867,7 +850,9 @@ $(document).ready(function(){
 		preload: "auto"
 	});
 
-	targetPlayer.player[0].jPlayer({
+
+
+	/*targetPlayer.player[0].jPlayer({
 		ready: function (event) {
 
 			if(event.jPlayer.html.used && event.jPlayer.html.video.available) {
@@ -903,7 +888,33 @@ $(document).ready(function(){
 		swfPath: "js",
 		supplied: suppliedMedia,
 		preload: "auto"
-	});
+	});*/
+
+	// refactored the above to eliminate duplication of code - MB
+
+	function playerListen(player) {
+		player.jPlayer({
+			ready: function (event) {
+
+				if(event.jPlayer.html.used && event.jPlayer.html.video.available) {
+					// sets size of video to that of container
+					// fitVideo($(this));
+				}
+			},
+			timeupdate: function(event) {
+				setTimeout(function() {
+					targetPlayer.manager(event);
+				},0);
+			},
+			solution: "html, flash",
+			swfPath: "js",
+			supplied: suppliedMedia,
+			preload: "auto"
+		});
+	}
+
+	playerListen(targetPlayer.player[0]);
+	playerListen(targetPlayer.player[1]);
 
 	// These events are fired as play time increments  
 
@@ -1283,9 +1294,7 @@ $(document).ready(function(){
 		
 		
 		while(nextSpan != endSpan) { 
-			//console.log('nextspan');   
-			//console.log(nextSpan);         
-			// $(nextSpan).clone().appendTo('#target-content');
+
 			if (nextSpan instanceof HTMLSpanElement) {
 				$(nextSpan).clone().appendTo(selectedStuff); 
 				selectedStuff.append(' ');
@@ -1316,10 +1325,6 @@ $(document).ready(function(){
 			nextSpanStartTime = Math.floor(myPlayerSource.data('jPlayer').status.duration * 1000);
 		}
 
-
-		//console.log(selectedStuff);
-
-
 		$('#target-content').append('</p>');
 
 		var timespan = {};
@@ -1328,18 +1333,11 @@ $(document).ready(function(){
 
 		timespan.mediaId = sourceMediaId;
 
-
-		//console.log("s="+startTime);
-		//console.log("e="+endTime);
-		//console.log("n="+nextSpanStartTime);
-
-		//console.log(targetPlayer.player[0].data('jPlayer').status.src);
-		//timespan.src = targetPlayer.player[0].data('jPlayer').status.src;
-
 		return timespan;
 	}
 
 
+	// check whether content has been highlighted on the LHS
 
 	$('#transcript-content').mouseup(function(e){ 
 
@@ -1788,7 +1786,7 @@ $(document).ready(function(){
 
 
 
-	// testing drag stuff
+	// testing panel resize stuff (not currently used)
 
 	$('.drag-bar').drag(function( ev, dd ){
 		$( this ).css('left', dd.offsetX);
