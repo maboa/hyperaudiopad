@@ -49,6 +49,11 @@
 	height:100%;
 }
 
+#caption-canvas {
+	width: 480px;
+	height: 270px;
+}
+
 	.jp-pause:before { content: '\e801'; } /* '⎉' */
 	.jp-play:before { content: '\e800'; } /* '▶' */
 	.jp-viewsource:before { content: '\e802'; } /* '▶' */

@@ -189,21 +189,34 @@ $(document).ready(function(){
 		seriously: new Seriously(),
 		videoMap: {
 			videoSource: null,
+			captionSource: null,
 			canvasTarget: null,
 			fader: null,
+			blend: null,
 			effect: []
 		},
 		currentVideoId: "",
 		fadeEnd: false, // Used to capture the fade at the end of a chunk. ie., True until the animation starts.
 		fadeStart: false, // Used to fade at the start of a chunk.
 
+		init: function() {
+			targetPlayer.initCaption();
+			targetPlayer.initVideoMap();
+		},
+
 		initVideoMap: function() {
 			this.videoMap.fader = this.seriously.effect('fader');
 			this.videoMap.fader.amount = 0; // Otherwise it defaults to complete fade of 1.
 			// this.videoMap.fader.color = [255,0,0,1];
 
+			this.videoMap.captionSource = this.seriously.source("#caption-canvas");
+			this.videoMap.blend = this.seriously.effect('blend');
+			this.videoMap.blend.top = this.videoMap.captionSource;
+			this.videoMap.blend.bottom = this.videoMap.fader;
+
 			this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
-			this.videoMap.canvasTarget.source = this.videoMap.fader;
+			// this.videoMap.canvasTarget.source = this.videoMap.fader;
+			this.videoMap.canvasTarget.source = this.videoMap.blend;
 		},
 		createVideoMap: function(effects) {
 
@@ -320,6 +333,82 @@ $(document).ready(function(){
 				rgba = color;
 			}
 			this.videoMap.fader.color = rgba;
+		},
+
+		initCaption: function() {
+			var canvas = this.captionCanvas = document.getElementById('caption-canvas');
+			var ctx = this.captionContext = this.captionCanvas.getContext('2d');
+			// canvas.width = 480;
+			// canvas.height = 270;
+			this.setCaption({
+				// color: 'black',
+				// bgcolor: 'white',
+				// size: '48px',
+				// align: 'RigHt',
+				// valign: 'BoTTom',
+				text:'Internet Amazonians'
+			});
+		},
+		setCaption: function(caption) {
+			var canvas = this.captionCanvas,
+				ctx = this.captionContext,
+				x, y;
+
+			caption.align = caption.align && caption.align.toLowerCase();
+			caption.valign = caption.valign && caption.valign.toLowerCase();
+
+			switch(caption.align) {
+				case 'left':
+					ctx.textAlign = 'left';
+					x = 10;
+					break;
+				case 'right':
+					ctx.textAlign = 'right';
+					x = canvas.width - 10;
+					break;
+				case 'center':
+				default:
+					ctx.textAlign = 'center';
+					x = canvas.width/2;
+					break;
+			}
+
+			switch(caption.valign) {
+				case 'top':
+					ctx.textBaseline = 'top';
+					y = 10;
+					break;
+				case 'bottom':
+					ctx.textBaseline = 'bottom';
+					y = canvas.height - 10;
+					break;
+				case 'middle':
+				default:
+					ctx.textBaseline = 'middle';
+					y = canvas.height/2;
+					break;
+			}
+
+			// Firefox did not like quotation marks around any of the font names. But Chrome seems to group the bold with the first 1 instead.
+			ctx.font = (caption.size || '32px') + ' bold CrimsonRoman, Georgia, Times, serif';
+
+/*
+			// Note for if we want a background rectangle.
+			// http://stackoverflow.com/questions/10099226/determine-width-of-string-in-html5-canvas
+			var dim = ctx.measureText(caption.text),
+				w = dim.width,
+				h = dim.height; // undefined
+			ctx.fillStyle = 'blue';
+			ctx.fillRect(x-(w/2), y-(32/2), w, 32); // For the center/middle case.
+
+			console.log('dim: %o', dim);
+*/
+
+			ctx.fillStyle = caption.bgcolor || '#000';
+			ctx.fillText(caption.text, x+1, y+1);
+
+			ctx.fillStyle = caption.color || '#fff';
+			ctx.fillText(caption.text, x, y);
 		},
 
 		play: function(config) {
@@ -822,7 +911,7 @@ $(document).ready(function(){
 		}
 	};
 
-	targetPlayer.initVideoMap();
+	targetPlayer.init();
 
 	function fitVideo(c) {
 		var s = c.data('jPlayer').options.size;
