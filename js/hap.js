@@ -50,13 +50,19 @@ $(document).ready(function(){
 			m4v: BASE+'video/raidsinrainforest.mp4',
 			webmv: BASE+'video/raidsinrainforest.webm'
 		}
-	}
-	, {
+	}, {
 		title: "The Justice Boat",
 		url: "transcripts/justiceboat.htm",
 		media: {
 			m4v: BASE+'video/justiceboat.mp4',
 			webmv: BASE+'video/justiceboat.webm'
+		}
+	}, {
+		title: "Edward Snowden Interview",
+		url: "transcripts/edsnowdeninterview.htm",
+		media: {
+			m4v: BASE+'video/edsnowdeninterview.mp4',
+			webmv: BASE+'video/edsnowdeninterview.webm'
 		}
 	}];
 
