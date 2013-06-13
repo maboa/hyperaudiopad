@@ -353,6 +353,7 @@ $(document).ready(function(){
 			var ctx = this.captionContext = this.captionCanvas.getContext('2d');
 			// canvas.width = 480;
 			// canvas.height = 270;
+/*
 			this.setCaption({
 				// color: 'black',
 				// bgcolor: 'white',
@@ -361,11 +362,32 @@ $(document).ready(function(){
 				// valign: 'BoTTom',
 				text:'Internet Amazonians'
 			});
+*/
 		},
 		setCaption: function(caption) {
 			var canvas = this.captionCanvas,
 				ctx = this.captionContext,
 				x, y;
+
+			/* Object of type:
+			caption = {
+				color: 'black',
+				bgcolor: 'white',
+				size: '48px',
+				align: 'RigHt',
+				valign: 'BoTTom',
+				text:'Internet Amazonians'
+			}
+			*/
+
+			console.log('caption: %o', caption);
+
+			if(typeof caption !== 'object') {
+				return;
+			}
+
+			// Reset the canvas
+			canvas.width = canvas.width;
 
 			caption.align = caption.align && caption.align.toLowerCase();
 			caption.valign = caption.valign && caption.valign.toLowerCase();
@@ -422,6 +444,11 @@ $(document).ready(function(){
 
 			ctx.fillStyle = caption.color || '#fff';
 			ctx.fillText(caption.text, x, y);
+
+			// Refresh the canvas into the map... otherwise it uses the old canvas.
+			// This is not working.
+			this.videoMap.captionSource = this.seriously.source("#caption-canvas");
+			this.videoMap.blend.top = this.videoMap.captionSource;
 		},
 
 		play: function(config) {
@@ -453,6 +480,8 @@ $(document).ready(function(){
 			this.nextMediaId = this.scriptIndex+1 < theScript.length ? theScript[this.scriptIndex+1].mediaId : null;
 
 			this.paused = false;
+
+			this.setCaption(theScript[this.scriptIndex].caption);
 
 			if(DEBUG_MP) {
 				console.log("------Play Target Transcript------");
@@ -571,12 +600,13 @@ $(document).ready(function(){
 
 			var currentJumpTo, nextJumpTo, nextVideoId;
 
-
 			this.start = theScript[this.scriptIndex].start;
 			this.end = theScript[this.scriptIndex].end;
 
 			this.currentMediaId = theScript[this.scriptIndex].mediaId;
 			currentJumpTo = theScript[this.scriptIndex].start / 1000;
+
+			this.setCaption(theScript[this.scriptIndex].caption);
 
 			if(this.scriptIndex+1 < theScript.length) {
 				this.nextMediaId = theScript[this.scriptIndex+1].mediaId;
@@ -741,8 +771,6 @@ $(document).ready(function(){
 */
 				// If the chunk playing has ended...
 				if (now > this.end) {
-
-					// BUG this bit of code is executed infintely after the piece has stopped playing
 
 					// check for the this.end
 
@@ -1064,34 +1092,68 @@ $(document).ready(function(){
 		if (DEBUG_MB) console.dir(event);
 
 		var startBracketIndex = newText.indexOf('[');
+		var endBracketIndex = newText.indexOf(']');
 
-		var commands = newText.substring(startBracketIndex+1,newText.indexOf(']'));
-		if (DEBUG_MB) console.log(commands);
-		var commandList = commands.split(" ");
-		console.dir(commandList);
+		// Ignore the events until the whole command has been entered
+		if(endBracketIndex < 0) {
+			return;
+		}
+
+		var startQuoteIndex = newText.indexOf('"');
+		var endQuoteIndex = newText.indexOf('"', startQuoteIndex+1);
+		var quoteInCmd = (startQuoteIndex >= 0) && (endQuoteIndex >= 0);
+		var quoteCaption = 'Needs "text"';
+
+		var commands = newText.substring(startBracketIndex+1,endBracketIndex);
+		var commandsTrimmed = commands;
+
+		if(quoteInCmd) {
+			quoteCaption = newText.substring(startQuoteIndex+1,endQuoteIndex);
+			commandsTrimmed = newText.substring(startBracketIndex+1,startQuoteIndex) + newText.substring(endQuoteIndex+1,endBracketIndex);
+		}
+
+		if (DEBUG_MB) console.log('commands: '+commands);
+		if (DEBUG_MB) console.log('commandsTrimmed: '+commandsTrimmed);
+		var commandList = commandsTrimmed.toLowerCase().split(" ");
+		if (DEBUG_MB) console.dir(commandList);
 
 		// read in any existing settings
 
 		var time = theScript[index].time,
 			color = theScript[index].color,
 			fade = theScript[index].fade,
-			effect = theScript[index].effect;
+			effect = theScript[index].effect,
+			caption = theScript[index].caption;
 
-		console.log("cm length = "+commandList.length);
-
-		var applyFlag = false;
+		if (DEBUG_MB) console.log("cm length = "+commandList.length);
 
 		// We could use this list to load the appropriate JS files (also conceivably we could load on demand) -MB
 		var effects = ['none','ascii','bleach-bypass','colorcube','emboss','invert','nightvision','noise','ripple','scanlines','sepia','sketch','tvglitch','vignette'];
 
 		var effectIndex = 0;
 
-		for (var i=0; i < commandList.length; i++) {
+		/* The commands need to have some rules.
+		 * 1) Primary command is first.
+		 *  - "apply" for effect.
+		 *  - "fade" for a main video fade.
+		 *  - "caption" for a caption.
+		 */
+
+		if(commandList[0] === 'apply') {
+			effect = [];
+		} else if(commandList[0] === 'fade') {
+			fade = true;
+		} else if(commandList[0] === 'caption') {
+			caption = {
+				text: quoteCaption
+			};
+		}
+
+		for (var i=1; i < commandList.length; i++) {
 
 			if (DEBUG_MB) console.log("word "+i);
 
-			if (applyFlag == true && $.inArray(commandList[i], effects) >= 0) {
-				// action = 'apply';
+			if (commandList[0] === 'apply' && $.inArray(commandList[i], effects) >= 0) {
 				if(commandList[i] === 'none') {
 					effect = [commandList[i]]; // none
 				} else {
@@ -1100,24 +1162,42 @@ $(document).ready(function(){
 				}
 			}
 
-			if (commandList[i] == 'apply') {
-				applyFlag = true;
-				effect = [];
-			}
-
 			if (DEBUG_MB) console.log(commandList[i]+ 'a number? = '+isNumber(commandList[i]) );
 
-			// detecting fade
-			if (commandList[i] == 'fade') {
-				fade = true;
+			// detecting main video fade
+			if (commandList[0] === 'fade') {
+				if (isNumber(commandList[i])) {
+					time = commandList[i];
+				}
+
+				if (isColor(commandList[i])) {
+					color = commandList[i];
+				}
 			}
 
-			if (fade && isNumber(commandList[i])) {
-				time = commandList[i];
-			}
-
-			if (fade && isColor(commandList[i])) {
-				color = commandList[i];
+			if(commandList[0] === 'caption') {
+				if(isColor(commandList[i])) {
+					if(!caption.color) {
+						caption.color = commandList[i]; // Stores the 1st color given
+					} else {
+						caption.bgcolor = commandList[i]; // Stores the 2nd or last color given.
+					}
+				}
+				switch(commandList[i]) {
+					case 'left':
+					case 'center':
+					case 'right':
+						caption.align = commandList[i];
+						break;
+					case 'top':
+					case 'middle':
+					case 'bottom':
+						caption.valign = commandList[i];
+						break;
+				}
+				if(isNumber(commandList[i])) {
+					caption.duration = commandList[i] * 1; // Convert to a number (from string)
+				}
 			}
 		}
 
@@ -1141,6 +1221,7 @@ $(document).ready(function(){
 			theScript[index].time = time;
 			theScript[index].color = color;
 			theScript[index].effect = effect;
+			theScript[index].caption = caption;
 
 			theScript[index].commandText = commands;
 
@@ -1438,6 +1519,8 @@ $(document).ready(function(){
 
 		var select = getSelText(); 
 			var tweetable = select+"";  
+
+		console.log('select: %o', select);
 
 		var startSpan = select.anchorNode.nextSibling; 
 		if (startSpan == null) {
