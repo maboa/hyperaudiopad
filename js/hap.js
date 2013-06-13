@@ -58,11 +58,18 @@ $(document).ready(function(){
 			webmv: BASE+'video/justiceboat.webm'
 		}
 	}, {
-		title: "Edward Snowden Interview",
+		title: "Snowden Interview",
 		url: "transcripts/edsnowdeninterview.htm",
 		media: {
 			m4v: BASE+'video/edsnowdeninterview.mp4',
 			webmv: BASE+'video/edsnowdeninterview.webm'
+		}
+	}, {
+		title: "Biden on NSA 2006",
+		url: "transcripts/biden2006nsa.htm",
+		media: {
+			m4v: BASE+'video/biden2006nsa.mp4',
+			webmv: BASE+'video/biden2006nsa.webm'
 		}
 	}];
 
