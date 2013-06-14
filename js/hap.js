@@ -365,7 +365,8 @@ $(document).ready(function(){
 */
 		},
 		setCaption: function(caption) {
-			var canvas = this.captionCanvas,
+			var self = this,
+				canvas = this.captionCanvas,
 				ctx = this.captionContext,
 				x, y;
 
@@ -445,10 +446,13 @@ $(document).ready(function(){
 			ctx.fillStyle = caption.color || '#fff';
 			ctx.fillText(caption.text, x, y);
 
-			// Refresh the canvas into the map... otherwise it uses the old canvas.
-			// This is not working.
-			this.videoMap.captionSource = this.seriously.source("#caption-canvas");
-			this.videoMap.blend.top = this.videoMap.captionSource;
+			this.videoMap.blend.top.update();
+
+			setTimeout(function() {
+				canvas.width = canvas.width;
+				self.videoMap.blend.top.update();
+			}, (caption.duration ? caption.duration * 1000 : 1000));
+
 		},
 
 		play: function(config) {
@@ -481,7 +485,9 @@ $(document).ready(function(){
 
 			this.paused = false;
 
-			this.setCaption(theScript[this.scriptIndex].caption);
+			if(this.scriptIndex > 0) {
+				this.setCaption(theScript[this.scriptIndex-1].caption);
+			}
 
 			if(DEBUG_MP) {
 				console.log("------Play Target Transcript------");
@@ -606,7 +612,9 @@ $(document).ready(function(){
 			this.currentMediaId = theScript[this.scriptIndex].mediaId;
 			currentJumpTo = theScript[this.scriptIndex].start / 1000;
 
-			this.setCaption(theScript[this.scriptIndex].caption);
+			if(this.scriptIndex > 0) {
+				this.setCaption(theScript[this.scriptIndex-1].caption);
+			}
 
 			if(this.scriptIndex+1 < theScript.length) {
 				this.nextMediaId = theScript[this.scriptIndex+1].mediaId;
