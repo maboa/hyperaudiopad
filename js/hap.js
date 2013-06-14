@@ -17,7 +17,7 @@ $(document).ready(function(){
 	$.jPlayer.timeFormat.padMin = false;
 
 	var DEBUG_MP = false;
-	var DEBUG_MB = false;
+	var DEBUG_MB = true;
 
 	var DEBUG_VIDEO = false;
 	// var BASE = "http://happyworm.com/";
@@ -1462,12 +1462,18 @@ $(document).ready(function(){
 		var nextSpan = startSpan; 
 		// $('#target-content').append('<p s="'+startTime+'" e="'+endTime+'" f="'+targetPlayer.player[0].data('jPlayer').status.src+'">');
 		var selectedStuff = $('<p i="'+sIndex+'" start="'+startTime+'" end="'+endTime+'">'); 
-		$('#target-content').append( selectedStuff ); 
+		var initialSelectedStuff = selectedStuff; 
 		
 		//console.log('selected....');
+
+
 		
 		
-		while(nextSpan != endSpan) { 
+		while(nextSpan && nextSpan != endSpan) { 
+
+			if(DEBUG_MB) console.log('nextSpan != endSpan while loop');
+			if(DEBUG_MB) console.log('endSpan = '+endSpan);
+			if(DEBUG_MB) console.log('nextSpan = '+nextSpan);
 
 			if (nextSpan instanceof HTMLSpanElement) {
 				$(nextSpan).clone().appendTo(selectedStuff); 
@@ -1483,31 +1489,39 @@ $(document).ready(function(){
 			}
 		}
 
-		$(endSpan).clone().appendTo(selectedStuff); 
+		if (nextSpan) {
+			$('#target-content').append( initialSelectedStuff ); 
 
-		// grab the span after the endSpan to get proper end time
+			$(endSpan).clone().appendTo(selectedStuff); 
 
-		var nextSpanStart = getNextNode(nextSpan,true,endSpan);
+			// grab the span after the endSpan to get proper end time
 
-		if (nextSpanStart instanceof HTMLParagraphElement) {
-			nextSpanStart = nextSpanStart.firstChild;
+			var nextSpanStart = getNextNode(nextSpan,true,endSpan);
+
+			if (nextSpanStart instanceof HTMLParagraphElement) {
+				nextSpanStart = nextSpanStart.firstChild;
+			}
+
+			var nextSpanStartTime = parseInt(nextSpanStart.getAttribute('m'));
+
+			if (isNaN(nextSpanStartTime)) { // checking for end of text select
+				nextSpanStartTime = Math.floor(myPlayerSource.data('jPlayer').status.duration * 1000);
+			}
+
+			$('#target-content').append('</p>');
+
+			var timespan = {};
+			timespan.start = startTime;
+			timespan.end = nextSpanStartTime;  
+
+			timespan.mediaId = sourceMediaId;
+
+			return timespan;
 		}
-
-		var nextSpanStartTime = parseInt(nextSpanStart.getAttribute('m'));
-
-		if (isNaN(nextSpanStartTime)) { // checking for end of text select
-			nextSpanStartTime = Math.floor(myPlayerSource.data('jPlayer').status.duration * 1000);
+		else
+		{
+			return null;
 		}
-
-		$('#target-content').append('</p>');
-
-		var timespan = {};
-		timespan.start = startTime;
-		timespan.end = nextSpanStartTime;  
-
-		timespan.mediaId = sourceMediaId;
-
-		return timespan;
 	}
 
 
@@ -1526,6 +1540,8 @@ $(document).ready(function(){
 		if (startSpan == null) {
 			startSpan = select.anchorNode.parentNode;
 		}
+
+		if(DEBUG_MB) console.log('startSpan = '+startSpan);
 
 
 		//var endSpan = select.focusNode.nextSibling;
@@ -1627,41 +1643,43 @@ $(document).ready(function(){
 				/* --- start snip --- */
 				
 				var timespan = copyOver(startSpan,endSpan,startTime,endTime, theScript.length);
-				theScript.push(timespan);
+				
+				if (timespan) {
+					theScript.push(timespan);
+
+					if(theScript.length === 1) {
+						// Setup the target player for the start.
+						targetPlayer.cue();
+					}
+					
+					// update the duration
+					targetPlayer.setDuration();
+
+					//$.bbq.pushState(theScript);
+					//console.dir(theScript);
+
+					//alert('here');
+
+					//$('#target-content span').addClass('transcript-grey');
+
+					$('#target-header-ctrl').fadeIn();
+					$('#target-action-ctrl').fadeIn();
+
+					$('#transcript-content-hint').fadeOut();
+
+					// this reveals the target video on first paste
+					
+					if (!$('#show-video-target').is(":visible")) {
+						$('#target-content').css('top','350px');
+					}
+
+					// making it clear that we have an editable content pane
+					$('#target-content').focus();
+					
+					hints = false;
+				}
 
 				/*--- end snip ----*/
-
-
-				if(theScript.length === 1) {
-					// Setup the target player for the start.
-					targetPlayer.cue();
-				}
-				
-				// update the duration
-				targetPlayer.setDuration();
-
-				//$.bbq.pushState(theScript);
-				//console.dir(theScript);
-
-				//alert('here');
-
-				//$('#target-content span').addClass('transcript-grey');
-
-				$('#target-header-ctrl').fadeIn();
-				$('#target-action-ctrl').fadeIn();
-
-				$('#transcript-content-hint').fadeOut();
-
-				// this reveals the target video on first paste
-				
-				if (!$('#show-video-target').is(":visible")) {
-					$('#target-content').css('top','350px');
-				}
-
-				// making it clear that we have an editable content pane
-				$('#target-content').focus();
-				
-				hints = false;
 
 				//e.preventDefault(); 
 				//e.stopImmediatePropagation();
@@ -1687,13 +1705,22 @@ $(document).ready(function(){
 		/*if (endNode == node) {
 			return null;
 		}*/
-		if (node.firstChild && !skipChildren) {
-			return node.firstChild;
+
+		if(DEBUG_MB) console.log('getNextNode');
+
+		if (node != null) {
+
+			if (node.firstChild && !skipChildren) {
+				return node.firstChild;
+			}
+			if (!node.parentNode){
+				return null;
+			}
+			return node.nextElementSibling || getNextNode(node.parentNode, true, endNode); 
+		} else {
+			if(DEBUG_MB) console.log('null node found');
+			return false;
 		}
-		if (!node.parentNode){
-			return null;
-		}
-		return node.nextElementSibling || getNextNode(node.parentNode, true, endNode); 
 
 		//return node.nextSibling || getNextNode(node.parentNode, true, endNode);
 
