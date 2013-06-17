@@ -71,6 +71,27 @@ $(document).ready(function(){
 			m4v: BASE+'video/biden2006nsa.mp4',
 			webmv: BASE+'video/biden2006nsa.webm'
 		}
+	}, {
+		title: "Sen. Feinstein",
+		url: "transcripts/sen-feinstein-1212.htm",
+		media: {
+			m4v: BASE+'video/sen-feinstein-1212.mp4',
+			webmv: BASE+'video/sen-feinstein-1212.webm'
+		}
+	}, {
+		title: "James Clapper Denies",
+		url: "transcripts/clapper-march-13.htm",
+		media: {
+			m4v: BASE+'video/clapper-march-13.mp4',
+			webmv: BASE+'video/clapper-march-13.webm'
+		}
+	}, {
+		title: "James Clapper Responds",
+		url: "transcripts/clapper-responds.htm",
+		media: {
+			m4v: BASE+'video/clapper-responds.mp4',
+			webmv: BASE+'video/clapper-responds.webm'
+		}
 	}];
 
 
