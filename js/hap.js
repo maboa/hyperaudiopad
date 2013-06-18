@@ -16,8 +16,8 @@ $(document).ready(function(){
 
 	$.jPlayer.timeFormat.padMin = false;
 
-	var DEBUG_MP = true;
-	var DEBUG_MB = false;
+	var DEBUG_MP = false;
+	var DEBUG_MB = true;
 
 	var DEBUG_VIDEO = false;
 	// var BASE = "http://happyworm.com/";
@@ -117,47 +117,55 @@ $(document).ready(function(){
 			if (DEBUG_MB) console.log("theScript[i].mediaId ="+theScript[i].mediaId);
 			if (DEBUG_MB) console.dir(transcripts);
 
-			var transcript = transcripts[theScript[i].mediaId].url;
+			// var transcript = transcripts[theScript[i].mediaId].url;
 
+			if(theScript[i].mediaId >= 0) {
 
+				$('#transcript-content').load(transcripts[theScript[i].mediaId].url, function() {
 
-			$('#transcript-content').load(transcript, function() {
-				
-				var startSpan, endSpan, startTime, endTime;
+					if (DEBUG_MB) console.log('transcript = '+transcripts[theScript[i].mediaId].url);
+					
+					var startSpan, endSpan, startTime, endTime;
 
-				startTime = theScript[i].start;
-				endTime = theScript[i].end;
+					startTime = theScript[i].start;
+					endTime = theScript[i].end;
 
-				if (DEBUG_MB) console.log("grabbing the spans");
+					if (DEBUG_MB) console.log("grabbing the spans");
 
-				$('#transcript-content span[m="'+startTime+'"]').each(function() {
-					startSpan = $(this)[0];
-					$('#transcript-content span[m="'+endTime+'"]').each(function() {
-						//endSpan = $(this)[0].previousElementSibling;
-						endSpan = $(this)[0];
+					$('#transcript-content span[m="'+startTime+'"]').each(function() {
+						startSpan = $(this)[0];
+						$('#transcript-content span[m="'+endTime+'"]').each(function() {
+							//endSpan = $(this)[0].previousElementSibling;
+							endSpan = $(this)[0];
 
-						if (DEBUG_MB) console.log("start/end");
-						if (DEBUG_MB) console.dir(startSpan);
-						if (DEBUG_MB) console.dir(endSpan);
-						if (DEBUG_MB) console.log("startTime = "+startTime);
-						if (DEBUG_MB) console.log("endTime = "+endTime);
+							if (DEBUG_MB) console.log("start/end");
+							if (DEBUG_MB) console.dir(startSpan);
+							if (DEBUG_MB) console.dir(endSpan);
+							if (DEBUG_MB) console.log("startTime = "+startTime);
+							if (DEBUG_MB) console.log("endTime = "+endTime);
 
-						copyOver(startSpan, endSpan, startTime, endTime, i);
+							copyOver(startSpan, endSpan, startTime, endTime, i);
 
-						if (DEBUG_MB) console.log("calling loadTranscriptsFromFile");
-						var commandText = theScript[i].commandText;
-						if (commandText != undefined && commandText.length > 0) {
-							var direction = $('<p>['+commandText+']</p>'); 
-							$('#target-content').append( direction );
-						}
+							if (DEBUG_MB) console.log("calling loadTranscriptsFromFile");
+							var commandText = theScript[i].commandText;
+							if (commandText != undefined && commandText.length > 0) {
+								var direction = $('<p><span>['+commandText+']<span></p>'); 
+								$('#target-content').append( direction );
+							}
 
-						// loadTranscriptsFromFile(++i);
-						loadTranscriptsFromFile({i:++i,callback:options.callback});
+							// loadTranscriptsFromFile(++i);
+							loadTranscriptsFromFile({i:++i,callback:options.callback});
+						});
 					});
 				});
-				
-				if (DEBUG_MB) console.log('transcript = '+transcript);
-			});
+			} else {
+				var commandText = theScript[i].commandText;
+				if (commandText != undefined && commandText.length > 0) {
+					var direction = $('<p i="'+i+'" start="'+theScript[i].start+'" end="'+theScript[i].end+'"><span>['+commandText+']</span></p>'); 
+					$('#target-content').append( direction );
+				}
+				loadTranscriptsFromFile({i:++i,callback:options.callback});
+			}
 		} else {
 			if (DEBUG_MB) console.log('dropping out');
 			if(options.callback) {
@@ -177,7 +185,11 @@ $(document).ready(function(){
 		loadTranscriptsFromFile({
 			callback:function() {
 				targetPlayer.cue();
-				loadTranscriptSource(theScript[theScript.length-1].mediaId);
+				var search = 1;
+				while(theScript[theScript.length-search].mediaId < 0) {
+					search++;
+				}
+				loadTranscriptSource(theScript[theScript.length-search].mediaId);
 				$('#transcript-content').show();
 				// TODO make top 350 a separate class and apply when needed
 				$('#target-content').css('top','350px');
