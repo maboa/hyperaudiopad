@@ -92,6 +92,13 @@ $(document).ready(function(){
 			m4v: BASE+'video/clapper-responds.mp4',
 			webmv: BASE+'video/clapper-responds.webm'
 		}
+	}, {
+		title: "Obama Responds",
+		url: "transcripts/obama-responds.htm",
+		media: {
+			m4v: BASE+'video/obama-responds.mp4',
+			webmv: BASE+'video/obama-responds.webm'
+		}
 	}];
 
 
