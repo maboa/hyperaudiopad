@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8 />
+	</head>
+	<body>
+		<video id="video-source" width"240" height="135" controls>
+			<source type="video/webm" src="/video/biden2006nsa.webm" />
+			<source type="video/mp4" src="/video/biden2006nsa.mp4" />
+		</video>
+		<canvas id="caption-canvas" width="240" height="135" style="border:1px dashed black;"></canvas>
+		<canvas id="target-canvas" width="240" height="135"></canvas>
+
+		<p>
+			<label for="caption-text">Caption:</label> <input id="caption-text" type="text" />
+			<a href="javascript:;" id="update">update</a>
+		</p>
+
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+<!--
+		<script type="text/javascript" src="js/jquery.jplayer.js"></script>
+		<script type="text/javascript" src="js/jquery.scrollto.min.js"></script>
+		<script type="text/javascript" src="js/jquery.event.drag.js"></script>
+		<script type="text/javascript" src="js/popcorn.js"></script>
+		<script type="text/javascript" src="js/popcorn.transcript.js"></script>
+		<script type="text/javascript" src="js/iemobile-fix.js"></script>
+		<script type="text/javascript" src="js/hap.js"></script>
+-->
+		<script type="text/javascript" src="js/seriously/seriously.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.ascii.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.bleach-bypass.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.blend.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.colorcube.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.emboss.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.fader.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.invert.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.nightvision.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.noise.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.ripple.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.scanlines.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.sepia.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.sketch.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.tvglitch.js"></script>
+		<script type="text/javascript" src="js/seriously/effects/seriously.vignette.js"></script>
+
+<script type="text/javascript">
+
+jQuery(document).ready(function($) {
+
+	captionTest = {
+
+		init: function() {
+
+			var s = this.seriously = new Seriously();
+			var canvas = this.captionCanvas = document.getElementById('caption-canvas');
+			this.captionContext = canvas.getContext('2d');
+
+			this.captionSource = s.source("#caption-canvas");
+			this.videoSource = s.source("#video-source");
+
+			this.blend = s.effect('blend');
+			this.blend.top = this.captionSource;
+			this.blend.bottom = this.videoSource;
+
+			this.canvasTarget = s.target('#target-canvas');
+			this.canvasTarget.source = this.blend;
+
+			s.go();
+
+			// this.setCaption('beer goggles');
+
+		},
+
+		setCaption: function(caption) {
+			var canvas = this.captionCanvas,
+				ctx = this.captionContext,
+				x = canvas.width/2,
+				y = canvas.height/2;
+
+			// Reset the canvas
+			canvas.width = canvas.width;
+
+			// Firefox did not like quotation marks around any of the font names. But Chrome seems to group the bold with the first 1 instead.
+			ctx.font = '16px bold CrimsonRoman, Georgia, Times, serif';
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+
+			ctx.fillStyle = '#000';
+			ctx.fillText(caption, x+1, y+1);
+
+			ctx.fillStyle = '#fff';
+			ctx.fillText(caption, x, y);
+
+		}
+	};
+
+	captionTest.init();
+
+	$('#caption-text').keyup(function() {
+		captionTest.setCaption(this.value);
+		// captionTest.blend.top.update();
+	});
+
+	$('#update').click(function() {
+		captionTest.blend.top.update();
+	});
+
+});
+
+</script>
+
+	</body>
+</html>
