@@ -1134,7 +1134,7 @@ $(document).ready(function(){
 						// this.createVideoMap((theScript[0].mediaId && theScript[0].effect) || []);
 
 						// Cue up the players ready for if the play button is pressed.
-						this.cue();
+						// this.cue(); // Comment out to leave it at end.
 
 						// Show the correct control button
 						$('#play-btn-target').show();
