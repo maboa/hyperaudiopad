@@ -16,8 +16,8 @@ $(document).ready(function(){
 
 	$.jPlayer.timeFormat.padMin = false;
 
-	var DEBUG_MP = false;
-	var DEBUG_MB = true;
+	var DEBUG_MP = true;
+	var DEBUG_MB = false;
 
 	var DEBUG_VIDEO = false;
 	// var BASE = "http://happyworm.com/";
@@ -609,6 +609,8 @@ $(document).ready(function(){
 			this.videoMap.titleBlend.top = this.videoMap.titleSource;
 
 			this.videoMap.titleBlend.top.update();
+
+			this.seriously.go();
 
 /*
 
