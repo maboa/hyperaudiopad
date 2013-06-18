@@ -16,8 +16,8 @@ $(document).ready(function(){
 
 	$.jPlayer.timeFormat.padMin = false;
 
-	var DEBUG_MP = false;
-	var DEBUG_MB = true;
+	var DEBUG_MP = true;
+	var DEBUG_MB = false;
 
 	var DEBUG_VIDEO = false;
 	// var BASE = "http://happyworm.com/";
@@ -243,14 +243,22 @@ $(document).ready(function(){
 			this.videoMap.fader.amount = 0; // Otherwise it defaults to complete fade of 1.
 			// this.videoMap.fader.color = [255,0,0,1];
 
+			// Blend the video map with captions
 			this.videoMap.captionSource = this.seriously.source("#caption-canvas");
-			this.videoMap.blend = this.seriously.effect('blend');
-			this.videoMap.blend.top = this.videoMap.captionSource;
-			this.videoMap.blend.bottom = this.videoMap.fader;
+			this.videoMap.captionBlend = this.seriously.effect('blend');
+			this.videoMap.captionBlend.top = this.videoMap.captionSource;
+			this.videoMap.captionBlend.bottom = this.videoMap.fader;
+
+			// Blend the video map with title
+			// this.videoMap.titleSource = this.seriously.source("#caption-canvas");
+			this.videoMap.titleBlend = this.seriously.effect('blend');
+			// this.videoMap.titleBlend.top = this.videoMap.titleSource;
+			this.videoMap.titleBlend.bottom = this.videoMap.captionBlend;
 
 			this.videoMap.canvasTarget = this.seriously.target('#target-canvas');
 			// this.videoMap.canvasTarget.source = this.videoMap.fader;
-			this.videoMap.canvasTarget.source = this.videoMap.blend;
+			// this.videoMap.canvasTarget.source = this.videoMap.captionBlend;
+			this.videoMap.canvasTarget.source = this.videoMap.titleBlend;
 		},
 		createVideoMap: function(effects) {
 
@@ -281,6 +289,10 @@ $(document).ready(function(){
 			if (DEBUG_MP) console.log("createVideoMap(): videoMap.effect=%o",this.videoMap.effect);
 		},
 		connectVideo: function(videoId) {
+
+			if(!videoId) {
+				return;
+			}
 
 			this.currentVideoId = videoId;
 
@@ -467,16 +479,128 @@ $(document).ready(function(){
 			ctx.fillStyle = caption.color || '#fff';
 			ctx.fillText(caption.text, x, y);
 
-			this.videoMap.blend.top.update();
+			this.videoMap.captionBlend.top.update();
 
 			setTimeout(function() {
 				canvas.width = canvas.width;
-				self.videoMap.blend.top.update();
+				self.videoMap.captionBlend.top.update();
 			}, (caption.duration ? caption.duration * 1000 : 1000));
 
 		},
 
+		clearTitle: function(title) {
+
+			var canvas = this.titleCanvas;
+
+			// Reset the canvas
+			if(canvas) {
+				canvas.width = canvas.width;
+				this.videoMap.titleBlend.top.update();
+			}
+		},
+
+		setTitle: function(title) {
+
+			var self = this,
+				canvas = this.titleCanvas = document.createElement('canvas'),
+				ctx = this.titleContext = canvas.getContext('2d'),
+				x, y;
+
+			canvas.width = 480;
+			canvas.height = 270;
+
+			/* Object of type:
+			title = {
+				color: 'black',
+				bgcolor: 'white',
+				size: '48px',
+				align: 'RigHt',
+				valign: 'BoTTom',
+				text:'Internet Amazonians'
+			}
+			*/
+
+			console.log('title: %o', title);
+
+			if(typeof title !== 'object') {
+				return;
+			}
+
+			// Reset the canvas
+			// canvas.width = canvas.width;
+
+			title.align = title.align && title.align.toLowerCase();
+			title.valign = title.valign && title.valign.toLowerCase();
+
+			switch(title.align) {
+				case 'left':
+					ctx.textAlign = 'left';
+					x = 10;
+					break;
+				case 'right':
+					ctx.textAlign = 'right';
+					x = canvas.width - 10;
+					break;
+				case 'center':
+				default:
+					ctx.textAlign = 'center';
+					x = canvas.width/2;
+					break;
+			}
+
+			switch(title.valign) {
+				case 'top':
+					ctx.textBaseline = 'top';
+					y = 10;
+					break;
+				case 'bottom':
+					ctx.textBaseline = 'bottom';
+					y = canvas.height - 10;
+					break;
+				case 'middle':
+				default:
+					ctx.textBaseline = 'middle';
+					y = canvas.height/2;
+					break;
+			}
+
+			// Firefox did not like quotation marks around any of the font names. But Chrome seems to group the bold with the first 1 instead.
+			ctx.font = (title.size || '32px') + ' bold CrimsonRoman, Georgia, Times, serif';
+
+/*
+			// Note for if we want a background rectangle.
+			// http://stackoverflow.com/questions/10099226/determine-width-of-string-in-html5-canvas
+			var dim = ctx.measureText(title.text),
+				w = dim.width,
+				h = dim.height; // undefined
+			ctx.fillStyle = 'blue';
+			ctx.fillRect(x-(w/2), y-(32/2), w, 32); // For the center/middle case.
+
+			console.log('dim: %o', dim);
+*/
+
+			ctx.fillStyle = title.bgcolor || '#000';
+			// ctx.fillText(title.text, x+1, y+1);
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			ctx.fillStyle = title.color || '#fff';
+			ctx.fillText(title.text, x, y);
+
+			this.videoMap.titleSource = this.seriously.source(canvas);
+			this.videoMap.titleBlend.top = this.videoMap.titleSource;
+/*
+			this.videoMap.titleBlend.top.update();
+
+			setTimeout(function() {
+				canvas.width = canvas.width;
+				self.videoMap.titleBlend.top.update();
+			}, (title.duration ? title.duration * 1000 : 1000));
+*/
+		},
+
 		play: function(config) {
+
+			var self = this;
 
 			// Handle the case where saved trans given but fullscreen denied at page load.
 			if(fullscreen.isRestricted()) {
@@ -541,6 +665,8 @@ $(document).ready(function(){
 				setTargetHighlighting(this.scriptIndex);
 			}
 
+			this.clearTitle();
+
 			var nextVideoId = "";
 
 			if(this.playerMediaId[0] === this.currentMediaId) {
@@ -551,6 +677,7 @@ $(document).ready(function(){
 				this.player[1].hide().jPlayer("pause");
 				this.player[0].show().jPlayer("play", config.jumpTo);
 				nextVideoId = this.player[0].data("jPlayer").internal.video.id;
+				clearInterval(this.managerInterval);
 			} else if(this.playerMediaId[1] === this.currentMediaId) {
 				if(DEBUG_MP) console.log('play(): already prepared for in player[1]');
 				if(config.jumpTo || !this.popcorn) {
@@ -559,10 +686,17 @@ $(document).ready(function(){
 				this.player[0].hide().jPlayer("pause");
 				this.player[1].show().jPlayer("play", config.jumpTo);
 				nextVideoId = this.player[1].data("jPlayer").internal.video.id;
+				clearInterval(this.managerInterval);
 			} else {
-				// we have a problem
+				this._pauseVideos();
+				this.setTitle(theScript[this.scriptIndex].title);
+				this.titleTimeRef = (new Date()).getTime();
+				clearInterval(this.managerInterval);
+				this.managerInterval = setInterval(function() {
+					console.log('manager interval: Generated in play()')
+					self.manager();
+				},250);
 			}
-
 			// Prepare the other player for the next media
 			if(DEBUG_MP) console.log('play(): prepare next media');
 			this.load(this.nextMediaId);
@@ -610,8 +744,12 @@ $(document).ready(function(){
 			$('#jp_container_target .jp-play').show();
 			$('#jp_container_target .jp-pause').hide();
 
-			// Then pause the player playing... or just pause both?
+			clearInterval(this.managerInterval);
 
+			this._pauseVideos();
+		},
+		_pauseVideos: function() {
+			// Then pause the player playing... or just pause both?
 			if(DEBUG_MP) console.log("pause(): Attempting to pause");
 			if (!this.player[0].data('jPlayer').status.paused) {
 				this.player[0].jPlayer("pause");
@@ -655,12 +793,14 @@ $(document).ready(function(){
 					this.player[0].hide();
 					this.player[1].show().jPlayer("pause", currentJumpTo);
 					nextVideoId = this.player[1].data("jPlayer").internal.video.id;
-				} else {
+				} else if(this.currentMediaId >= 0) {
 					if(DEBUG_MP) console.log('cue(): prepare the current video');
 					this.load(this.currentMediaId);
 					this.player[(this.lastPlayerPrimed+1)%2].hide();
 					this.player[this.lastPlayerPrimed].show().jPlayer("pause", currentJumpTo);
 					nextVideoId = this.player[this.lastPlayerPrimed].data("jPlayer").internal.video.id;
+				} else {
+					this.setTitle(theScript[this.scriptIndex].title);
 				}
 				killTargetPopcorn();
 				setTargetHighlighting(this.scriptIndex);
@@ -706,7 +846,7 @@ $(document).ready(function(){
 			if(DEBUG_MP) console.log('loadTranscriptTarget('+id+')');
 			if(DEBUG_MB) console.log('sourceMediaId = '+sourceMediaId);
 
-			if(typeof id !== 'number') {
+			if(typeof id !== 'number' || id < 0) {
 				if(DEBUG_MP) console.log('Ignoring: id='+id);
 				return false;
 			}
@@ -755,13 +895,16 @@ $(document).ready(function(){
 				} else if (this.playerMediaId[1] === this.currentMediaId) {
 					now = this.player[1].data('jPlayer').status.currentTime * 1000;
 				} else {
-					// We have a problem
+					// Titles
+					now = (new Date()).getTime() - this.titleTimeRef;
 				}
 
 				//console.log("now="+now+" this.end="+this.end+"theScript.length="+theScript.length+" this.scriptIndex="+this.scriptIndex);
 
 				if(DEBUG_MP) console.log("targetPlayer.manager(): this.end="+this.end);
 				if(DEBUG_MP) console.log("targetPlayer.manager(): now="+now);
+
+				if(DEBUG_MP) console.log("targetPlayer.manager(): titleTimeRef="+this.titleTimeRef);
 
 				if(this.fadeEnd) {
 					if(DEBUG_MP) console.log('manager(): fade END detected');
@@ -905,6 +1048,9 @@ $(document).ready(function(){
 						if(DEBUG_MP) console.log("targetPlayer.playerMediaId[0] = "+this.playerMediaId[0]);
 						if(DEBUG_MP) console.log("targetPlayer.playerMediaId[1] = "+this.playerMediaId[1]);
 
+						this.clearTitle();
+						clearInterval(this.managerInterval);
+
 						// Compared with this.currentVideoId further down.
 						var nextVideoId = "";
 
@@ -930,6 +1076,14 @@ $(document).ready(function(){
 							this.player[1].jPlayer("play",this.start/1000); 
 						} else {
 							// Would need to change the media... But it should already be ready.
+							this._pauseVideos();
+							this.setTitle(theScript[this.scriptIndex].title);
+							this.titleTimeRef = (new Date()).getTime();
+							clearInterval(this.managerInterval);
+							this.managerInterval = setInterval(function() {
+								console.log('manager interval: Generated in manager()')
+								self.manager();
+							},250);
 						}
 
 						if (effectArray.length) {
@@ -1105,8 +1259,27 @@ $(document).ready(function(){
 		return false;
 	});
 
-	// Listen to contenteditable
+	// function to update the target transcript indexes when splicing in a title
+	function spliceTargetIndex(index, myPara) {
+		index = Number(index);
+		$('#target-content p').each(function() {
+			var $this = $(this),
+				i = Number($this.attr('i'));
 
+			console.log(i + ":  " + $this.text());
+			if(i === index) {
+				// if($this.text().toLowerCase().indexOf('[title') >= 0) {
+				if($this[0] === myPara) {
+					$this.attr('i', i+1);
+				}
+			} else if(i > index) {
+				$this.attr('i', i+1);
+			}
+		});
+	}
+	// window.spliceTargetIndex = spliceTargetIndex; // TMP for testing
+
+	// Listen to contenteditable
 	document.addEventListener("DOMCharacterDataModified", function(event) {
 		
 		// This whole thing needs 'evolving'
@@ -1115,6 +1288,7 @@ $(document).ready(function(){
 		if (DEBUG_MB) console.dir(event);
 		if (DEBUG_MB) console.log($(event.target).parent().attr("m"));
 		var index = $(event.target).parents('p').attr("i");
+		var parentPara = $(event.target).parents('p')[0];
 		var newText = event.newValue;
 		if (DEBUG_MB) console.log(event.newValue);
 		if (DEBUG_MB) console.log("the whole event");
@@ -1152,7 +1326,8 @@ $(document).ready(function(){
 			color = theScript[index].color,
 			fade = theScript[index].fade,
 			effect = theScript[index].effect,
-			caption = theScript[index].caption;
+			caption = theScript[index].caption,
+			title = theScript[index].title;
 
 		if (DEBUG_MB) console.log("cm length = "+commandList.length);
 
@@ -1174,6 +1349,10 @@ $(document).ready(function(){
 			fade = true;
 		} else if(commandList[0] === 'caption') {
 			caption = {
+				text: quoteCaption
+			};
+		} else if(commandList[0] === 'title') {
+			title = {
 				text: quoteCaption
 			};
 		}
@@ -1204,6 +1383,8 @@ $(document).ready(function(){
 				}
 			}
 
+			// The captionn and title coding could probably be merged in a refactor
+
 			if(commandList[0] === 'caption') {
 				if(isColor(commandList[i])) {
 					if(!caption.color) {
@@ -1228,29 +1409,75 @@ $(document).ready(function(){
 					caption.duration = commandList[i] * 1; // Convert to a number (from string)
 				}
 			}
+
+
+			if(commandList[0] === 'title') {
+				if(isColor(commandList[i])) {
+					if(!title.color) {
+						title.color = commandList[i]; // Stores the 1st color given
+					} else {
+						title.bgcolor = commandList[i]; // Stores the 2nd or last color given.
+					}
+				}
+				switch(commandList[i]) {
+					case 'left':
+					case 'center':
+					case 'right':
+						title.align = commandList[i];
+						break;
+					case 'top':
+					case 'middle':
+					case 'bottom':
+						title.valign = commandList[i];
+						break;
+				}
+				if(isNumber(commandList[i])) {
+					title.duration = commandList[i] * 1; // Convert to a number (from string)
+				}
+			}
+
 		}
 
 		// if (DEBUG_MB) console.log(action);
 		if (DEBUG_MB) console.log(time);
 		if (DEBUG_MB) console.log(color);
 
-		if ( newText.indexOf(']') > 0 ) {
-			if (theScript.length == 0) { // direction has been given at the start
-				if (DEBUG_MB) console.log('theScript length is zero');
-				// create empty timespan to hold the effect
+		if ( newText.indexOf(']') > 0 ) { // Beleive this clause redundant due to check and return at start.
+
+			// direction has been given at the start OR this is a title
+			if (theScript.length === 0 || commandList[0] === 'title') {
+
+				// create empty timespan to hold the effect/title
 				var timespan = {};
 				timespan.start = 0;
-				timespan.end = 0;
-				timespan.mediaId = 0;
-				theScript.push(timespan);
-				index = 0;
+
+				timespan.mediaId = -1; // 0
+
+				if(theScript.length === 0) {
+					if (DEBUG_MB) console.log('theScript length is zero');
+					timespan.end = 0;
+					theScript.push(timespan);
+					index = 0;
+				} else {
+					if (DEBUG_MB) console.log('Adding title to theScript');
+					timespan.end = title.duration * 1000;
+					spliceTargetIndex(index, parentPara);
+					$(parentPara).attr('start',timespan.start).attr('end',timespan.end);
+					index++;
+					theScript.splice(index, 0, timespan);
+				}
+
+				// update the duration
+				targetPlayer.setDuration();
 			}
+
 			// theScript[index].action = action;
 			theScript[index].fade = fade;
 			theScript[index].time = time;
 			theScript[index].color = color;
 			theScript[index].effect = effect;
 			theScript[index].caption = caption;
+			theScript[index].title = title;
 
 			theScript[index].commandText = commands;
 
