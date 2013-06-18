@@ -600,8 +600,10 @@ $(document).ready(function(){
 
 			this.videoMap.titleSource = this.seriously.source(canvas);
 			this.videoMap.titleBlend.top = this.videoMap.titleSource;
-/*
+
 			this.videoMap.titleBlend.top.update();
+
+/*
 
 			setTimeout(function() {
 				canvas.width = canvas.width;
@@ -1306,12 +1308,18 @@ $(document).ready(function(){
 		if (DEBUG_MB) console.log("the whole event");
 		if (DEBUG_MB) console.dir(event);
 
+
 		var startBracketIndex = newText.indexOf('[');
 		var endBracketIndex = newText.indexOf(']');
 
 		// Ignore the events until the whole command has been entered
 		if(endBracketIndex < 0) {
 			return;
+		}
+
+		if(!parentPara) {
+			$(event.target).wrap('<p><span>'); // .wrap('<span>');
+			parentPara = $(event.target).parents('p')[0];
 		}
 
 		var startQuoteIndex = newText.indexOf('"');
@@ -1334,12 +1342,21 @@ $(document).ready(function(){
 
 		// read in any existing settings
 
-		var time = theScript[index].time,
-			color = theScript[index].color,
-			fade = theScript[index].fade,
-			effect = theScript[index].effect,
-			caption = theScript[index].caption,
+		var time,
+			color,
+			fade,
+			effect,
+			caption,
+			title;
+
+		if(theScript[index]) {
+			time = theScript[index].time;
+			color = theScript[index].color;
+			fade = theScript[index].fade;
+			effect = theScript[index].effect;
+			caption = theScript[index].caption;
 			title = theScript[index].title;
+		}
 
 		if (DEBUG_MB) console.log("cm length = "+commandList.length);
 
@@ -1465,7 +1482,13 @@ $(document).ready(function(){
 
 				timespan.mediaId = -1; // 0
 
-				if(theScript.length === 0) {
+				if (theScript.length === 0 && commandList[0] === 'title') {
+					if (DEBUG_MB) console.log('theScript length is zero AND adding title');
+					timespan.end = title.duration * 1000;
+					index = 0;
+					$(parentPara).attr('i',index).attr('start',timespan.start).attr('end',timespan.end);
+					theScript.push(timespan);
+				} else if(theScript.length === 0) {
 					if (DEBUG_MB) console.log('theScript length is zero');
 					timespan.end = 0;
 					theScript.push(timespan);
