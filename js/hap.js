@@ -1480,6 +1480,8 @@ $(document).ready(function(){
 
 		if ( newText.indexOf(']') > 0 ) { // Beleive this clause redundant due to check and return at start.
 
+			var needCue = false;
+
 			// direction has been given at the start OR this is a title
 			if (theScript.length === 0 || commandList[0] === 'title') {
 
@@ -1495,6 +1497,7 @@ $(document).ready(function(){
 					index = 0;
 					$(parentPara).attr('i',index).attr('start',timespan.start).attr('end',timespan.end);
 					theScript.push(timespan);
+					needCue = true;
 				} else if(theScript.length === 0) {
 					if (DEBUG_MB) console.log('theScript length is zero');
 					timespan.end = 0;
@@ -1522,6 +1525,10 @@ $(document).ready(function(){
 			theScript[index].title = title;
 
 			theScript[index].commandText = commands;
+
+			if(needCue) {
+				targetPlayer.cue();
+			}
 
 			/*if (theScript[index].commandText == undefined) {
 				if (DEBUG_MB) console.log('creating commandText');
