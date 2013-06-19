@@ -16,7 +16,7 @@ $(document).ready(function(){
 
 	$.jPlayer.timeFormat.padMin = false;
 
-	var DEBUG_MP = true;
+	var DEBUG_MP = false;
 	var DEBUG_MB = false;
 
 	var DEBUG_VIDEO = false;
@@ -141,9 +141,32 @@ $(document).ready(function(){
 
 					$('#transcript-content span[m="'+startTime+'"]').each(function() {
 						startSpan = $(this)[0];
-						$('#transcript-content span[m="'+endTime+'"]').each(function() {
-							//endSpan = $(this)[0].previousElementSibling;
-							endSpan = $(this)[0];
+
+						// remember the endTime is either the start time of the following span or
+						// in the case it is the last span - that span + 1000ms
+
+						if (DEBUG_MB) console.log("endTime = "+endTime);
+						
+						var nextSpan = $('#transcript-content span[m="'+endTime+'"]');
+						var lastSpan = false;
+
+						if (!nextSpan.length) {
+							nextSpan = $('#transcript-content span').last();
+							lastSpan = true;
+						}
+
+						if (DEBUG_MB) console.log("nextspan ...");
+						if (DEBUG_MB) console.dir(nextSpan);
+						if (DEBUG_MB) console.log("lastSpan = "+lastSpan);
+
+						nextSpan.each(function() {
+							if (lastSpan == true) {
+								endSpan = $(this)[0];
+							} else {
+								endSpan = $(this)[0].previousElementSibling;
+							}
+							
+							//
 
 							if (DEBUG_MB) console.log("start/end");
 							if (DEBUG_MB) console.dir(startSpan);
@@ -964,6 +987,11 @@ $(document).ready(function(){
 					this.fadeTo({amount:0, duration:duration});
 				}
 */
+				if (DEBUG_MB) {
+					console.log("now = "+now);
+					console.log("this.end = "+this.end);
+				}
+
 				// If the chunk playing has ended...
 				if (now > this.end) {
 
@@ -1819,7 +1847,7 @@ $(document).ready(function(){
 
 			var timespan = {};
 			timespan.start = startTime;
-			timespan.end = nextSpanStartTime;  
+			timespan.end = nextSpanStartTime;
 
 			timespan.mediaId = sourceMediaId;
 
@@ -1916,14 +1944,14 @@ $(document).ready(function(){
 
 			var startTime = parseInt(startSpan.getAttribute('m'));
 			//var endTime = parseInt(endSpan.getAttribute('m'));
-			var endTime = parseInt(endSpan.getAttribute('m')) + 1000; 
 
-			/*console.log('startTime');
-			console.log(startTime);
-			console.log('--------');
-			console.log('endTime');
-			console.log(endTime); 
-			console.log('--------');*/
+			
+
+			var endTime = parseInt(endSpan.getAttribute('m')); 
+
+			
+
+
 
 			var tempSpan = endSpan;
 			var tempTime = endTime;
@@ -1934,6 +1962,35 @@ $(document).ready(function(){
 				startSpan = tempSpan;
 				startTime = tempTime;
 			}
+
+			
+
+			if(DEBUG_MB) console.log("next time ="+getNextNode(endSpan,true,endSpan).getAttribute('m'));
+
+			var nextElement = getNextNode(endSpan,true,endSpan);
+
+			if (nextElement instanceof HTMLParagraphElement) {
+				nextElement = nextElement.firstChild;
+			}
+
+			var startNextWord = nextElement.getAttribute('m');
+
+			// endTime should only be last word time + 1 second if there is no next node
+
+			if (startNextWord) {
+				if(DEBUG_MB) console.log('not last word');
+				endTime = parseInt(startNextWord);
+			} else {
+				if(DEBUG_MB) console.log('last word');
+				endTime = Math.floor(myPlayerSource.data('jPlayer').status.duration * 1000);
+			}
+
+			if(DEBUG_MB) console.log('startTime');
+			if(DEBUG_MB) console.log(startTime);
+			if(DEBUG_MB) console.log('--------');
+			if(DEBUG_MB) console.log('endTime');
+			if(DEBUG_MB) console.log(endTime); 
+			if(DEBUG_MB) console.log('--------');
 			
 			// check for single word click
 			//if (getNextNode(startSpan,true,endSpan) != endSpan) {
@@ -1950,7 +2007,11 @@ $(document).ready(function(){
 				/* --- start snip --- */
 				
 				var timespan = copyOver(startSpan,endSpan,startTime,endTime, theScript.length);
-				
+
+				if(DEBUG_MB) console.log('--------');
+				if(DEBUG_MB) console.log('timespan ...');
+				if(DEBUG_MB) console.dir(timespan);
+
 				if (timespan) {
 					theScript.push(timespan);
 
