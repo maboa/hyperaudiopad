@@ -245,6 +245,7 @@ $(document).ready(function(){
 	var myPlayerSource = $("#jquery_jplayer_source");
 	var sourceMediaId = null;
 	var sourcePopcorn = null;
+	var myAudio = $('#jquery_jplayer_audio');
 
 	// making it clear that we have an editable content pane
 	$('#target-content').focus();
@@ -537,7 +538,9 @@ $(document).ready(function(){
 			// Reset the canvas
 			if(canvas) {
 				canvas.width = canvas.width;
-				this.videoMap.titleBlend.top.update();
+				if(this.videoMap.titleBlend.top.update) {
+					this.videoMap.titleBlend.top.update();
+				}
 			}
 		},
 
@@ -1272,9 +1275,6 @@ $(document).ready(function(){
 	playerListen(targetPlayer.player[0]);
 	playerListen(targetPlayer.player[1]);
 
-
-
-	var myAudio = $('#jquery_jplayer_audio');
 	myAudio.jPlayer({
 		ready: function (event) {
 			// Err Umm... Could set a flag here if we think user could react within a few ms.
@@ -1439,8 +1439,8 @@ $(document).ready(function(){
 				text: quoteCaption
 			};
 		} else if(commandList[0] === 'audio') {
-			url = {
-				text: quoteCaption
+			audio = {
+				url: quoteCaption
 			};
 		}
 
@@ -1563,8 +1563,9 @@ $(document).ready(function(){
 				} else if(theScript.length === 0) {
 					if (DEBUG_MB) console.log('theScript length is zero');
 					timespan.end = 0;
-					theScript.push(timespan);
 					index = 0;
+					$(parentPara).attr('i',index).attr('start',timespan.start).attr('end',timespan.end);
+					theScript.push(timespan);
 				} else {
 					if (DEBUG_MB) console.log('Adding title to theScript');
 					timespan.end = title.duration * 1000;
