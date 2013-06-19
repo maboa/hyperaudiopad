@@ -20,7 +20,7 @@ $(document).ready(function(){
 	var DEBUG_MB = false;
 
 	var DEBUG_VIDEO = false;
-	var DEBUG_AUDIO = true;
+	var DEBUG_AUDIO = false;
 	var DEBUG_CURRENTTIME = false;
 
 	// var BASE = "http://happyworm.com/";
@@ -228,6 +228,7 @@ $(document).ready(function(){
 				$('#target-content').css('top','350px');
 				// saved pieces should default view in fullscreen
 				
+				targetPlayer.setDuration();
 				fullscreen.request();
 			}
 		});
@@ -787,7 +788,7 @@ $(document).ready(function(){
 
 			var findAudioFromIndex = this.scriptIndex-1 < 0 ? 0 : this.scriptIndex-1;
 
-			// Odd looking mediaId logic since it either undefined or -1... need to normalize that bit. (effects vs titles/audio)
+			// Odd looking mediaId logic since it either undefined or -1 when not being used... need to normalize that bit. (effects vs titles/audio)
 			if(this.scriptIndex > 0 || !(theScript[0].mediaId >= 0)) {
 
 				for(var findAudio = findAudioFromIndex; findAudio >= 0; findAudio--) {
@@ -809,7 +810,7 @@ $(document).ready(function(){
 						if(typeof audio.volume === 'number') {
 							myAudio.jPlayer('volume', audio.volume);
 						}
-						if(typeof audio.volume === 'number') {
+						if(typeof audio.start === 'number') {
 							offset += audio.start;
 						}
 
@@ -924,7 +925,7 @@ $(document).ready(function(){
 				this.createVideoMap(effectArray);
 				this.connectVideo(nextVideoId);
 
-				// this.setCurrentTime();
+				this.setCurrentTime(0); // assuming this is the first time we cue up
 			}
 
 			if(this.currentMediaId !== this.nextMediaId) {
@@ -1198,6 +1199,37 @@ $(document).ready(function(){
 							this.connectVideo(nextVideoId);
 						}
 
+						// Setup the audio if necessary
+
+						// Odd looking mediaId logic since it either undefined or -1 when not being used... need to normalize that bit. (effects vs titles/audio)
+						// if(this.scriptIndex > 0 || !(theScript[0].mediaId >= 0)) {
+
+						if(theScript[this.scriptIndex-1] && theScript[this.scriptIndex-1].audio) {
+							var offset = 0,
+								audio = theScript[this.scriptIndex-1].audio;
+							if(DEBUG_AUDIO) console.log('manager(): theScript[%f]=%o',this.scriptIndex-1,theScript[this.scriptIndex-1]);
+
+							if(myAudio.data('jPlayer').status.src !== audio.url) {
+								if(DEBUG_AUDIO) console.log('manager(): setMedia=%s',audio.url);
+								myAudio.jPlayer('setMedia', {
+									mp3: audio.url
+								});
+							}
+
+							if(DEBUG_AUDIO) console.log('manager(): script chunk offset=%f',offset);
+
+							if(DEBUG_AUDIO) console.log('manager(): volume=%f : start=%f',audio.volume,audio.start);
+							if(typeof audio.volume === 'number') {
+								myAudio.jPlayer('volume', audio.volume);
+							}
+							if(typeof audio.start === 'number') {
+								offset += audio.start;
+							}
+
+							if(DEBUG_AUDIO) console.log('manager(): playing at offset=%f',offset);
+							myAudio.jPlayer('play', offset);
+						}
+
 					} else {
 						// Ended Target Transcript.
 						if (DEBUG_MP) console.log("Ended Target Transcript.");
@@ -1276,10 +1308,12 @@ $(document).ready(function(){
 			if(DEBUG_CURRENTTIME) console.log('getCurrentTime(): currentTime=%f',currentTime);
 			return currentTime;
 		},
-		setCurrentTime: function() {
-			var currentTime = this.getCurrentTime();
+		setCurrentTime: function(time) {
+			var currentTime = (typeof time === 'number') ? time : this.getCurrentTime();
 			if(currentTime > this.duration) {
 				currentTime = this.duration;
+			} else if(currentTime < 0) {
+				currentTime = 0;
 			}
 			$('#jp_container_target .jp-current-time').text($.jPlayer.convertTime(currentTime));
 		}
@@ -1636,7 +1670,8 @@ $(document).ready(function(){
 
 		if ( newText.indexOf(']') > 0 ) { // Beleive this clause redundant due to check and return at start.
 
-			var needCue = false;
+			var needCue = false,
+				copyOldProps = true;
 
 			// direction has been given at the start OR this is a title
 			if (theScript.length === 0 || commandList[0] === 'title') {
@@ -1654,6 +1689,8 @@ $(document).ready(function(){
 					$(parentPara).attr('i',index).attr('start',timespan.start).attr('end',timespan.end);
 					theScript.push(timespan);
 					needCue = true;
+					copyOldProps = false;
+					theScript[index].title = title;
 				} else if(theScript.length === 0) {
 					if (DEBUG_MB) console.log('theScript length is zero');
 					timespan.end = 0;
@@ -1667,20 +1704,25 @@ $(document).ready(function(){
 					$(parentPara).attr('start',timespan.start).attr('end',timespan.end);
 					index++;
 					theScript.splice(index, 0, timespan);
+					copyOldProps = false;
+					theScript[index].title = title;
 				}
 
 				// update the duration
 				targetPlayer.setDuration();
 			}
 
-			// theScript[index].action = action;
-			theScript[index].fade = fade;
-			theScript[index].time = time;
-			theScript[index].color = color;
-			theScript[index].effect = effect;
-			theScript[index].caption = caption;
-			theScript[index].title = title;
-			theScript[index].audio = audio;
+			// titles create a new object, so do not copy the old ones or we get duplicates. Bad for audio at least.
+			if(copyOldProps) {
+
+				theScript[index].fade = fade;
+				theScript[index].time = time;
+				theScript[index].color = color;
+				theScript[index].effect = effect;
+				theScript[index].caption = caption;
+				theScript[index].title = title;
+				theScript[index].audio = audio;
+			}
 
 			theScript[index].commandText = commands;
 
