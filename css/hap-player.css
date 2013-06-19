@@ -171,3 +171,8 @@
 		width: 100%;
 	}
 */
+
+.jp-audio, .jp-audio audio {
+	width:0;
+	height:0;
+}

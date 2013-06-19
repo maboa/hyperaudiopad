@@ -1272,6 +1272,20 @@ $(document).ready(function(){
 	playerListen(targetPlayer.player[0]);
 	playerListen(targetPlayer.player[1]);
 
+
+
+	var myAudio = $('#jquery_jplayer_audio');
+	myAudio.jPlayer({
+		ready: function (event) {
+			// Err Umm... Could set a flag here if we think user could react within a few ms.
+		},
+		cssSelectorAncestor: "#jp_container_source",
+		solution: "html, flash",
+		swfPath: "js",
+		supplied: "mp3"
+	});
+
+
 	// These events are fired as play time increments  
 
 	var playingWord = 1;
