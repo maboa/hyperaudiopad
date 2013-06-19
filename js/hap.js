@@ -785,31 +785,44 @@ $(document).ready(function(){
 				myAudio.jPlayer('pause');
 			}
 
-			// The audio has the following issues:
-			// 1) Pressing play (on GUI) does not know where the video is in the chunk. ie., We need to know its currentTime and use that instead of jumpTo
-
 			var findAudioFromIndex = this.scriptIndex-1 < 0 ? 0 : this.scriptIndex-1;
-			for(var findAudio = findAudioFromIndex; findAudio >= 0; findAudio--) {
-				if(DEBUG_AUDIO) console.log('play(): findAudio=%f : theScript.length=%f',findAudio,theScript.length);
-				if(theScript[findAudio] && theScript[findAudio].audio) {
-					var offset = this.getRelativeTimeOffset(findAudio, findAudioFromIndex),
-						audioUrl = theScript[findAudio].audio.url;
-					if(DEBUG_AUDIO) console.log('play(): [found] theScript[%f]=%o',findAudio,theScript[findAudio]);
-					if(myAudio.data('jPlayer').status.src !== audioUrl) {
-						if(DEBUG_AUDIO) console.log('play(): [found] setMedia=%s',audioUrl);
-						myAudio.jPlayer('setMedia', {
-							mp3: audioUrl
-						});
+
+			// Odd looking mediaId logic since it either undefined or -1... need to normalize that bit. (effects vs titles/audio)
+			if(this.scriptIndex > 0 || !(theScript[0].mediaId >= 0)) {
+
+				for(var findAudio = findAudioFromIndex; findAudio >= 0; findAudio--) {
+					if(DEBUG_AUDIO) console.log('play(): findAudio=%f : theScript.length=%f',findAudio,theScript.length);
+					if(theScript[findAudio] && theScript[findAudio].audio) {
+						var offset = this.getRelativeTimeOffset(findAudio, findAudioFromIndex),
+							audio = theScript[findAudio].audio;
+						if(DEBUG_AUDIO) console.log('play(): [found] theScript[%f]=%o',findAudio,theScript[findAudio]);
+						if(myAudio.data('jPlayer').status.src !== audio.url) {
+							if(DEBUG_AUDIO) console.log('play(): [found] setMedia=%s',audio.url);
+							myAudio.jPlayer('setMedia', {
+								mp3: audio.url
+							});
+						}
+
+						if(DEBUG_AUDIO) console.log('play(): [found] script chunk offset=%f',offset);
+
+						if(DEBUG_AUDIO) console.log('play(): [found] volume=%f : start=%f',audio.volume,audio.start);
+						if(typeof audio.volume === 'number') {
+							myAudio.jPlayer('volume', audio.volume);
+						}
+						if(typeof audio.volume === 'number') {
+							offset += audio.start;
+						}
+
+						if(DEBUG_AUDIO) console.log('play(): [found] before jumpTo/currentTime offset=%f',offset);
+						if(config.jumpTo) {
+							offset += config.jumpTo - (theScript[this.scriptIndex].start / 1000);
+						} else {
+							offset += this.getRelativeCurrentTime();
+						}
+						if(DEBUG_AUDIO) console.log('play(): [found] playing at offset=%f',offset);
+						myAudio.jPlayer('play', offset);
+						break;  // exit for loop
 					}
-					if(DEBUG_AUDIO) console.log('play(): [found] before jumpTo offset=%f',offset);
-					if(config.jumpTo) {
-						offset += config.jumpTo - (theScript[this.scriptIndex].start / 1000);
-					} else {
-						offset += this.getRelativeCurrentTime();
-					}
-					if(DEBUG_AUDIO) console.log('play(): [found] playing at offset=%f',offset);
-					myAudio.jPlayer('play', offset);
-					break;  // exit for loop
 				}
 			}
 
