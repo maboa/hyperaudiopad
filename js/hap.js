@@ -847,6 +847,7 @@ $(document).ready(function(){
 
 				this.createVideoMap(effectArray);
 				this.connectVideo(nextVideoId);
+
 /*
 				if (this.currentVideoId !== nextVideoId) {
 					this.connectVideo(nextVideoId);
@@ -1134,7 +1135,7 @@ $(document).ready(function(){
 						// this.createVideoMap((theScript[0].mediaId && theScript[0].effect) || []);
 
 						// Cue up the players ready for if the play button is pressed.
-						// this.cue(); // Comment out to leave it at end.
+						this.cue(); // Ideally we want this to not display the start, but leave on the end
 
 						// Show the correct control button
 						$('#play-btn-target').show();
@@ -1356,7 +1357,8 @@ $(document).ready(function(){
 			fade,
 			effect,
 			caption,
-			title;
+			title,
+			audio;
 
 		if(theScript[index]) {
 			time = theScript[index].time;
@@ -1365,6 +1367,7 @@ $(document).ready(function(){
 			effect = theScript[index].effect;
 			caption = theScript[index].caption;
 			title = theScript[index].title;
+			audio = theScript[index].audio;
 		}
 
 		if (DEBUG_MB) console.log("cm length = "+commandList.length);
@@ -1393,7 +1396,13 @@ $(document).ready(function(){
 			title = {
 				text: quoteCaption
 			};
+		} else if(commandList[0] === 'audio') {
+			url = {
+				text: quoteCaption
+			};
 		}
+
+		// Ripe for refactor... want more generic command syntax... Knock on refactor to other parts though.
 
 		for (var i=1; i < commandList.length; i++) {
 
@@ -1421,7 +1430,7 @@ $(document).ready(function(){
 				}
 			}
 
-			// The captionn and title coding could probably be merged in a refactor
+			// The caption and title coding could probably be merged in a refactor
 
 			if(commandList[0] === 'caption') {
 				if(isColor(commandList[i])) {
@@ -1471,6 +1480,15 @@ $(document).ready(function(){
 				}
 				if(isNumber(commandList[i])) {
 					title.duration = commandList[i] * 1; // Convert to a number (from string)
+				}
+			}
+
+			if(commandList[0] === 'audio') {
+				if(isPercent(commandList[i])) {
+					audio.volume = percentToRatio(commandList[i]);
+				}
+				if(isNumber(commandList[i])) {
+					audio.start = commandList[i] * 1; // Convert to a number (from string)
 				}
 			}
 
@@ -1525,46 +1543,13 @@ $(document).ready(function(){
 			theScript[index].effect = effect;
 			theScript[index].caption = caption;
 			theScript[index].title = title;
+			theScript[index].audio = audio;
 
 			theScript[index].commandText = commands;
 
 			if(needCue) {
 				targetPlayer.cue();
 			}
-
-			/*if (theScript[index].commandText == undefined) {
-				if (DEBUG_MB) console.log('creating commandText');
-				theScript[index].commandText = [];
-			}
-
-
-			// check that the start bracket position does not already exist as this indicates we are editing an existing command
-			// of course if you change the position of the start bracket it will break
-			// this is all temporary - we should probably parse the whole document on save to create the commandText data (at least)
-
-			var commandTextNotFound = true;
-			var commandTextIndex = 0;
-
-			if (theScript[index].commandStart != undefined) {
-				for (var i=0; i < theScript[index].commandStart.length; i++) {
-					if (theScript[index].commandStart[i] == startBracketIndex) {
-						commandTextIndex = i;
-						commandTextNotFound = false;
-					}
-				}
-			}
-
-			if (theScript[index].commandStart == undefined) {
-				if (DEBUG_MB) console.log('creating commandStart');
-				theScript[index].commandStart = [];
-			}
-
-			if (commandTextNotFound == true) {
-				theScript[index].commandStart.push(startBracketIndex);
-				theScript[index].commandText.push(commands);
-			} else {
-				theScript[index].commandText[commandTextIndex] = commands;
-			}*/
 
 		}
 
@@ -1574,6 +1559,17 @@ $(document).ready(function(){
 
 	function isNumber(n) {
 		return !isNaN(parseFloat(n)) && isFinite(n);
+	}
+
+	function isPercent(p) {
+		var ui = p.indexOf('%'),
+			n = p.substring(0,ui);
+		return (ui >= 0) && isNumber(n) && (ui === p.length-1);
+	}
+	function percentToRatio(p) {
+		var ui = p.indexOf('%'),
+			n = p.substring(0,ui);
+		return Number(n) / 100;
 	}
 
 	var legalColors = ['black','silver','gray','white','maroon','red','purple','fuchsia','green','lime','olive','yellow','navy','blue','teal','aqua'];
