@@ -20,6 +20,9 @@ $(document).ready(function(){
 	var DEBUG_MB = false;
 
 	var DEBUG_VIDEO = false;
+	var DEBUG_AUDIO = true;
+	var DEBUG_CURRENTTIME = false;
+
 	// var BASE = "http://happyworm.com/";
 	var BASE = "/";
 
@@ -256,6 +259,7 @@ $(document).ready(function(){
 		scriptIndex: 0, // ref to theScript[]
 		start: 0,
 		end: 0,
+		duration: 0,
 		player: [$("#jquery_jplayer_1"),$("#jquery_jplayer_2")],
 		playerMediaId: [],
 		currentMediaId: null,
@@ -457,7 +461,7 @@ $(document).ready(function(){
 			}
 			*/
 
-			console.log('caption: %o', caption);
+			// console.log('caption: %o', caption);
 
 			if(typeof caption !== 'object') {
 				return;
@@ -565,7 +569,7 @@ $(document).ready(function(){
 			}
 			*/
 
-			console.log('title: %o', title);
+			if(DEBUG_MP) console.log('title: %o', title);
 
 			if(typeof title !== 'object') {
 				return;
@@ -621,7 +625,7 @@ $(document).ready(function(){
 			ctx.fillStyle = 'blue';
 			ctx.fillRect(x-(w/2), y-(32/2), w, 32); // For the center/middle case.
 
-			console.log('dim: %o', dim);
+			if(DEBUG_TITLE) console.log('dim: %o', dim);
 */
 
 			ctx.fillStyle = title.bgcolor || '#000';
@@ -638,13 +642,6 @@ $(document).ready(function(){
 
 			this.seriously.go();
 
-/*
-
-			setTimeout(function() {
-				canvas.width = canvas.width;
-				self.videoMap.titleBlend.top.update();
-			}, (title.duration ? title.duration * 1000 : 1000));
-*/
 		},
 
 		play: function(config) {
@@ -656,9 +653,11 @@ $(document).ready(function(){
 				fullscreen.request();
 			}
 
-			console.log("==============");
-			console.dir(theScript);
-			console.log("==============");
+			if(DEBUG_MP) {
+				console.log("==============");
+				console.log("theScript: %o", theScript);
+				console.log("==============");
+			}
 
 			// Set play configuration
 			if(config) {
@@ -742,7 +741,7 @@ $(document).ready(function(){
 				this.titleTimeRef = (new Date()).getTime();
 				clearInterval(this.managerInterval);
 				this.managerInterval = setInterval(function() {
-					console.log('manager interval: Generated in play()')
+					if(DEBUG_MP) console.log('manager interval: Generated in play()')
 					self.manager();
 				},250);
 			}
@@ -781,6 +780,39 @@ $(document).ready(function(){
 				this.connectVideo(nextVideoId);
 			}
 
+			if(!myAudio.data('jPlayer').status.paused) {
+				if(DEBUG_AUDIO) console.log('play(): pausing audio since it was playing');
+				myAudio.jPlayer('pause');
+			}
+
+			// The audio has the following issues:
+			// 1) Pressing play (on GUI) does not know where the video is in the chunk. ie., We need to know its currentTime and use that instead of jumpTo
+
+			var findAudioFromIndex = this.scriptIndex-1 < 0 ? 0 : this.scriptIndex-1;
+			for(var findAudio = findAudioFromIndex; findAudio >= 0; findAudio--) {
+				if(DEBUG_AUDIO) console.log('play(): findAudio=%f : theScript.length=%f',findAudio,theScript.length);
+				if(theScript[findAudio] && theScript[findAudio].audio) {
+					var offset = this.getRelativeTimeOffset(findAudio, findAudioFromIndex),
+						audioUrl = theScript[findAudio].audio.url;
+					if(DEBUG_AUDIO) console.log('play(): [found] theScript[%f]=%o',findAudio,theScript[findAudio]);
+					if(myAudio.data('jPlayer').status.src !== audioUrl) {
+						if(DEBUG_AUDIO) console.log('play(): [found] setMedia=%s',audioUrl);
+						myAudio.jPlayer('setMedia', {
+							mp3: audioUrl
+						});
+					}
+					if(DEBUG_AUDIO) console.log('play(): [found] before jumpTo offset=%f',offset);
+					if(config.jumpTo) {
+						offset += config.jumpTo - (theScript[this.scriptIndex].start / 1000);
+					} else {
+						offset += this.getRelativeCurrentTime();
+					}
+					if(DEBUG_AUDIO) console.log('play(): [found] playing at offset=%f',offset);
+					myAudio.jPlayer('play', offset);
+					break;  // exit for loop
+				}
+			}
+
 			this.fadeEnd = theScript[this.scriptIndex].fade;
 			this.fadeStart = false;
 		},
@@ -796,6 +828,11 @@ $(document).ready(function(){
 			clearInterval(this.managerInterval);
 
 			this._pauseVideos();
+
+			if (!myAudio.data('jPlayer').status.paused) {
+				myAudio.jPlayer("pause");
+				if(DEBUG_MP) console.log("pause(): paused myAudio");
+			}
 		},
 		_pauseVideos: function() {
 			// Then pause the player playing... or just pause both?
@@ -874,11 +911,7 @@ $(document).ready(function(){
 				this.createVideoMap(effectArray);
 				this.connectVideo(nextVideoId);
 
-/*
-				if (this.currentVideoId !== nextVideoId) {
-					this.connectVideo(nextVideoId);
-				}
-*/
+				// this.setCurrentTime();
 			}
 
 			if(this.currentMediaId !== this.nextMediaId) {
@@ -939,7 +972,7 @@ $(document).ready(function(){
 				now;
 
 			if (!this.paused) {
-
+/*
 				if (this.playerMediaId[0] === this.currentMediaId) {
 					now = this.player[0].data('jPlayer').status.currentTime * 1000;
 				} else if (this.playerMediaId[1] === this.currentMediaId) {
@@ -948,6 +981,10 @@ $(document).ready(function(){
 					// Titles
 					now = (new Date()).getTime() - this.titleTimeRef;
 				}
+*/
+				now = this.getAbsoluteCurrentTime() * 1000; // We is working in da milliseconds.
+
+				this.setCurrentTime();
 
 				//console.log("now="+now+" this.end="+this.end+"theScript.length="+theScript.length+" this.scriptIndex="+this.scriptIndex);
 
@@ -1136,7 +1173,7 @@ $(document).ready(function(){
 							this.titleTimeRef = (new Date()).getTime();
 							clearInterval(this.managerInterval);
 							this.managerInterval = setInterval(function() {
-								console.log('manager interval: Generated in manager()')
+								if(DEBUG_MP) console.log('manager interval: Generated in manager()')
 								self.manager();
 							},250);
 						}
@@ -1178,6 +1215,7 @@ $(document).ready(function(){
 				}
 			}
 		},
+		// setDuration calculates the duration of the target player contents
 		setDuration: function() {
 			var duration = 0;
 			$.each(theScript, function() {
@@ -1185,8 +1223,52 @@ $(document).ready(function(){
 			});
 
 			duration /= 1000; // convert to seconds.
-
+			this.duration = duration;
 			$('#jp_container_target .jp-duration').text($.jPlayer.convertTime(duration));
+		},
+		// getCurrentTimeOffset calculates the duration of the previous entities.
+		getCurrentTimeOffset: function(scriptIndex) {
+			return this.getRelativeTimeOffset(0,scriptIndex);
+		},
+		// getRelativeTimeOffset calculates the time between two script entities.
+		getRelativeTimeOffset: function(thatIndex, thisIndex) {
+			var offset = 0;
+			for(var i=thatIndex; i < thisIndex; i++) {
+				offset += theScript[i].end - theScript[i].start;
+			}
+			offset /= 1000; // convert to seconds.
+			if(DEBUG_CURRENTTIME) console.log('getRelativeTimeOffset(%f,%f): offset=%f',thatIndex,thisIndex,offset);
+			return offset;
+		},
+		getAbsoluteCurrentTime: function() {
+			var currentTime = 0;
+
+			if(this.playerMediaId[0] === this.currentMediaId) {
+				currentTime = this.player[0].data('jPlayer').status.currentTime;
+			} else if(this.playerMediaId[1] === this.currentMediaId) {
+				currentTime = this.player[1].data('jPlayer').status.currentTime;
+			} else if(!this.paused) {
+				currentTime = ((new Date()).getTime() - this.titleTimeRef) / 1000;
+			}
+			if(DEBUG_CURRENTTIME) console.log('getAbsoluteCurrentTime(): currentTime=%f',currentTime);
+			return currentTime;
+		},
+		getRelativeCurrentTime: function() {
+			var currentTime = this.getAbsoluteCurrentTime() - (theScript[this.scriptIndex].start / 1000);
+			if(DEBUG_CURRENTTIME) console.log('getRelativeCurrentTime(): currentTime=%f',currentTime);
+			return currentTime;
+		},
+		getCurrentTime: function() {
+			var currentTime = this.getCurrentTimeOffset(this.scriptIndex) + this.getRelativeCurrentTime();
+			if(DEBUG_CURRENTTIME) console.log('getCurrentTime(): currentTime=%f',currentTime);
+			return currentTime;
+		},
+		setCurrentTime: function() {
+			var currentTime = this.getCurrentTime();
+			if(currentTime > this.duration) {
+				currentTime = this.duration;
+			}
+			$('#jp_container_target .jp-current-time').text($.jPlayer.convertTime(currentTime));
 		}
 	};
 
@@ -1276,15 +1358,14 @@ $(document).ready(function(){
 	playerListen(targetPlayer.player[1]);
 
 	myAudio.jPlayer({
-		ready: function (event) {
-			// Err Umm... Could set a flag here if we think user could react within a few ms.
+		error: function (event) {
+			console.log('audio error event: %o',event);
 		},
-		cssSelectorAncestor: "#jp_container_source",
 		solution: "html, flash",
 		swfPath: "js",
-		supplied: "mp3"
+		supplied: "mp3",
+		preload: "auto"
 	});
-
 
 	// These events are fired as play time increments  
 
@@ -1332,7 +1413,7 @@ $(document).ready(function(){
 			var $this = $(this),
 				i = Number($this.attr('i'));
 
-			console.log(i + ":  " + $this.text());
+			if(DEBUG_MP) console.log(i + ":  " + $this.text());
 			if(i === index) {
 				// if($this.text().toLowerCase().indexOf('[title') >= 0) {
 				if($this[0] === myPara) {
@@ -1880,7 +1961,7 @@ $(document).ready(function(){
 		var select = getSelText(); 
 			var tweetable = select+"";  
 
-		console.log('select: %o', select);
+		if(DEBUG_MB) console.log('select: %o', select);
 
 		var startSpan = select.anchorNode.nextSibling; 
 		if (startSpan == null) {
