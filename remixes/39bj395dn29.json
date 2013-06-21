@@ -1,0 +1,1 @@
+[{"start":0,"mediaId":-1,"end":0,"title":{"text":"2006","duration":0},"commandText":"audio \"/audio/gemini.mp3\" 75% 5","audio":{"url":"/audio/gemini.mp3","volume":0.75,"start":5}},{"start":0,"mediaId":-1,"end":3000,"title":{"text":"2006","duration":3},"commandText":"title \"2006\" for 3 seconds"},{"start":543,"end":59019,"mediaId":4}]
