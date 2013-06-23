@@ -119,14 +119,12 @@ $(document).ready(function(){
 			i = 0;
 		}
 
-		if (DEBUG_LOAD_REMIX) console.log("index = "+i);
+		if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): index = "+i);
 
 		if (i < theScript.length) {
-			if (DEBUG_LOAD_REMIX) console.log("copying over...");
 
-			if (DEBUG_LOAD_REMIX) console.log("i ="+i);
-			if (DEBUG_LOAD_REMIX) console.log("theScript[i].mediaId ="+theScript[i].mediaId);
-			if (DEBUG_LOAD_REMIX) console.dir(transcripts);
+			if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): transcripts = %o",transcripts);
+			if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): theScript[%f].mediaId = %f", i, theScript[i].mediaId);
 
 			// var transcript = transcripts[theScript[i].mediaId].url;
 
@@ -134,14 +132,14 @@ $(document).ready(function(){
 
 				$('#transcript-content').load(transcripts[theScript[i].mediaId].url, function() {
 
-					if (DEBUG_LOAD_REMIX) console.log('transcript = '+transcripts[theScript[i].mediaId].url);
+					if (DEBUG_LOAD_REMIX) console.log('loadTranscriptsFromFile(): transcript URL = '+transcripts[theScript[i].mediaId].url);
 					
 					var startSpan, endSpan, startTime, endTime;
 
 					startTime = theScript[i].start;
 					endTime = theScript[i].end;
 
-					if (DEBUG_LOAD_REMIX) console.log("grabbing the spans");
+					if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): grabbing the spans");
 
 					$('#transcript-content span[m="'+startTime+'"]').each(function() {
 						startSpan = $(this)[0];
@@ -149,7 +147,7 @@ $(document).ready(function(){
 						// remember the endTime is either the start time of the following span or
 						// in the case it is the last span - that span + 1000ms
 
-						if (DEBUG_LOAD_REMIX) console.log("endTime = "+endTime);
+						if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): endTime = "+endTime);
 						
 						var nextSpan = $('#transcript-content span[m="'+endTime+'"]');
 						var lastSpan = false;
@@ -159,9 +157,8 @@ $(document).ready(function(){
 							lastSpan = true;
 						}
 
-						if (DEBUG_LOAD_REMIX) console.log("nextspan ...");
-						if (DEBUG_LOAD_REMIX) console.dir(nextSpan);
-						if (DEBUG_LOAD_REMIX) console.log("lastSpan = "+lastSpan);
+						if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): nextspan = %o", nextSpan);
+						if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): lastSpan = "+lastSpan);
 
 						nextSpan.each(function() {
 							if (lastSpan == true) {
@@ -172,15 +169,15 @@ $(document).ready(function(){
 							
 							//
 
-							if (DEBUG_LOAD_REMIX) console.log("start/end");
-							if (DEBUG_LOAD_REMIX) console.dir(startSpan);
-							if (DEBUG_LOAD_REMIX) console.dir(endSpan);
-							if (DEBUG_LOAD_REMIX) console.log("startTime = "+startTime);
-							if (DEBUG_LOAD_REMIX) console.log("endTime = "+endTime);
+							if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): startSpan = %o", startSpan);
+							if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): endSpan = %o", endSpan);
+							if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): startTime = "+startTime);
+							if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): endTime = "+endTime);
 
+							if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): copying over...");
 							copyOver(startSpan, endSpan, startTime, endTime, i);
 
-							if (DEBUG_LOAD_REMIX) console.log("calling loadTranscriptsFromFile");
+							if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): calling loadTranscriptsFromFile");
 							var commandText = theScript[i].commandText;
 							if (commandText != undefined && commandText.length > 0) {
 								var direction = $('<p><span>['+commandText+']<span></p>'); 
@@ -194,6 +191,7 @@ $(document).ready(function(){
 				});
 			} else {
 				var commandText = theScript[i].commandText;
+				if (DEBUG_LOAD_REMIX) console.log('loadTranscriptsFromFile(): No transcript, handling commandText: ' + commandText);
 				if (commandText != undefined && commandText.length > 0) {
 					var direction = $('<p i="'+i+'" start="'+theScript[i].start+'" end="'+theScript[i].end+'"><span>['+commandText+']</span></p>'); 
 					$('#target-content').append( direction );
@@ -201,7 +199,7 @@ $(document).ready(function(){
 				loadTranscriptsFromFile({i:++i,callback:options.callback});
 			}
 		} else {
-			if (DEBUG_LOAD_REMIX) console.log('dropping out');
+			if (DEBUG_LOAD_REMIX) console.log('loadTranscriptsFromFile(): dropping out');
 			if(options.callback) {
 				options.callback();
 			}
@@ -211,8 +209,8 @@ $(document).ready(function(){
 
 	function loadTheScript(data) {
 
-		if (DEBUG_LOAD_REMIX) console.log(' ==================== theScript loaded in');
-		if (DEBUG_LOAD_REMIX) console.dir(data);
+		if (DEBUG_LOAD_REMIX) console.log('loadTheScript(%o): theScript loaded in');
+		if (DEBUG_LOAD_REMIX) console.log('loadTheScript(%o)',data);
 		theScript = data;
 
 		$('#transcript-content').hide();
