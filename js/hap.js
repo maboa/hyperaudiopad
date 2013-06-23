@@ -22,6 +22,7 @@ $(document).ready(function(){
 	var DEBUG_VIDEO = false;
 	var DEBUG_AUDIO = false;
 	var DEBUG_CURRENTTIME = false;
+	var DEBUG_LOAD_REMIX = true;
 
 	// var BASE = "http://happyworm.com/";
 	var BASE = "/";
@@ -118,14 +119,14 @@ $(document).ready(function(){
 			i = 0;
 		}
 
-		if (DEBUG_MB) console.log("index = "+i);
+		if (DEBUG_LOAD_REMIX) console.log("index = "+i);
 
 		if (i < theScript.length) {
-			if (DEBUG_MB) console.log("copying over...");
+			if (DEBUG_LOAD_REMIX) console.log("copying over...");
 
-			if (DEBUG_MB) console.log("i ="+i);
-			if (DEBUG_MB) console.log("theScript[i].mediaId ="+theScript[i].mediaId);
-			if (DEBUG_MB) console.dir(transcripts);
+			if (DEBUG_LOAD_REMIX) console.log("i ="+i);
+			if (DEBUG_LOAD_REMIX) console.log("theScript[i].mediaId ="+theScript[i].mediaId);
+			if (DEBUG_LOAD_REMIX) console.dir(transcripts);
 
 			// var transcript = transcripts[theScript[i].mediaId].url;
 
@@ -133,14 +134,14 @@ $(document).ready(function(){
 
 				$('#transcript-content').load(transcripts[theScript[i].mediaId].url, function() {
 
-					if (DEBUG_MB) console.log('transcript = '+transcripts[theScript[i].mediaId].url);
+					if (DEBUG_LOAD_REMIX) console.log('transcript = '+transcripts[theScript[i].mediaId].url);
 					
 					var startSpan, endSpan, startTime, endTime;
 
 					startTime = theScript[i].start;
 					endTime = theScript[i].end;
 
-					if (DEBUG_MB) console.log("grabbing the spans");
+					if (DEBUG_LOAD_REMIX) console.log("grabbing the spans");
 
 					$('#transcript-content span[m="'+startTime+'"]').each(function() {
 						startSpan = $(this)[0];
@@ -148,7 +149,7 @@ $(document).ready(function(){
 						// remember the endTime is either the start time of the following span or
 						// in the case it is the last span - that span + 1000ms
 
-						if (DEBUG_MB) console.log("endTime = "+endTime);
+						if (DEBUG_LOAD_REMIX) console.log("endTime = "+endTime);
 						
 						var nextSpan = $('#transcript-content span[m="'+endTime+'"]');
 						var lastSpan = false;
@@ -158,9 +159,9 @@ $(document).ready(function(){
 							lastSpan = true;
 						}
 
-						if (DEBUG_MB) console.log("nextspan ...");
-						if (DEBUG_MB) console.dir(nextSpan);
-						if (DEBUG_MB) console.log("lastSpan = "+lastSpan);
+						if (DEBUG_LOAD_REMIX) console.log("nextspan ...");
+						if (DEBUG_LOAD_REMIX) console.dir(nextSpan);
+						if (DEBUG_LOAD_REMIX) console.log("lastSpan = "+lastSpan);
 
 						nextSpan.each(function() {
 							if (lastSpan == true) {
@@ -171,15 +172,15 @@ $(document).ready(function(){
 							
 							//
 
-							if (DEBUG_MB) console.log("start/end");
-							if (DEBUG_MB) console.dir(startSpan);
-							if (DEBUG_MB) console.dir(endSpan);
-							if (DEBUG_MB) console.log("startTime = "+startTime);
-							if (DEBUG_MB) console.log("endTime = "+endTime);
+							if (DEBUG_LOAD_REMIX) console.log("start/end");
+							if (DEBUG_LOAD_REMIX) console.dir(startSpan);
+							if (DEBUG_LOAD_REMIX) console.dir(endSpan);
+							if (DEBUG_LOAD_REMIX) console.log("startTime = "+startTime);
+							if (DEBUG_LOAD_REMIX) console.log("endTime = "+endTime);
 
 							copyOver(startSpan, endSpan, startTime, endTime, i);
 
-							if (DEBUG_MB) console.log("calling loadTranscriptsFromFile");
+							if (DEBUG_LOAD_REMIX) console.log("calling loadTranscriptsFromFile");
 							var commandText = theScript[i].commandText;
 							if (commandText != undefined && commandText.length > 0) {
 								var direction = $('<p><span>['+commandText+']<span></p>'); 
@@ -200,7 +201,7 @@ $(document).ready(function(){
 				loadTranscriptsFromFile({i:++i,callback:options.callback});
 			}
 		} else {
-			if (DEBUG_MB) console.log('dropping out');
+			if (DEBUG_LOAD_REMIX) console.log('dropping out');
 			if(options.callback) {
 				options.callback();
 			}
@@ -210,8 +211,8 @@ $(document).ready(function(){
 
 	function loadTheScript(data) {
 
-		if (DEBUG_MB) console.log(' ==================== theScript loaded in');
-		if (DEBUG_MB) console.dir(data);
+		if (DEBUG_LOAD_REMIX) console.log(' ==================== theScript loaded in');
+		if (DEBUG_LOAD_REMIX) console.dir(data);
 		theScript = data;
 
 		$('#transcript-content').hide();
