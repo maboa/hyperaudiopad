@@ -160,11 +160,27 @@ $(document).ready(function(){
 						if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): nextspan = %o", nextSpan);
 						if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): lastSpan = "+lastSpan);
 
+						// MJP is unclear as to why we have an each loop here... And $(this)[0] === this so WTF... +1 for bad code.
 						nextSpan.each(function() {
+							// See: $(this)[0] === this
+							if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): this = %o",this);
+							if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): $(this)[0] = %o",$(this)[0]);
+
 							if (lastSpan == true) {
 								endSpan = $(this)[0];
 							} else {
-								endSpan = $(this)[0].previousElementSibling;
+
+								if (DEBUG_LOAD_REMIX) console.log("loadTranscriptsFromFile(): nextSpan.previousElementSibling = "+$(this)[0].previousElementSibling);
+
+								if($(this)[0].previousElementSibling) {
+									endSpan = $(this)[0].previousElementSibling;
+								} else {
+									// We need to find the previous span
+									// Since we know the structure... Assume it is: 1) Up parent <p>, 2) Previous sibling, 3) down to children, and 4) The last span.
+
+									endSpan = $(this.parentNode.previousElementSibling).children('span').last()[0];
+								}
+
 							}
 							
 							//
