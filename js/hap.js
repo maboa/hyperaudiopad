@@ -22,7 +22,7 @@ $(document).ready(function(){
 	var DEBUG_VIDEO = false;
 	var DEBUG_AUDIO = false;
 	var DEBUG_CURRENTTIME = false;
-	var DEBUG_LOAD_REMIX = true;
+	var DEBUG_LOAD_REMIX = false;
 
 	// var BASE = "http://happyworm.com/";
 	var BASE = "/";
